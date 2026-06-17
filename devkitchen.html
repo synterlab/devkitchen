@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>DevKitchen</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg-deep:#050510;--bg-card:rgba(255,255,255,0.04);--glass-border:rgba(255,255,255,0.08);--glass-blur:20px;--cyan:#00e5ff;--purple:#a855f7;--gold:#fbbf24;--red:#ef4444;--green:#22c55e;--text-primary:#f8fafc;--text-secondary:#94a3b8;--text-muted:#64748b}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg-deep);color:var(--text-primary);display:flex;justify-content:center;align-items:center;position:relative}
+.bg-gradient{position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(ellipse at 20% 20%,rgba(168,85,247,0.08) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(0,229,255,0.06) 0%,transparent 50%),radial-gradient(ellipse at 50% 50%,rgba(251,191,36,0.03) 0%,transparent 50%);z-index:0;pointer-events:none}
+.bg-grid{position:fixed;top:0;left:0;width:100%;height:100%;background-image:linear-gradient(rgba(255,255,255,0.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.015) 1px,transparent 1px);background-size:60px 60px;z-index:0;pointer-events:none}
+.floating-particles{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;overflow:hidden}
+.particle{position:absolute;border-radius:50%;opacity:0.4;animation:floatUp linear infinite}
+@keyframes floatUp{0%{transform:translateY(100vh) scale(0);opacity:0}10%{opacity:0.4}90%{opacity:0.4}100%{transform:translateY(-100px) scale(1);opacity:0}}
+#app{width:100%;max-width:430px;height:100vh;max-height:932px;position:relative;z-index:1;display:flex;flex-direction:column;background:linear-gradient(180deg,#0a0a1a 0%,#050510 100%);overflow:hidden}
+.screen{position:absolute;top:0;left:0;width:100%;height:100%;display:none;flex-direction:column;padding:20px;padding-bottom:90px;overflow-y:auto;scrollbar-width:none;transition:opacity 0.4s ease,transform 0.4s ease;opacity:0;transform:translateY(20px)}
+.screen.active{display:flex;opacity:1;transform:translateY(0)}
+.screen::-webkit-scrollbar{display:none}
+.glass-card{background:var(--bg-card);backdrop-filter:blur(var(--glass-blur));-webkit-backdrop-filter:blur(var(--glass-blur));border:1px solid var(--glass-border);border-radius:20px;padding:20px;margin-bottom:16px;transition:transform 0.2s ease,box-shadow 0.2s ease}
+.glass-card:active{transform:scale(0.98)}
+h1{font-size:28px;font-weight:800;letter-spacing:-0.5px;background:linear-gradient(135deg,#fff 0%,#94a3b8 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+h2{font-size:22px;font-weight:700;letter-spacing:-0.3px}
+h3{font-size:16px;font-weight:600;color:var(--text-secondary)}
+.subtitle{font-size:14px;color:var(--text-secondary);line-height:1.5}
+.btn{width:100%;padding:16px 24px;border:none;border-radius:16px;font-family:inherit;font-size:16px;font-weight:600;cursor:pointer;transition:all 0.2s ease;position:relative;overflow:hidden}
+.btn-primary{background:linear-gradient(135deg,var(--cyan) 0%,#0891b2 100%);color:#000;box-shadow:0 0 20px rgba(0,229,255,0.3)}
+.btn-primary:hover,.btn-primary:active{transform:translateY(-2px);box-shadow:0 0 30px rgba(0,229,255,0.5)}
+.btn-secondary{background:rgba(255,255,255,0.06);color:var(--text-primary);border:1px solid var(--glass-border)}
+.btn-secondary:hover,.btn-secondary:active{background:rgba(255,255,255,0.1)}
+.btn-gold{background:linear-gradient(135deg,var(--gold) 0%,#d97706 100%);color:#000;box-shadow:0 0 20px rgba(251,191,36,0.3)}
+.btn-gold:hover,.btn-gold:active{transform:translateY(-2px);box-shadow:0 0 30px rgba(251,191,36,0.5)}
+.btn-danger{background:linear-gradient(135deg,var(--red) 0%,#b91c1c 100%);color:#fff;box-shadow:0 0 20px rgba(239,68,68,0.3)}
+.input-group{margin-bottom:16px}
+.input-group label{display:block;font-size:13px;font-weight:500;color:var(--text-secondary);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px}
+.input-field{width:100%;padding:14px 18px;background:rgba(255,255,255,0.04);border:1px solid var(--glass-border);border-radius:14px;color:var(--text-primary);font-family:inherit;font-size:15px;outline:none;transition:all 0.2s ease}
+.input-field:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,229,255,0.1)}
+.input-field::placeholder{color:var(--text-muted)}
+.bottom-nav{position:absolute;bottom:0;left:0;width:100%;height:80px;background:rgba(5,5,16,0.85);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);border-top:1px solid var(--glass-border);display:flex;justify-content:space-around;align-items:center;z-index:100;padding-bottom:10px}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 20px;cursor:pointer;transition:all 0.2s ease;color:var(--text-muted);border:none;background:none;font-family:inherit}
+.nav-item.active{color:var(--cyan)}
+.nav-item svg{width:24px;height:24px;transition:transform 0.2s ease}
+.nav-item.active svg{transform:scale(1.1);filter:drop-shadow(0 0 8px rgba(0,229,255,0.5))}
+.nav-item span{font-size:11px;font-weight:500}
+.progress-bar{width:100%;height:8px;background:rgba(255,255,255,0.06);border-radius:4px;overflow:hidden;margin-top:8px}
+.progress-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--cyan),var(--purple));transition:width 0.5s ease;box-shadow:0 0 10px rgba(0,229,255,0.3)}
+.avatar{width:56px;height:56px;border-radius:18px;background:linear-gradient(135deg,var(--purple),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff;box-shadow:0 0 20px rgba(168,85,247,0.3);flex-shrink:0}
+.stat-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:rgba(255,255,255,0.05);border:1px solid var(--glass-border);border-radius:100px;font-size:13px;font-weight:600}
+.stat-badge.coins{color:var(--gold)}
+.stat-badge.xp{color:var(--cyan)}
+.ingredient-card{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 12px;background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);border-radius:18px;cursor:pointer;transition:all 0.2s ease;position:relative;overflow:hidden;min-width:80px;flex-shrink:0}
+.ingredient-card:hover,.ingredient-card:active{transform:translateY(-4px)}
+.ingredient-card.selected{border-color:var(--cyan);box-shadow:0 0 20px rgba(0,229,255,0.2);background:rgba(0,229,255,0.05)}
+.ingredient-icon{width:48px;height:48px;display:flex;align-items:center;justify-content:center;font-size:28px;position:relative}
+.ingredient-icon::after{content:'';position:absolute;width:40px;height:40px;border-radius:50%;filter:blur(12px);opacity:0.5;z-index:-1}
+.ingredient-card.idea .ingredient-icon::after{background:var(--purple)}
+.ingredient-card.code .ingredient-icon::after{background:var(--cyan)}
+.ingredient-card.design .ingredient-icon::after{background:#fff}
+.ingredient-card.hype .ingredient-icon::after{background:var(--gold)}
+.ingredient-name{font-size:12px;font-weight:600;color:var(--text-secondary)}
+.ingredient-value{font-size:11px;color:var(--text-muted)}
+.cooking-pan{width:100%;aspect-ratio:1;max-height:280px;background:radial-gradient(circle,rgba(0,229,255,0.08) 0%,transparent 70%);border:2px dashed var(--glass-border);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;transition:all 0.3s ease;margin:20px 0}
+.cooking-pan.active{border-color:var(--cyan);box-shadow:0 0 40px rgba(0,229,255,0.15);animation:panPulse 2s ease-in-out infinite}
+@keyframes panPulse{0%,100%{box-shadow:0 0 40px rgba(0,229,255,0.15)}50%{box-shadow:0 0 60px rgba(0,229,255,0.25)}}
+.cooking-pan-content{text-align:center;padding:20px}
+.cooking-pan-text{font-size:14px;color:var(--text-muted);margin-bottom:8px}
+.cooking-pan-hint{font-size:12px;color:var(--text-secondary)}
+.pan-ingredients{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:10px;max-width:200px}
+.pan-ingredient{font-size:24px;animation:dropIn 0.3s ease-out}
+.timing-container{width:100%;height:60px;background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);border-radius:16px;position:relative;overflow:hidden;margin:16px 0}
+.timing-zones{position:absolute;top:0;left:0;width:100%;height:100%;display:flex}
+.timing-zone{height:100%;opacity:0.15}
+.timing-zone.early{background:var(--red)}
+.timing-zone.perfect{background:var(--green)}
+.timing-zone.late{background:var(--red)}
+.timing-indicator{position:absolute;top:0;width:4px;height:100%;background:#fff;box-shadow:0 0 10px #fff;border-radius:2px;transition:left 0.05s linear}
+.overheat-container{width:100%;margin:12px 0}
+.overheat-label{display:flex;justify-content:space-between;font-size:12px;color:var(--text-secondary);margin-bottom:6px}
+.overheat-bar{width:100%;height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden}
+.overheat-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--gold),var(--red));transition:width 0.3s ease;width:0%}
+.bug-alert{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);padding:12px 24px;background:rgba(239,68,68,0.9);border:1px solid rgba(239,68,68,0.5);border-radius:12px;color:#fff;font-weight:700;font-size:14px;display:none;animation:bugShake 0.5s ease-in-out;z-index:50;cursor:pointer;backdrop-filter:blur(10px)}
+@keyframes bugShake{0%,100%{transform:translate(-50%,-50%) translateX(0)}25%{transform:translate(-50%,-50%) translateX(-10px)}75%{transform:translate(-50%,-50%) translateX(10px)}}
+.glitch-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(239,68,68,0.2);pointer-events:none;z-index:200;display:none;animation:glitchFlash 0.3s ease-in-out}
+@keyframes glitchFlash{0%,100%{opacity:0}50%{opacity:1}}
+.star-rating{display:flex;gap:8px;justify-content:center;margin:16px 0}
+.star{font-size:36px;color:var(--text-muted);transition:all 0.3s ease}
+.star.filled{color:var(--gold);text-shadow:0 0 20px rgba(251,191,36,0.5)}
+.star.pop{animation:starPop 0.4s ease}
+@keyframes starPop{0%{transform:scale(0) rotate(-180deg)}70%{transform:scale(1.2) rotate(10deg)}100%{transform:scale(1) rotate(0deg)}}
+.result-stat{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--glass-border)}
+.result-stat:last-child{border-bottom:none}
+.result-stat-label{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text-secondary)}
+.result-stat-value{font-size:18px;font-weight:700}
+.result-stat-value.positive{color:var(--green)}
+.result-stat-value.negative{color:var(--red)}
+.feedback-text{text-align:center;font-size:16px;font-weight:500;color:var(--text-secondary);padding:16px;background:rgba(255,255,255,0.03);border-radius:14px;margin:16px 0;border:1px solid var(--glass-border)}
+.project-card{display:flex;align-items:center;gap:14px;padding:16px;background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);border-radius:16px;margin-bottom:10px;transition:all 0.2s ease}
+.project-card:hover{background:rgba(255,255,255,0.05);transform:translateX(4px)}
+.project-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.project-info{flex:1}
+.project-name{font-size:15px;font-weight:600;margin-bottom:2px}
+.project-meta{font-size:12px;color:var(--text-muted)}
+.project-stars{font-size:14px;color:var(--gold)}
+.level-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;background:linear-gradient(135deg,rgba(168,85,247,0.2),rgba(0,229,255,0.2));border:1px solid rgba(168,85,247,0.3);border-radius:100px;font-size:12px;font-weight:700;color:var(--purple)}
+.milestone{display:flex;align-items:center;gap:12px;padding:14px;background:rgba(255,255,255,0.02);border-radius:14px;margin-bottom:8px;border:1px solid transparent;transition:all 0.2s ease}
+.milestone.completed{border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.05)}
+.milestone-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;background:rgba(255,255,255,0.05)}
+.milestone.completed .milestone-icon{background:rgba(34,197,94,0.15)}
+.milestone-info{flex:1}
+.milestone-name{font-size:14px;font-weight:600}
+.milestone-desc{font-size:12px;color:var(--text-muted)}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);padding:12px 24px;background:rgba(255,255,255,0.1);backdrop-filter:blur(20px);border:1px solid var(--glass-border);border-radius:12px;font-size:14px;font-weight:500;z-index:300;transition:transform 0.3s ease;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.success{border-color:rgba(34,197,94,0.3);color:var(--green)}
+.toast.error{border-color:rgba(239,68,68,0.3);color:var(--red)}
+.shake{animation:shake 0.5s ease-in-out}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(10px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+.particle-dot{position:absolute;width:6px;height:6px;border-radius:50%;animation:particleBurst 0.8s ease-out forwards}
+@keyframes particleBurst{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0}}
+.confetti-piece{position:absolute;width:8px;height:8px;animation:confettiFall 2s ease-out forwards}
+@keyframes confettiFall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(300px) rotate(720deg);opacity:0}}
+.xp-gain{position:absolute;font-size:18px;font-weight:700;color:var(--cyan);pointer-events:none;animation:xpFloat 1.5s ease-out forwards;z-index:50;text-shadow:0 0 10px rgba(0,229,255,0.5)}
+@keyframes xpFloat{0%{transform:translateY(0);opacity:1}100%{transform:translateY(-80px);opacity:0}}
+.project-type-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:16px 0}
+.project-type-card{padding:20px 14px;background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);border-radius:18px;text-align:center;cursor:pointer;transition:all 0.2s ease}
+.project-type-card:hover,.project-type-card:active{background:rgba(255,255,255,0.06);transform:translateY(-2px)}
+.project-type-card.selected{border-color:var(--cyan);background:rgba(0,229,255,0.05);box-shadow:0 0 20px rgba(0,229,255,0.1)}
+.project-type-icon{font-size:32px;margin-bottom:8px}
+.project-type-name{font-size:14px;font-weight:600;margin-bottom:4px}
+.project-type-difficulty{font-size:11px;color:var(--text-muted)}
+.req-bar{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.req-label{font-size:12px;color:var(--text-secondary);width:50px;flex-shrink:0}
+.req-track{flex:1;height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden}
+.req-fill{height:100%;border-radius:3px;transition:width 0.5s ease}
+.req-fill.idea{background:var(--purple)}
+.req-fill.code{background:var(--cyan)}
+.req-fill.design{background:#fff}
+.req-fill.hype{background:var(--gold)}
+.req-value{font-size:12px;font-weight:600;color:var(--text-secondary);width:30px;text-align:right}
+@media(min-width:431px){#app{border-radius:40px;box-shadow:0 0 60px rgba(0,0,0,0.5);height:90vh}}
+</style>
+</head>
+<body>
+<div class="bg-gradient"></div>
+<div class="bg-grid"></div>
+<div class="floating-particles" id="particles"></div>
+<div class="glitch-overlay" id="glitchOverlay"></div>
+<div class="toast" id="toast"></div>
+<div id="app">
+<div class="screen active" id="authScreen">
+<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:40px 20px;">
+<div style="width:80px;height:80px;border-radius:24px;background:linear-gradient(135deg,var(--purple),var(--cyan));display:flex;align-items:center;justify-content:center;font-size:40px;margin-bottom:24px;box-shadow:0 0 40px rgba(168,85,247,0.3);">👨‍🍳</div>
+<h1 style="margin-bottom:8px;">DevKitchen</h1>
+<p class="subtitle" style="margin-bottom:40px;">Cook digital projects. Build the future.</p>
+<div id="authForm" style="width:100%;">
+<div class="input-group"><label>Username</label><input type="text" class="input-field" id="authUsername" placeholder="chef_dev" autocomplete="off"></div>
+<div class="input-group" id="emailGroup"><label>Email</label><input type="email" class="input-field" id="authEmail" placeholder="chef@devkitchen.app" autocomplete="off"></div>
+<div class="input-group"><label>Password</label><input type="password" class="input-field" id="authPassword" placeholder="••••••••" autocomplete="off"></div>
+<button class="btn btn-primary" id="authBtn" style="margin-top:8px;"><span id="authBtnText">Start Cooking</span></button>
+<button class="btn btn-secondary" id="authToggle" style="margin-top:12px;">Already have an account? Login</button>
+</div>
+</div>
+</div>
+<div class="screen" id="projectSelectScreen">
+<div style="margin-bottom:20px;"><h2 style="margin-bottom:4px;">Choose Project</h2><p class="subtitle">Select what you want to cook today</p></div>
+<div class="project-type-grid" id="projectTypeGrid"></div>
+<button class="btn btn-primary" id="confirmProjectBtn" style="opacity:0.5;pointer-events:none;">Confirm Selection</button>
+<button class="btn btn-secondary" id="backToDashBtn" style="margin-top:12px;">Back to Dashboard</button>
+</div>
+<div class="screen" id="dashboardScreen">
+<div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;">
+<div class="avatar" id="dashAvatar">D</div>
+<div style="flex:1;">
+<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;"><h2 id="dashUsername">Developer</h2><span class="level-badge" id="dashLevel">Lv.1</span></div>
+<div class="progress-bar"><div class="progress-fill" id="dashXpBar" style="width:0%"></div></div>
+<div style="display:flex;justify-content:space-between;margin-top:4px;"><span style="font-size:11px;color:var(--text-muted);" id="dashXpText">0 / 100 XP</span></div>
+</div>
+</div>
+<div style="display:flex;gap:10px;margin-bottom:24px;">
+<div class="stat-badge coins"><span>🪙</span><span id="dashCoins">0</span></div>
+<div class="stat-badge xp"><span>⚡</span><span id="dashTotalXp">0 XP</span></div>
+</div>
+<button class="btn btn-gold" id="startCookingBtn" style="margin-bottom:24px;">🔥 Start Cooking</button>
+<h3 style="margin-bottom:12px;">Recent Projects</h3>
+<div id="recentProjects"><div class="glass-card" style="text-align:center;padding:30px;"><p style="color:var(--text-muted);font-size:14px;">No projects yet. Start your first cook!</p></div></div>
+<h3 style="margin-bottom:12px;margin-top:8px;">Milestones</h3>
+<div id="milestones">
+<div class="milestone" data-id="first-project"><div class="milestone-icon">🎯</div><div class="milestone-info"><div class="milestone-name">First Project</div><div class="milestone-desc">Complete your first cook</div></div></div>
+<div class="milestone" data-id="reach-level-5"><div class="milestone-icon">⭐</div><div class="milestone-info"><div class="milestone-name">Rising Chef</div><div class="milestone-desc">Reach Level 5</div></div></div>
+<div class="milestone" data-id="earn-1000"><div class="milestone-icon">💰</div><div class="milestone-info"><div class="milestone-name">Wealthy Chef</div><div class="milestone-desc">Earn 1,000 coins</div></div></div>
+<div class="milestone" data-id="perfect-rating"><div class="milestone-icon">🏆</div><div class="milestone-info"><div class="milestone-name">Perfect Cook</div><div class="milestone-desc">Get a 5-star rating</div></div></div>
+</div>
+</div>
+<div class="screen" id="gameScreen">
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+<div><h3 style="margin-bottom:4px;">Project Order</h3><h2 id="projectName" style="font-size:18px;">Build Viral Idle Game</h2></div>
+<button class="btn btn-secondary" id="cancelCookBtn" style="width:auto;padding:8px 16px;font-size:13px;">✕ Cancel</button>
+</div>
+<div class="glass-card">
+<h3 style="margin-bottom:12px;">Required Balance</h3>
+<div class="req-bar"><span class="req-label">💡 Idea</span><div class="req-track"><div class="req-fill idea" id="reqIdea" style="width:30%"></div></div><span class="req-value" id="reqIdeaVal">30%</span></div>
+<div class="req-bar"><span class="req-label">💻 Code</span><div class="req-track"><div class="req-fill code" id="reqCode" style="width:40%"></div></div><span class="req-value" id="reqCodeVal">40%</span></div>
+<div class="req-bar"><span class="req-label">🎨 Design</span><div class="req-track"><div class="req-fill design" id="reqDesign" style="width:20%"></div></div><span class="req-value" id="reqDesignVal">20%</span></div>
+<div class="req-bar"><span class="req-label">🔥 Hype</span><div class="req-track"><div class="req-fill hype" id="reqHype" style="width:10%"></div></div><span class="req-value" id="reqHypeVal">10%</span></div>
+</div>
+<div class="cooking-pan" id="cookingPan">
+<div class="cooking-pan-content" id="panContent">
+<div class="cooking-pan-text">Tap ingredients below</div>
+<div class="cooking-pan-hint">Add to the pan to start</div>
+</div>
+<div class="bug-alert" id="bugAlert">🐛 BUG DETECTED! TAP TO FIX!</div>
+</div>
+<div class="overheat-container" id="overheatContainer" style="display:none;">
+<div class="overheat-label"><span>⚠️ Overheat</span><span id="overheatPercent">0%</span></div>
+<div class="overheat-bar"><div class="overheat-fill" id="overheatFill"></div></div>
+</div>
+<div class="timing-container" id="timingContainer" style="display:none;">
+<div class="timing-zones"><div class="timing-zone early" style="width:30%"></div><div class="timing-zone perfect" style="width:20%"></div><div class="timing-zone late" style="width:30%"></div></div>
+<div class="timing-indicator" id="timingIndicator" style="left:0%"></div>
+</div>
+<div style="margin-top:8px;">
+<h3 style="margin-bottom:12px;">Ingredients</h3>
+<div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none;">
+<div class="ingredient-card idea" data-type="idea" data-value="10"><div class="ingredient-icon">💡</div><span class="ingredient-name">Idea</span><span class="ingredient-value">+10</span></div>
+<div class="ingredient-card code" data-type="code" data-value="10"><div class="ingredient-icon">💻</div><span class="ingredient-name">Code</span><span class="ingredient-value">+10</span></div>
+<div class="ingredient-card design" data-type="design" data-value="10"><div class="ingredient-icon">🎨</div><span class="ingredient-name">Design</span><span class="ingredient-value">+10</span></div>
+<div class="ingredient-card hype" data-type="hype" data-value="10"><div class="ingredient-icon">🔥</div><span class="ingredient-name">Hype</span><span class="ingredient-value">+10</span></div>
+</div>
+</div>
+<button class="btn btn-primary" id="cookBtn" style="margin-top:16px;opacity:0.5;pointer-events:none;">🍳 Start Cooking</button>
+</div>
+<div class="screen" id="resultScreen">
+<div style="text-align:center;padding-top:20px;">
+<div id="resultIcon" style="font-size:64px;margin-bottom:16px;">🎉</div>
+<h2 id="resultTitle">Project Launched!</h2>
+<p class="subtitle" id="resultSubtitle" style="margin-bottom:24px;">Your project is live</p>
+<div class="star-rating" id="starRating"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
+<div class="glass-card" style="text-align:left;">
+<div class="result-stat"><div class="result-stat-label"><span>👥</span><span>Users Gained</span></div><div class="result-stat-value positive" id="resultUsers">+0</div></div>
+<div class="result-stat"><div class="result-stat-label"><span>🪙</span><span>Coins Earned</span></div><div class="result-stat-value positive" id="resultCoins">+0</div></div>
+<div class="result-stat"><div class="result-stat-label"><span>⚡</span><span>XP Gained</span></div><div class="result-stat-value positive" id="resultXp">+0</div></div>
+</div>
+<div class="feedback-text" id="resultFeedback">Great work! Your timing was perfect.</div>
+<button class="btn btn-primary" id="continueBtn" style="margin-top:8px;">Continue</button>
+</div>
+</div>
+<div class="screen" id="profileScreen">
+<div style="text-align:center;padding-top:20px;margin-bottom:24px;">
+<div class="avatar" id="profileAvatar" style="width:80px;height:80px;font-size:32px;margin:0 auto 16px;">D</div>
+<h2 id="profileUsername">Developer</h2>
+<span class="level-badge" id="profileLevel" style="margin-top:8px;">Lv.1</span>
+</div>
+<div class="glass-card">
+<h3 style="margin-bottom:16px;">Stats</h3>
+<div class="result-stat"><div class="result-stat-label"><span>🪙</span><span>Total Coins</span></div><div class="result-stat-value" id="profileCoins">0</div></div>
+<div class="result-stat"><div class="result-stat-label"><span>⚡</span><span>Total XP</span></div><div class="result-stat-value" id="profileXp">0</div></div>
+<div class="result-stat"><div class="result-stat-label"><span>🍳</span><span>Projects Cooked</span></div><div class="result-stat-value" id="profileProjects">0</div></div>
+<div class="result-stat"><div class="result-stat-label"><span>⭐</span><span>Avg Rating</span></div><div class="result-stat-value" id="profileAvgRating">0.0</div></div>
+</div>
+<div class="glass-card">
+<h3 style="margin-bottom:16px;">Account</h3>
+<div class="result-stat"><div class="result-stat-label"><span>📧</span><span>Email</span></div><div class="result-stat-value" id="profileEmail" style="font-size:13px;">-</div></div>
+<div class="result-stat"><div class="result-stat-label"><span>📅</span><span>Joined</span></div><div class="result-stat-value" id="profileJoined" style="font-size:13px;">-</div></div>
+</div>
+<button class="btn btn-danger" id="logoutBtn" style="margin-top:8px;">🚪 Logout</button>
+</div>
+<nav class="bottom-nav" id="bottomNav" style="display:none;">
+<button class="nav-item active" data-screen="dashboard">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+<span>Home</span>
+</button>
+<button class="nav-item" data-screen="game">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+<span>Play</span>
+</button>
+<button class="nav-item" data-screen="profile">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+<span>Profile</span>
+</button>
+</nav>
+</div>
+<script>
+const state={currentUser:null,currentProject:null,selectedProjectType:null,ingredientsSelected:{idea:0,code:0,design:0,hype:0},cookingState:'idle',authMode:'register',projects:[],milestones:{'first-project':false,'reach-level-5':false,'earn-1000':false,'perfect-rating':false}};
+const PROJECT_TYPES=[{name:'Build Viral Idle Game',icon:'🎮',difficulty:'Easy',requirements:{idea:30,code:40,design:20,hype:10}},{name:'Launch SaaS Dashboard',icon:'📊',difficulty:'Medium',requirements:{idea:20,code:50,design:20,hype:10}},{name:'Create AI Chatbot',icon:'🤖',difficulty:'Hard',requirements:{idea:40,code:35,design:15,hype:10}},{name:'Design Portfolio Site',icon:'🎨',difficulty:'Easy',requirements:{idea:25,code:20,design:45,hype:10}},{name:'Build Crypto Tracker',icon:'₿',difficulty:'Medium',requirements:{idea:15,code:45,design:25,hype:15}},{name:'Launch Social App',icon:'💬',difficulty:'Hard',requirements:{idea:35,code:30,design:20,hype:15}}];
+const FEEDBACKS={perfect:['Absolute perfection! Your timing was flawless.','Master chef! That was a perfect cook.','Incredible! The project launched flawlessly.'],good:['Great work! Your timing was solid.','Well done! The project turned out nicely.','Nice cook! Just a tiny bit off perfect.'],okay:['Not bad! Room for improvement on timing.','Decent result. Watch your timing next time.','Acceptable, but you can do better.'],poor:['Undercooked! You stopped too early.','Overcooked! You waited too long.','Timing was off. The project suffered.'],failed:['Disaster! The project crashed on launch.','Critical failure! Too many bugs.','The project failed. Back to the kitchen!']};
+const screens={auth:document.getElementById('authScreen'),projectSelect:document.getElementById('projectSelectScreen'),dashboard:document.getElementById('dashboardScreen'),game:document.getElementById('gameScreen'),result:document.getElementById('resultScreen'),profile:document.getElementById('profileScreen')};
+const bottomNav=document.getElementById('bottomNav');
+const toast=document.getElementById('toast');
+const glitchOverlay=document.getElementById('glitchOverlay');
+function generateId(){return Date.now().toString(36)+Math.random().toString(36).substr(2)}
+function showToast(message,type){type=type||'success';toast.textContent=message;toast.className='toast '+type+' show';setTimeout(function(){toast.classList.remove('show')},2500)}
+function switchScreen(screenName){Object.values(screens).forEach(function(s){s.classList.remove('active')});screens[screenName].classList.add('active');document.querySelectorAll('.nav-item').forEach(function(item){item.classList.toggle('active',item.dataset.screen===screenName)});if(screenName==='dashboard')updateDashboard();if(screenName==='profile')updateProfile()}
+function saveState(){if(state.currentUser){localStorage.setItem('devkitchen_user',JSON.stringify(state.currentUser));localStorage.setItem('devkitchen_projects',JSON.stringify(state.projects));localStorage.setItem('devkitchen_milestones',JSON.stringify(state.milestones))}}
+function loadState(){var user=localStorage.getItem('devkitchen_user');var projects=localStorage.getItem('devkitchen_projects');var milestones=localStorage.getItem('devkitchen_milestones');if(user){state.currentUser=JSON.parse(user);state.projects=projects?JSON.parse(projects):[];state.milestones=milestones?JSON.parse(milestones):state.milestones;bottomNav.style.display='flex';switchScreen('dashboard')}}
+function getXpForLevel(level){return level*100}
+function getLevel(xp){return Math.floor(xp/100)+1}
+function getXpInLevel(xp){return xp%100}
+function updateUserStats(coins,xp){state.currentUser.coins+=coins;state.currentUser.xp+=xp;state.currentUser.level=getLevel(state.currentUser.xp);saveState()}
+function createParticles(){var container=document.getElementById('particles');var colors=['var(--cyan)','var(--purple)','var(--gold)'];for(var i=0;i<20;i++){var p=document.createElement('div');p.className='particle';p.style.left=Math.random()*100+'%';p.style.width=Math.random()*4+2+'px';p.style.height=p.style.width;p.style.background=colors[Math.floor(Math.random()*colors.length)];p.style.animationDuration=Math.random()*10+10+'s';p.style.animationDelay=Math.random()*10+'s';container.appendChild(p)}}
+function spawnParticles(x,y,color,count){var container=document.getElementById('app');for(var i=0;i<count;i++){var dot=document.createElement('div');dot.className='particle-dot';dot.style.left=x+'px';dot.style.top=y+'px';dot.style.background=color;dot.style.setProperty('--tx',(Math.random()-0.5)*120+'px');dot.style.setProperty('--ty',(Math.random()-0.5)*120+'px');container.appendChild(dot);setTimeout(function(){dot.remove()},800)}}
+function spawnConfetti(){var container=document.getElementById('app');var colors=['#00e5ff','#a855f7','#fbbf24','#22c55e','#ef4444'];for(var i=0;i<30;i++){var piece=document.createElement('div');piece.className='confetti-piece';piece.style.left=Math.random()*100+'%';piece.style.top='-10px';piece.style.background=colors[Math.floor(Math.random()*colors.length)];piece.style.width=Math.random()*8+4+'px';piece.style.height=Math.random()*8+4+'px';piece.style.borderRadius=Math.random()>0.5?'50%':'2px';piece.style.animationDelay=Math.random()*0.5+'s';piece.style.animationDuration=Math.random()*1+1.5+'s';container.appendChild(piece);setTimeout(function(){piece.remove()},2500)}}
+function spawnXpGain(x,y,amount){var container=document.getElementById('app');var el=document.createElement('div');el.className='xp-gain';el.textContent='+'+amount+' XP';el.style.left=x+'px';el.style.top=y+'px';container.appendChild(el);setTimeout(function(){el.remove()},1500)}
+var authBtn=document.getElementById('authBtn');
+var authToggle=document.getElementById('authToggle');
+var authBtnText=document.getElementById('authBtnText');
+var emailGroup=document.getElementById('emailGroup');
+authToggle.addEventListener('click',function(){state.authMode=state.authMode==='register'?'login':'register';authBtnText.textContent=state.authMode==='register'?'Start Cooking':'Login';authToggle.textContent=state.authMode==='register'?'Already have an account? Login':"Don't have an account? Register";emailGroup.style.display=state.authMode==='register'?'block':'none'});
+authBtn.addEventListener('click',function(){var username=document.getElementById('authUsername').value.trim();var email=document.getElementById('authEmail').value.trim();var password=document.getElementById('authPassword').value;if(!username||!password||(state.authMode==='register'&&!email)){showToast('Please fill all fields','error');return}if(state.authMode==='register'){state.currentUser={id:generateId(),username:username,email:email,level:1,coins:100,xp:0,createdAt:new Date().toISOString()};state.projects=[];showToast('Welcome to DevKitchen, Chef!')}else{var stored=localStorage.getItem('devkitchen_user');if(stored){var user=JSON.parse(stored);if(user.username===username){state.currentUser=user;state.projects=JSON.parse(localStorage.getItem('devkitchen_projects')||'[]');showToast('Welcome back, Chef!')}else{showToast('User not found','error');return}}else{showToast('No account found. Please register.','error');return}}saveState();bottomNav.style.display='flex';switchScreen('dashboard')});
+function initProjectSelect(){var grid=document.getElementById('projectTypeGrid');grid.innerHTML=PROJECT_TYPES.map(function(p,i){return '<div class="project-type-card" data-index="'+i+'"><div class="project-type-icon">'+p.icon+'</div><div class="project-type-name">'+p.name+'</div><div class="project-type-difficulty">'+p.difficulty+'</div></div>'}).join('');grid.querySelectorAll('.project-type-card').forEach(function(card){card.addEventListener('click',function(){grid.querySelectorAll('.project-type-card').forEach(function(c){c.classList.remove('selected')});card.classList.add('selected');state.selectedProjectType=PROJECT_TYPES[parseInt(card.dataset.index)];document.getElementById('confirmProjectBtn').style.opacity='1';document.getElementById('confirmProjectBtn').style.pointerEvents='auto'})})}
+document.getElementById('confirmProjectBtn').addEventListener('click',function(){if(!state.selectedProjectType)return;startGame(state.selectedProjectType)});
+document.getElementById('backToDashBtn').addEventListener('click',function(){switchScreen('dashboard')});
+function updateDashboard(){if(!state.currentUser)return;document.getElementById('dashUsername').textContent=state.currentUser.username;document.getElementById('dashAvatar').textContent=state.currentUser.username[0].toUpperCase();document.getElementById('dashLevel').textContent='Lv.'+state.currentUser.level;document.getElementById('dashCoins').textContent=state.currentUser.coins;document.getElementById('dashTotalXp').textContent=state.currentUser.xp+' XP';var xpInLevel=getXpInLevel(state.currentUser.xp);var xpNeeded=getXpForLevel(state.currentUser.level);document.getElementById('dashXpBar').style.width=(xpInLevel/xpNeeded*100)+'%';document.getElementById('dashXpText').textContent=xpInLevel+' / '+xpNeeded+' XP';var recentContainer=document.getElementById('recentProjects');var recent=state.projects.slice(-3).reverse();if(recent.length===0){recentContainer.innerHTML='<div class="glass-card" style="text-align:center;padding:30px;"><p style="color:var(--text-muted);font-size:14px;">No projects yet. Start your first cook!</p></div>'}else{recentContainer.innerHTML=recent.map(function(p){var color=p.rating>=4?'var(--green)':p.rating>=3?'var(--gold)':'var(--red)';return '<div class="project-card"><div class="project-icon" style="background:linear-gradient(135deg,'+color+',transparent);opacity:0.3;">'+p.icon+'</div><div class="project-info"><div class="project-name">'+p.name+'</div><div class="project-meta">'+new Date(p.date).toLocaleDateString()+'</div></div><div class="project-stars">'+'★'.repeat(p.rating)+'☆'.repeat(5-p.rating)+'</div></div>'}).join('')}updateMilestones()}
+function updateMilestones(){var items=document.querySelectorAll('#milestones .milestone');items.forEach(function(item){var id=item.dataset.id;var completed=false;if(id==='first-project')completed=state.projects.length>=1;if(id==='reach-level-5')completed=state.currentUser.level>=5;if(id==='earn-1000')completed=state.currentUser.coins>=1000;if(id==='perfect-rating')completed=state.projects.some(function(p){return p.rating===5});if(completed&&!state.milestones[id]){state.milestones[id]=true;saveState();showToast('🏆 Milestone unlocked!')}item.classList.toggle('completed',completed)})}
+document.getElementById('startCookingBtn').addEventListener('click',function(){switchScreen('projectSelect')});
+var cookingInterval=null;var timingInterval=null;var bugTimeout=null;var overheatInterval=null;var timingPosition=0;var timingDirection=1;var overheatLevel=0;var bugCount=0;var totalIngredients=0;
+function startGame(projectType){state.currentProject={name:projectType.name,icon:projectType.icon,requirements:projectType.requirements,ingredients:{idea:0,code:0,design:0,hype:0}};state.ingredientsSelected={idea:0,code:0,design:0,hype:0};state.cookingState='selecting';totalIngredients=0;bugCount=0;overheatLevel=0;document.getElementById('projectName').textContent=projectType.name;document.getElementById('reqIdea').style.width=projectType.requirements.idea+'%';document.getElementById('reqCode').style.width=projectType.requirements.code+'%';document.getElementById('reqDesign').style.width=projectType.requirements.design+'%';document.getElementById('reqHype').style.width=projectType.requirements.hype+'%';document.getElementById('reqIdeaVal').textContent=projectType.requirements.idea+'%';document.getElementById('reqCodeVal').textContent=projectType.requirements.code+'%';document.getElementById('reqDesignVal').textContent=projectType.requirements.design+'%';document.getElementById('reqHypeVal').textContent=projectType.requirements.hype+'%';var pan=document.getElementById('cookingPan');pan.classList.remove('active');document.getElementById('panContent').innerHTML='<div class="cooking-pan-text">Tap ingredients below</div><div class="cooking-pan-hint">Add to the pan to start</div>';document.getElementById('timingContainer').style.display='none';document.getElementById('overheatContainer').style.display='none';document.getElementById('bugAlert').style.display='none';document.querySelectorAll('.ingredient-card').forEach(function(card){card.classList.remove('selected')});updateCookBtn();switchScreen('game')}
+function updateCookBtn(){var btn=document.getElementById('cookBtn');var total=state.ingredientsSelected.idea+state.ingredientsSelected.code+state.ingredientsSelected.design+state.ingredientsSelected.hype;if(total>=10){btn.style.opacity='1';btn.style.pointerEvents='auto';btn.textContent='🍳 Start Cooking'}else{btn.style.opacity='0.5';btn.style.pointerEvents='none';btn.textContent='🍳 Add more ingredients ('+total+'/10)'}}
+document.querySelectorAll('.ingredient-card').forEach(function(card){card.addEventListener('click',function(e){if(state.cookingState!=='selecting')return;var type=card.dataset.type;var value=parseInt(card.dataset.value);state.ingredientsSelected[type]+=value;totalIngredients++;card.classList.add('selected');setTimeout(function(){card.classList.remove('selected')},200);var rect=card.getBoundingClientRect();var appRect=document.getElementById('app').getBoundingClientRect();spawnParticles(rect.left-appRect.left+rect.width/2,rect.top-appRect.top+rect.height/2,type==='idea'?'var(--purple)':type==='code'?'var(--cyan)':type==='design'?'#fff':'var(--gold)',6);updatePanDisplay();updateCookBtn()})});
+function updatePanDisplay(){var panContent=document.getElementById('panContent');var total=state.ingredientsSelected.idea+state.ingredientsSelected.code+state.ingredientsSelected.design+state.ingredientsSelected.hype;if(total===0){panContent.innerHTML='<div class="cooking-pan-text">Tap ingredients below</div><div class="cooking-pan-hint">Add to the pan to start</div>';return}var html='<div class="pan-ingredients">';for(var i=0;i<state.ingredientsSelected.idea/10;i++)html+='<span class="pan-ingredient">💡</span>';for(var i=0;i<state.ingredientsSelected.code/10;i++)html+='<span class="pan-ingredient">💻</span>';for(var i=0;i<state.ingredientsSelected.design/10;i++)html+='<span class="pan-ingredient">🎨</span>';for(var i=0;i<state.ingredientsSelected.hype/10;i++)html+='<span class="pan-ingredient">🔥</span>';html+='</div>';panContent.innerHTML=html}
+document.getElementById('cookBtn').addEventListener('click',function(){if(state.cookingState!=='selecting')return;startCookingPhase()});
+document.getElementById('cancelCookBtn').addEventListener('click',function(){clearAllIntervals();switchScreen('dashboard')});
+function clearAllIntervals(){if(cookingInterval){clearInterval(cookingInterval);cookingInterval=null}if(timingInterval){clearInterval(timingInterval);timingInterval=null}if(bugTimeout){clearTimeout(bugTimeout);bugTimeout=null}if(overheatInterval){clearInterval(overheatInterval);overheatInterval=null}}
+function startCookingPhase(){state.cookingState='cooking';document.getElementById('cookingPan').classList.add('active');document.getElementById('cookBtn').style.display='none';document.getElementById('overheatContainer').style.display='block';overheatInterval=setInterval(function(){overheatLevel+=2;document.getElementById('overheatFill').style.width=overheatLevel+'%';document.getElementById('overheatPercent').textContent=Math.floor(overheatLevel)+'%';if(overheatLevel>=100){clearAllIntervals();showFailure('Overheated! The project burned.');return}},300);scheduleBug();setTimeout(function(){if(state.cookingState!=='cooking')return;startTimingPhase()},3000)}
+function scheduleBug(){if(state.cookingState!=='cooking'&&state.cookingState!=='timing')return;var delay=Math.random()*2000+1500;bugTimeout=setTimeout(function(){if(state.cookingState!=='cooking'&&state.cookingState!=='timing')return;showBug()},delay)}
+function showBug(){var alert=document.getElementById('bugAlert');alert.style.display='block';alert.style.animation='none';alert.offsetHeight;alert.style.animation='bugShake 0.5s ease-in-out';var app=document.getElementById('app');app.classList.add('shake');setTimeout(function(){app.classList.remove('shake')},500);bugCount++;setTimeout(function(){if(alert.style.display==='block'){alert.style.display='none';overheatLevel+=15;document.getElementById('overheatFill').style.width=overheatLevel+'%';document.getElementById('overheatPercent').textContent=Math.floor(overheatLevel)+'%';showToast('Bug ignored! Overheat increased.','error');if(overheatLevel<100)scheduleBug()}},2000)}
+document.getElementById('bugAlert').addEventListener('click',function(){this.style.display='none';overheatLevel=Math.max(0,overheatLevel-10);document.getElementById('overheatFill').style.width=overheatLevel+'%';document.getElementById('overheatPercent').textContent=Math.floor(overheatLevel)+'%';showToast('Bug fixed! 🔧');spawnParticles(215,300,'var(--green)',8);if(state.cookingState==='cooking'||state.cookingState==='timing')scheduleBug()});
+function startTimingPhase(){state.cookingState='timing';document.getElementById('timingContainer').style.display='block';document.getElementById('panContent').innerHTML='<div class="cooking-pan-text" style="font-size:18px;font-weight:700;">STOP THE TIMER!</div><div class="cooking-pan-hint">Tap anywhere to stop</div>';timingPosition=0;timingDirection=1;var speed=2;timingInterval=setInterval(function(){timingPosition+=timingDirection*speed;if(timingPosition>=100){timingPosition=100;timingDirection=-1}if(timingPosition<=0){timingPosition=0;timingDirection=1}document.getElementById('timingIndicator').style.left=timingPosition+'%'},30);var stopHandler=function(){if(state.cookingState!=='timing')return;clearAllIntervals();document.getElementById('app').removeEventListener('click',stopHandler);evaluateTiming()};document.getElementById('app').addEventListener('click',stopHandler)}
+function evaluateTiming(){var pos=timingPosition;var result;if(pos>=30&&pos<=50){result='perfect'}else if(pos>=20&&pos<=60){result='good'}else if(pos>=10&&pos<=70){result='okay'}else if(pos<10){result='poor'}else{result='poor'}if(bugCount>2)result='failed';if(overheatLevel>80)result='failed';calculateResult(result)}
+function showFailure(reason){glitchOverlay.style.display='block';setTimeout(function(){glitchOverlay.style.display='none'},300);var app=document.getElementById('app');app.classList.add('shake');setTimeout(function(){app.classList.remove('shake')},500);showToast(reason,'error');calculateResult('failed')}
+function calculateResult(timingResult){state.cookingState='result';var req=state.currentProject.requirements;var sel=state.ingredientsSelected;var totalSel=sel.idea+sel.code+sel.design+sel.hype;var ideaRatio=sel.idea/totalSel;var codeRatio=sel.code/totalSel;var designRatio=sel.design/totalSel;var hypeRatio=sel.hype/totalSel;var ideaDiff=Math.abs(ideaRatio*100-req.idea);var codeDiff=Math.abs(codeRatio*100-req.code);var designDiff=Math.abs(designRatio*100-req.design);var hypeDiff=Math.abs(hypeRatio*100-req.hype);var balanceScore=Math.max(0,100-(ideaDiff+codeDiff+designDiff+hypeDiff)/4);var rating,coins,xp,users;if(timingResult==='failed'){rating=1;coins=10;xp=5;users=Math.floor(Math.random()*50)}else if(timingResult==='perfect'){rating=5;coins=100+Math.floor(balanceScore);xp=50+Math.floor(balanceScore/2);users=1000+Math.floor(Math.random()*2000)}else if(timingResult==='good'){rating=4;coins=70+Math.floor(balanceScore*0.7);xp=35+Math.floor(balanceScore/3);users=500+Math.floor(Math.random()*1000)}else if(timingResult==='okay'){rating=3;coins=40+Math.floor(balanceScore*0.5);xp=20+Math.floor(balanceScore/4);users=200+Math.floor(Math.random()*300)}else{rating=2;coins=20;xp=10;users=50+Math.floor(Math.random()*100)}var levelBonus=state.currentUser.level*5;coins+=levelBonus;var feedbackList=FEEDBACKS[timingResult];var feedback=feedbackList[Math.floor(Math.random()*feedbackList.length)];if(balanceScore<50)feedback+=' Ingredient balance was way off.';else if(balanceScore<80)feedback+=' Ingredient balance could be better.';else if(timingResult!=='failed')feedback+=' Perfect ingredient balance!';if(bugCount>0)feedback+=' ('+bugCount+' bugs squashed)';showResult({rating:rating,coins:coins,xp:xp,users:users,feedback:feedback,timingResult:timingResult})}
+function showResult(result){var project={id:generateId(),name:state.currentProject.name,icon:state.currentProject.icon,rating:result.rating,coins:result.coins,xp:result.xp,users:result.users,date:new Date().toISOString()};state.projects.push(project);updateUserStats(result.coins,result.xp);var icon=result.rating>=4?'🎉':result.rating>=3?'👍':result.rating>=2?'😬':'💥';document.getElementById('resultIcon').textContent=icon;document.getElementById('resultTitle').textContent=result.rating>=3?'Project Launched!':'Project Struggled...';document.getElementById('resultSubtitle').textContent=result.rating>=3?'Your project is live':'Needs more work next time';document.getElementById('resultUsers').textContent='+'+result.users.toLocaleString();document.getElementById('resultCoins').textContent='+'+result.coins;document.getElementById('resultXp').textContent='+'+result.xp;document.getElementById('resultFeedback').textContent=result.feedback;var stars=document.querySelectorAll('#starRating .star');stars.forEach(function(s,i){s.classList.remove('filled','pop');if(i<result.rating){setTimeout(function(){s.classList.add('filled','pop')},i*150)}});if(result.rating>=4){spawnConfetti();var rect=document.getElementById('resultIcon').getBoundingClientRect();var appRect=document.getElementById('app').getBoundingClientRect();spawnXpGain(rect.left-appRect.left+32,rect.top-appRect.top,result.xp)}switchScreen('result')}
+document.getElementById('continueBtn').addEventListener('click',function(){state.cookingState='idle';state.ingredientsSelected={idea:0,code:0,design:0,hype:0};state.currentProject=null;document.getElementById('cookBtn').style.display='block';document.getElementById('cookBtn').style.opacity='0.5';document.getElementById('cookBtn').style.pointerEvents='none';switchScreen('dashboard')});
+function updateProfile(){if(!state.currentUser)return;document.getElementById('profileUsername').textContent=state.currentUser.username;document.getElementById('profileAvatar').textContent=state.currentUser.username[0].toUpperCase();document.getElementById('profileLevel').textContent='Lv.'+state.currentUser.level;document.getElementById('profileCoins').textContent=state.currentUser.coins;document.getElementById('profileXp').textContent=state.currentUser.xp;document.getElementById('profileProjects').textContent=state.projects.length;document.getElementById('profileEmail').textContent=state.currentUser.email;document.getElementById('profileJoined').textContent=new Date(state.currentUser.createdAt).toLocaleDateString();var avg=state.projects.length>0?(state.projects.reduce(function(s,p){return s+p.rating},0)/state.projects.length).toFixed(1):'0.0';document.getElementById('profileAvgRating').textContent=avg}
+document.getElementById('logoutBtn').addEventListener('click',function(){state.currentUser=null;state.projects=[];localStorage.removeItem('devkitchen_user');localStorage.removeItem('devkitchen_projects');localStorage.removeItem('devkitchen_milestones');bottomNav.style.display='none';switchScreen('auth');showToast('Logged out successfully')});
+document.querySelectorAll('.nav-item').forEach(function(item){item.addEventListener('click',function(){var screen=item.dataset.screen;if(screen==='game'){switchScreen('projectSelect')}else{switchScreen(screen)}})});
+createParticles();
+initProjectSelect();
+loadState();
+</script>
+</body>
+</html>
