@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="ory-verify" content="orynth-b14d01bbe0ab4be4801bf261a1e8d33a">
 <meta name="description" content="DevKitchen Square — Learn programming by cooking in a real 3D kitchen.">
 <title>DevKitchen Square</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -165,10 +164,18 @@ footer{
   text-align:center;font-size:11px;color:var(--text3);
 }
 footer a{color:var(--text2);}footer a:hover{color:var(--fire2);}
-.ory-badge{
-  display:inline-flex;align-items:center;gap:6px;margin-top:10px;
-  padding:5px 12px;background:rgba(255,107,0,.06);border:1px solid rgba(255,107,0,.18);
-  border-radius:20px;font-size:10px;color:var(--fire);
+
+
+/* ══ EASYA BANNER ══ */
+#easya-banner{
+  display:flex;align-items:center;justify-content:center;
+  padding:14px 20px 0;
+  position:relative;z-index:10;
+}
+#easya-logo{
+  height:56px;width:auto;
+  border-radius:12px;
+  object-fit:contain;
 }
 
 /* ══ GAME PAGE ══ */
@@ -426,6 +433,9 @@ footer a{color:var(--text2);}footer a:hover{color:var(--fire2);}
 
 <!-- HOME PAGE -->
 <div id="page-home" class="page active">
+  <div id="easya-banner">
+    <img src="easya-logo.png" alt="EasyA Kickstart" id="easya-logo">
+  </div>
   <section class="hero">
     <div class="hero-bg"></div>
     <img src="logo.png" alt="DevKitchen" class="hero-logo">
@@ -490,7 +500,6 @@ footer a{color:var(--text2);}footer a:hover{color:var(--fire2);}
 
   <footer>
     <p>© 2026 DevKitchen Square &nbsp;·&nbsp; <a href="#" onclick="goPage('upgrade');return false;">Upgrade</a> &nbsp;·&nbsp; <a href="#" onclick="openLogin();return false;">Sign in</a></p>
-    <div class="ory-badge">🔐 Verified by Ory &nbsp;·&nbsp; orynth.dev</div>
   </footer>
 </div>
 
