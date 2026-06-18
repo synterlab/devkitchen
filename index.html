@@ -4,891 +4,778 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="ory-verify" content="orynth-b14d01bbe0ab4be4801bf261a1e8d33a">
-<meta name="description" content="DevKitchen — Learn programming concepts by cooking. Arrange code blocks to cook 3D dishes!">
-<title>DevKitchen — Learn to Code by Cooking</title>
+<meta name="description" content="DevKitchen Square — Learn programming concepts by cooking. Arrange code blocks to cook 3D dishes!">
+<title>DevKitchen Square</title>
 <style>
-/* ============================================================
-   RESET & BASE
-============================================================ */
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
 :root{
-  --bg:#080812; --surface:#0e0e1a; --surface2:#131325; --border:#1a1a2e; --border2:#222240;
-  --purple:#7c6af7; --purple-dim:#3d3578; --gold:#e2c77a; --green:#3fb950;
-  --red:#ff5f57; --orange:#ffa657; --blue:#79c0ff; --pink:#f78166;
-  --text:#e6edf3; --text2:#8b949e; --text3:#484f58; --text4:#2d333b;
-  --nav-h:52px; --radius:8px; --radius-sm:5px;
-  --font:'Courier New',monospace;
-  --font-ui:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  /* Brand palette from logo */
+  --amber:#F4A822; --amber-dk:#C8850A; --amber-lt:#FFD252;
+  --navy:#1E2340;  --navy2:#262B52; --navy3:#2D3561;
+  --border:#3A4078; --border2:#454B85;
+  --cream:#FFF5E0; --cream2:#C8BC9E; --cream3:#7A7260;
+  --brown:#5C3317; --brown2:#3D2010;
+  --green:#4CAF50; --green-dk:#388E3C;
+  --red:#EF5350;   --blue:#1976D2;
+  --nav-h:56px; --r:10px; --r-sm:6px;
+  --f:'Courier New',monospace;
+  --fu:-apple-system,BlinkMacSystemFont,'Segoe UI',Nunito,sans-serif;
 }
 html{scroll-behavior:smooth;}
-body{background:var(--bg);color:var(--text);font-family:var(--font-ui);overflow-x:hidden;min-height:100vh;}
+body{background:var(--navy);color:var(--cream);font-family:var(--fu);overflow-x:hidden;min-height:100vh;}
 a{color:inherit;text-decoration:none;}
-button{font-family:var(--font-ui);cursor:pointer;border:none;outline:none;}
-input{font-family:var(--font-ui);outline:none;}
-
-/* ============================================================
-   SCROLLBAR
-============================================================ */
+button{font-family:var(--fu);cursor:pointer;border:none;outline:none;}
 ::-webkit-scrollbar{width:4px;height:4px;}
-::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
 
-/* ============================================================
-   NAV
-============================================================ */
+/* ══ NAV ══════════════════════════════════════════════ */
 #nav{
   position:fixed;top:0;left:0;right:0;height:var(--nav-h);z-index:1000;
-  background:rgba(8,8,18,0.92);backdrop-filter:blur(12px);
+  background:rgba(26,27,52,0.96);backdrop-filter:blur(14px);
   border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;padding:0 20px;
+  display:flex;align-items:center;justify-content:space-between;padding:0 18px;
 }
-#nav-logo{display:flex;align-items:center;gap:8px;cursor:pointer;}
-#nav-logo .logo-icon{font-size:22px;}
-#nav-logo .logo-text{font-family:var(--font);font-size:14px;font-weight:bold;color:var(--gold);letter-spacing:1px;}
-#nav-links{display:flex;align-items:center;gap:4px;}
-.nav-link{
-  padding:6px 12px;border-radius:var(--radius-sm);font-size:13px;color:var(--text2);
-  cursor:pointer;transition:all 0.15s;border:1px solid transparent;
-  touch-action:manipulation;
+#nav-logo{display:flex;align-items:center;gap:10px;cursor:pointer;flex-shrink:0;}
+#nav-logo img{width:36px;height:36px;border-radius:8px;object-fit:cover;}
+#nav-logo .logo-text{font-size:16px;font-weight:800;color:var(--amber);letter-spacing:0.5px;font-family:var(--fu);}
+#nav-logo .logo-sq{font-size:11px;color:var(--cream3);font-weight:400;letter-spacing:1px;text-transform:uppercase;}
+#nav-links{display:flex;align-items:center;gap:2px;}
+.nav-lnk{
+  padding:7px 12px;border-radius:var(--r-sm);font-size:13px;color:var(--cream2);
+  cursor:pointer;transition:all 0.15s;border:1px solid transparent;touch-action:manipulation;
+  white-space:nowrap;
 }
-.nav-link:hover{color:var(--text);background:var(--surface2);}
-.nav-link.active{color:var(--text);background:var(--surface2);border-color:var(--border2);}
-.nav-link.primary{color:var(--bg);background:var(--green);font-weight:600;}
-.nav-link.primary:hover{background:#2ea043;}
-#nav-user{display:flex;align-items:center;gap:8px;}
+.nav-lnk:hover{color:var(--cream);background:var(--navy3);}
+.nav-lnk.play-btn{
+  background:var(--amber);color:var(--brown2);font-weight:800;font-size:13px;
+  border-radius:var(--r-sm);padding:7px 16px;
+}
+.nav-lnk.play-btn:hover{background:var(--amber-lt);}
+#nav-user{display:flex;align-items:center;gap:8px;flex-shrink:0;}
 #nav-avatar{
-  width:30px;height:30px;border-radius:50%;background:var(--purple-dim);
-  border:2px solid var(--purple);display:flex;align-items:center;justify-content:center;
-  font-size:13px;font-weight:bold;color:var(--purple);cursor:pointer;
+  width:32px;height:32px;border-radius:50%;background:var(--navy3);
+  border:2px solid var(--amber);display:none;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;color:var(--amber);cursor:pointer;
 }
-#nav-username{font-size:12px;color:var(--text2);}
-#nav-login-btn{
-  padding:6px 14px;border-radius:var(--radius-sm);font-size:12px;
-  background:transparent;color:var(--text2);border:1px solid var(--border2);
+#nav-username{font-size:12px;color:var(--cream2);display:none;}
+#nav-signin{
+  padding:7px 14px;border-radius:var(--r-sm);font-size:12px;
+  background:transparent;color:var(--cream2);border:1px solid var(--border2);
   cursor:pointer;transition:all 0.15s;
 }
-#nav-login-btn:hover{color:var(--text);border-color:var(--text3);}
+#nav-signin:hover{color:var(--cream);border-color:var(--cream3);}
 
-/* ============================================================
-   PAGE SYSTEM
-============================================================ */
+/* ══ PAGE SYSTEM ═══════════════════════════════════════ */
 .page{display:none;padding-top:var(--nav-h);}
 .page.active{display:block;}
 #page-game.active{display:flex;flex-direction:column;height:100vh;overflow:hidden;}
 
-/* ============================================================
-   LANDING PAGE
-============================================================ */
-#page-home{
-  min-height:100vh;overflow-y:auto;
-}
+/* ══ LANDING ═══════════════════════════════════════════ */
+#page-home{min-height:100vh;overflow-y:auto;}
 
-/* Hero */
 .hero{
-  min-height:calc(100vh - var(--nav-h));display:flex;flex-direction:column;
-  align-items:center;justify-content:center;text-align:center;padding:40px 20px;
-  background:radial-gradient(ellipse 60% 50% at 50% 0%, #1a1040 0%, var(--bg) 70%);
+  min-height:calc(100vh - var(--nav-h));
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:40px 20px;
+  background:radial-gradient(ellipse 70% 60% at 50% 30%,#2A2F60 0%,var(--navy) 70%);
   position:relative;overflow:hidden;
 }
 .hero::before{
-  content:'';position:absolute;inset:0;
-  background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  content:'';position:absolute;inset:0;opacity:.04;
+  background:repeating-linear-gradient(0deg,transparent,transparent 39px,var(--amber) 40px),
+             repeating-linear-gradient(90deg,transparent,transparent 39px,var(--amber) 40px);
+}
+.hero-logo-img{
+  width:96px;height:96px;border-radius:22px;margin-bottom:20px;
+  box-shadow:0 8px 40px rgba(244,168,34,.35);position:relative;z-index:1;
 }
 .hero-tag{
-  display:inline-flex;align-items:center;gap:6px;padding:5px 14px;
-  border:1px solid var(--purple-dim);border-radius:20px;
-  font-size:11px;color:var(--purple);background:rgba(124,106,247,0.08);
-  margin-bottom:24px;letter-spacing:0.5px;
+  display:inline-flex;align-items:center;gap:6px;padding:5px 16px;
+  border:1px solid rgba(244,168,34,.35);border-radius:20px;
+  font-size:11px;color:var(--amber);background:rgba(244,168,34,.08);
+  margin-bottom:20px;letter-spacing:0.5px;position:relative;z-index:1;
 }
 .hero h1{
-  font-size:clamp(32px,7vw,64px);font-weight:800;line-height:1.1;
-  margin-bottom:16px;color:var(--text);letter-spacing:-1px;
-  font-family:var(--font-ui);
+  font-size:clamp(30px,7vw,60px);font-weight:900;line-height:1.1;
+  margin-bottom:14px;color:var(--cream);letter-spacing:-1px;
+  font-family:var(--fu);position:relative;z-index:1;
 }
-.hero h1 span{color:var(--gold);}
+.hero h1 em{font-style:normal;color:var(--amber);}
 .hero-sub{
-  font-size:clamp(14px,2.5vw,18px);color:var(--text2);max-width:480px;
-  line-height:1.6;margin-bottom:36px;
+  font-size:clamp(14px,2.5vw,17px);color:var(--cream2);max-width:460px;
+  line-height:1.7;margin-bottom:32px;position:relative;z-index:1;
 }
-.hero-cta{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;}
+.hero-cta{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;position:relative;z-index:1;}
 .btn{
   display:inline-flex;align-items:center;gap:8px;
-  padding:12px 24px;border-radius:var(--radius);font-size:14px;font-weight:600;
+  padding:13px 26px;border-radius:var(--r);font-size:15px;font-weight:700;
   cursor:pointer;transition:all 0.2s;touch-action:manipulation;border:none;
 }
-.btn-primary{background:var(--purple);color:#fff;}
-.btn-primary:hover{background:#6a5ce6;transform:translateY(-1px);box-shadow:0 8px 24px rgba(124,106,247,0.35);}
-.btn-secondary{background:transparent;color:var(--text);border:1px solid var(--border2);}
-.btn-secondary:hover{background:var(--surface2);border-color:var(--text3);}
-.btn-gold{background:var(--gold);color:#1a1000;}
-.btn-gold:hover{background:#d4b860;transform:translateY(-1px);}
+.btn-amber{background:var(--amber);color:var(--brown2);}
+.btn-amber:hover{background:var(--amber-lt);transform:translateY(-1px);box-shadow:0 8px 24px rgba(244,168,34,.4);}
+.btn-outline{background:transparent;color:var(--cream);border:2px solid var(--border2);}
+.btn-outline:hover{border-color:var(--cream2);background:var(--navy3);}
 
-/* Hero preview cards */
-.hero-preview{
-  margin-top:56px;display:flex;gap:12px;flex-wrap:wrap;justify-content:center;max-width:700px;
+.hero-stats{
+  display:flex;gap:10px;flex-wrap:wrap;justify-content:center;
+  margin-top:44px;position:relative;z-index:1;
 }
-.preview-card{
-  background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);
-  padding:14px 18px;display:flex;align-items:center;gap:10px;
-  font-size:13px;color:var(--text2);min-width:160px;
-}
-.preview-card .pc-icon{font-size:22px;}
-.preview-card .pc-label{font-size:10px;color:var(--text3);margin-top:1px;}
-
-/* Section common */
-.section{padding:80px 20px;}
-.section-inner{max-width:1000px;margin:0 auto;}
-.section-tag{
-  display:inline-block;padding:4px 12px;border-radius:20px;
-  font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;
-  margin-bottom:12px;
-}
-.section-title{font-size:clamp(22px,4vw,36px);font-weight:800;margin-bottom:12px;font-family:var(--font-ui);}
-.section-sub{font-size:15px;color:var(--text2);max-width:520px;line-height:1.7;}
-
-/* How to play */
-#section-htp{background:var(--surface);}
-.htp-tag{background:rgba(62,185,80,0.1);color:var(--green);}
-.steps-grid{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin-top:40px;
-}
-.step-card{
-  background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);
-  padding:24px;position:relative;overflow:hidden;transition:border-color 0.2s;
-}
-.step-card:hover{border-color:var(--border2);}
-.step-num-big{
-  position:absolute;top:12px;right:16px;font-size:48px;font-weight:900;
-  color:var(--border2);font-family:var(--font-ui);line-height:1;
-}
-.step-icon-big{font-size:32px;margin-bottom:14px;display:block;}
-.step-card h3{font-size:15px;font-weight:700;margin-bottom:8px;}
-.step-card p{font-size:13px;color:var(--text2);line-height:1.6;}
-
-/* Block demo */
-.block-demo{
-  margin-top:36px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);
-  overflow:hidden;
-}
-.block-demo-header{
-  padding:8px 14px;background:rgba(0,0,0,0.3);border-bottom:1px solid var(--border);
+.stat-pill{
   display:flex;align-items:center;gap:8px;
+  background:rgba(255,245,224,.05);border:1px solid var(--border);
+  border-radius:var(--r);padding:10px 16px;font-size:13px;
 }
-.bd-dot{width:9px;height:9px;border-radius:50%;}
-.bd-dot.r{background:#ff5f57;} .bd-dot.y{background:#ffbd2e;} .bd-dot.g{background:#28ca41;}
-.bd-filename{font-family:var(--font);font-size:11px;color:var(--text3);margin-left:6px;}
-.block-demo-body{padding:14px;display:flex;gap:10px;flex-wrap:wrap;}
-.demo-block{
-  display:inline-flex;align-items:center;gap:6px;padding:8px 12px;
-  background:var(--surface2);border:1px solid var(--border2);border-left:3px solid var(--purple);
-  border-radius:var(--radius-sm);font-family:var(--font);font-size:12px;
-  cursor:default;user-select:none;
-}
-.demo-block.cond{border-left-color:var(--pink);}
-.demo-block.loop{border-left-color:var(--green);}
-.demo-block .d-name{color:var(--blue);}
-.demo-block.cond .d-name{color:var(--pink);}
-.demo-block.loop .d-name{color:var(--green);}
-.demo-block .d-paren{color:var(--text3);}
-.demo-block .d-arg{color:var(--orange);}
-.demo-block .d-num{
-  font-size:9px;color:var(--text3);background:var(--border);
-  border-radius:3px;padding:1px 5px;
-}
+.stat-pill .sp-icon{font-size:18px;}
+.stat-pill .sp-label{font-size:10px;color:var(--cream3);margin-top:1px;}
 
-/* About */
-#section-about{}
-.about-tag{background:rgba(226,199,122,0.1);color:var(--gold);}
-.about-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;margin-top:40px;}
-.about-card{
-  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;
+/* ══ SECTION SHARED ════════════════════════════════════ */
+.sec{padding:72px 20px;}
+.sec-inner{max-width:960px;margin:0 auto;}
+.sec-tag{
+  display:inline-block;padding:4px 14px;border-radius:20px;font-size:10px;
+  font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;
 }
-.about-card .ac-icon{font-size:28px;margin-bottom:14px;}
-.about-card h3{font-size:15px;font-weight:700;margin-bottom:8px;}
-.about-card p{font-size:13px;color:var(--text2);line-height:1.65;}
+.sec-title{font-size:clamp(22px,4vw,34px);font-weight:800;margin-bottom:12px;}
+.sec-sub{font-size:15px;color:var(--cream2);max-width:500px;line-height:1.7;}
 
-/* Upgrade preview on landing */
-#section-upgrade-preview{
-  background:linear-gradient(135deg,#0f0a2a 0%,var(--bg) 60%);
-  border-top:1px solid var(--border);
+/* ══ HOW TO PLAY SECTION ═══════════════════════════════ */
+#sec-htp{background:var(--navy2);}
+.htp-steps{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;margin-top:36px;
 }
-.upgrade-tag{background:rgba(226,199,122,0.1);color:var(--gold);}
-.upgrade-preview-cards{
-  display:flex;gap:20px;margin-top:40px;flex-wrap:wrap;justify-content:center;
+.htp-card{
+  background:var(--navy);border:1px solid var(--border);border-radius:var(--r);
+  padding:22px 18px;position:relative;overflow:hidden;
 }
-.up-card{
-  background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);
-  padding:28px;flex:1;min-width:240px;max-width:300px;transition:border-color 0.2s;
+.htp-card .htp-num{
+  position:absolute;top:10px;right:14px;font-size:44px;font-weight:900;
+  color:var(--border);font-family:var(--fu);line-height:1;
 }
-.up-card.featured{border-color:var(--gold);background:linear-gradient(135deg,rgba(226,199,122,0.06),var(--surface));}
-.up-card:hover{border-color:var(--text3);}
-.up-card.featured:hover{border-color:var(--gold);}
-.up-badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:1px;padding:3px 10px;border-radius:20px;margin-bottom:16px;}
-.up-badge.free{background:var(--border);color:var(--text2);}
-.up-badge.pro{background:rgba(226,199,122,0.15);color:var(--gold);border:1px solid rgba(226,199,122,0.3);}
-.up-badge.team{background:rgba(124,106,247,0.15);color:var(--purple);border:1px solid rgba(124,106,247,0.3);}
-.up-price{font-size:32px;font-weight:800;margin-bottom:4px;}
-.up-price span{font-size:14px;font-weight:400;color:var(--text2);}
-.up-desc{font-size:12px;color:var(--text2);margin-bottom:20px;}
-.up-features{list-style:none;display:flex;flex-direction:column;gap:8px;margin-bottom:24px;}
-.up-features li{font-size:13px;color:var(--text2);display:flex;align-items:center;gap:8px;}
-.up-features li::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0;}
-.up-features li.na{color:var(--text3);}
-.up-features li.na::before{content:'–';color:var(--text3);}
-.up-btn{
-  width:100%;padding:10px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;
-  cursor:pointer;border:none;transition:all 0.15s;
-}
-.up-btn.free{background:var(--border);color:var(--text2);}
-.up-btn.pro{background:var(--gold);color:#1a1000;}
-.up-btn.pro:hover{background:#d4b860;}
-.up-btn.team{background:var(--purple);color:#fff;}
-.up-btn.team:hover{background:#6a5ce6;}
+.htp-card .htp-icon{font-size:28px;margin-bottom:12px;display:block;}
+.htp-card h3{font-size:14px;font-weight:700;margin-bottom:6px;color:var(--cream);}
+.htp-card p{font-size:12px;color:var(--cream2);line-height:1.6;}
 
-/* Footer */
-footer{
-  border-top:1px solid var(--border);padding:32px 20px;text-align:center;
-  font-size:12px;color:var(--text3);
+/* ── MINI INTERACTIVE DEMO ── */
+#demo-wrap{
+  margin-top:32px;background:var(--navy);border:1px solid var(--border);
+  border-radius:var(--r);overflow:hidden;
 }
-footer a{color:var(--text2);}footer a:hover{color:var(--text);}
+#demo-header{
+  padding:8px 14px;background:var(--navy2);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:6px;
+}
+.ddot{width:9px;height:9px;border-radius:50%;}
+.ddot.r{background:#ff5f57;}.ddot.y{background:#ffbd2e;}.ddot.g{background:#28ca41;}
+#demo-filename{font-family:var(--f);font-size:10px;color:var(--cream3);margin-left:6px;}
+#demo-body{padding:14px;display:flex;gap:12px;flex-wrap:wrap;}
 
-/* ============================================================
-   UPGRADE PAGE
-============================================================ */
-#page-upgrade{min-height:100vh;overflow-y:auto;}
-.upgrade-hero{
-  padding:60px 20px 40px;text-align:center;
-  background:linear-gradient(135deg,#0f0a2a 0%,var(--bg) 70%);
-  border-bottom:1px solid var(--border);
+#demo-avail-col{flex:1;min-width:140px;}
+#demo-seq-col{flex:1;min-width:140px;}
+.demo-col-label{
+  font-size:9px;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--cream3);margin-bottom:8px;
 }
-.upgrade-hero h1{font-size:clamp(24px,5vw,40px);font-weight:800;margin-bottom:10px;}
-.upgrade-hero p{font-size:15px;color:var(--text2);}
-.upgrade-section{padding:48px 20px;max-width:900px;margin:0 auto;}
-.pricing-grid{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;}
-.pricing-card{
-  background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);
-  padding:32px;flex:1;min-width:240px;max-width:280px;
+#demo-avail-blocks,#demo-seq-blocks{
+  display:flex;flex-direction:column;gap:6px;min-height:80px;
+}
+.d-block{
+  display:flex;align-items:center;gap:6px;padding:9px 11px;
+  background:var(--navy2);border:1px solid var(--border2);border-left:3px solid var(--amber);
+  border-radius:var(--r-sm);font-family:var(--f);font-size:11px;color:var(--cream);
+  cursor:pointer;transition:all 0.15s;user-select:none;touch-action:manipulation;
   position:relative;
 }
-.pricing-card.featured{border-color:var(--gold);box-shadow:0 0 40px rgba(226,199,122,0.08);}
-.featured-label{
+.d-block:hover{border-color:var(--amber);background:var(--navy3);}
+.d-block .db-num{
+  font-size:9px;background:var(--border);color:var(--cream3);
+  border-radius:3px;padding:1px 5px;min-width:16px;text-align:center;
+}
+.d-block .db-name{color:#79c0ff;font-weight:bold;}
+.d-block .db-paren{color:var(--cream3);}
+.d-block .db-arg{color:#ffa657;}
+.d-block .db-rm{margin-left:auto;color:var(--cream3);padding:1px 5px;font-size:14px;}
+.d-block .db-rm:hover{color:var(--red);}
+.d-block.used{opacity:.28;pointer-events:none;}
+
+#demo-empty{
+  border:1px dashed var(--border);border-radius:var(--r-sm);padding:20px;
+  text-align:center;font-size:11px;color:var(--cream3);line-height:1.6;
+}
+#demo-footer{
+  padding:10px 14px;background:var(--navy2);border-top:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+}
+#demo-status{font-family:var(--f);font-size:10px;color:var(--cream3);flex:1;}
+#demo-status.ok{color:var(--green);}
+#demo-status.err{color:var(--red);}
+#demo-status.warn{color:var(--amber);}
+#demo-run{
+  padding:7px 18px;background:var(--green-dk);color:#fff;border:1px solid var(--green);
+  border-radius:var(--r-sm);font-size:12px;font-weight:700;cursor:pointer;
+  font-family:var(--f);letter-spacing:.5px;transition:all .15s;
+}
+#demo-run:hover{background:var(--green);}
+#demo-run:disabled{background:#1a3a1a;color:#2a5a2a;border-color:#1a3a1a;cursor:not-allowed;}
+#demo-reset{
+  padding:7px 12px;background:transparent;color:var(--cream3);border:1px solid var(--border);
+  border-radius:var(--r-sm);font-size:11px;cursor:pointer;font-family:var(--f);transition:all .15s;
+}
+#demo-reset:hover{color:var(--amber);border-color:var(--amber);}
+.demo-cta-row{margin-top:16px;text-align:center;}
+
+/* ══ ABOUT SECTION ═════════════════════════════════════ */
+.about-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:36px;}
+.about-card{
+  background:var(--navy2);border:1px solid var(--border);border-radius:var(--r);
+  padding:22px 18px;
+}
+.about-card .ac-icon{font-size:26px;margin-bottom:12px;}
+.about-card h3{font-size:14px;font-weight:700;margin-bottom:8px;}
+.about-card p{font-size:12px;color:var(--cream2);line-height:1.65;}
+
+/* ══ UPGRADE PREVIEW ═══════════════════════════════════ */
+#sec-upgrade-prev{
+  background:linear-gradient(135deg,#1a1f45 0%,var(--navy) 60%);
+  border-top:1px solid var(--border);
+}
+.pricing-row{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-top:36px;}
+.price-card{
+  background:var(--navy2);border:1px solid var(--border2);border-radius:var(--r);
+  padding:26px;flex:1;min-width:220px;max-width:280px;
+  position:relative;transition:border-color .2s;
+}
+.price-card:hover{border-color:var(--amber);}
+.price-card.featured{border-color:var(--amber);background:linear-gradient(135deg,rgba(244,168,34,.06),var(--navy2));}
+.feat-chip{
   position:absolute;top:-1px;left:50%;transform:translateX(-50%);
-  background:var(--gold);color:#1a1000;font-size:10px;font-weight:700;
-  padding:3px 14px;border-radius:0 0 var(--radius-sm) var(--radius-sm);letter-spacing:1px;
+  background:var(--amber);color:var(--brown2);font-size:9px;font-weight:800;
+  padding:3px 14px;border-radius:0 0 var(--r-sm) var(--r-sm);letter-spacing:1px;
+}
+.tier-badge{
+  display:inline-block;font-size:9px;font-weight:700;letter-spacing:1px;
+  padding:3px 10px;border-radius:20px;margin-bottom:14px;margin-top:6px;
+}
+.tb-free{background:var(--border);color:var(--cream2);}
+.tb-pro{background:rgba(244,168,34,.15);color:var(--amber);border:1px solid rgba(244,168,34,.3);}
+.tb-team{background:rgba(25,118,210,.15);color:#64b3f4;border:1px solid rgba(25,118,210,.3);}
+.price-amt{font-size:30px;font-weight:800;margin-bottom:3px;}
+.price-amt span{font-size:13px;font-weight:400;color:var(--cream2);}
+.price-desc{font-size:12px;color:var(--cream2);margin-bottom:18px;}
+.feat-list{list-style:none;display:flex;flex-direction:column;gap:7px;margin-bottom:22px;}
+.feat-list li{font-size:12px;color:var(--cream2);display:flex;align-items:flex-start;gap:7px;}
+.feat-list li::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0;margin-top:1px;}
+.feat-list li.na{color:var(--cream3);}
+.feat-list li.na::before{content:'–';color:var(--cream3);}
+.price-btn{
+  width:100%;padding:10px;border-radius:var(--r-sm);font-size:13px;font-weight:700;
+  cursor:pointer;border:none;transition:all .15s;
+}
+.pb-free{background:var(--border);color:var(--cream2);}
+.pb-pro{background:var(--amber);color:var(--brown2);}
+.pb-pro:hover{background:var(--amber-lt);}
+.pb-team{background:#1976D2;color:#fff;}
+.pb-team:hover{background:#1565C0;}
+
+/* ══ FOOTER ════════════════════════════════════════════ */
+footer{
+  border-top:1px solid var(--border);padding:28px 20px;
+  font-size:12px;color:var(--cream3);text-align:center;
+}
+footer a{color:var(--cream2);}footer a:hover{color:var(--amber);}
+.ory-badge{
+  display:inline-flex;align-items:center;gap:6px;margin-top:12px;
+  padding:5px 12px;background:rgba(244,168,34,.08);border:1px solid rgba(244,168,34,.25);
+  border-radius:20px;font-size:10px;color:var(--amber);
 }
 
-/* ============================================================
-   PROFILE PAGE
-============================================================ */
-#page-profile{min-height:100vh;overflow-y:auto;padding:40px 20px;}
-.profile-inner{max-width:600px;margin:0 auto;}
-.profile-card{
-  background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);
-  padding:32px;margin-bottom:20px;
+/* ══ UPGRADE PAGE ══════════════════════════════════════ */
+#page-upgrade{min-height:100vh;overflow-y:auto;}
+.upgrade-hero{
+  padding:56px 20px 36px;text-align:center;
+  background:linear-gradient(135deg,#1a1f45 0%,var(--navy) 70%);
+  border-bottom:1px solid var(--border);
 }
-.profile-avatar-lg{
-  width:64px;height:64px;border-radius:50%;background:var(--purple-dim);
-  border:3px solid var(--purple);display:flex;align-items:center;justify-content:center;
-  font-size:26px;font-weight:bold;color:var(--purple);margin-bottom:16px;
-}
-.progress-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:8px;}
-.progress-fill{height:100%;background:var(--green);border-radius:3px;transition:width 0.4s;}
+.upgrade-hero h1{font-size:clamp(22px,5vw,38px);font-weight:800;margin-bottom:8px;}
+.upgrade-hero p{font-size:14px;color:var(--cream2);}
+.upgrade-section{padding:44px 20px;max-width:860px;margin:0 auto;}
 
-/* ============================================================
-   GAME PAGE
-============================================================ */
-#page-game{background:var(--bg);}
-
-#canvas-container{
-  flex-shrink:0;height:55vh;background:#f5e6d0;position:relative;
+/* ══ PROFILE PAGE ══════════════════════════════════════ */
+#page-profile{min-height:100vh;overflow-y:auto;}
+.profile-wrap{max-width:580px;margin:36px auto;padding:0 20px;}
+.p-card{
+  background:var(--navy2);border:1px solid var(--border2);border-radius:var(--r);
+  padding:28px;margin-bottom:16px;
 }
+.p-avatar{
+  width:60px;height:60px;border-radius:50%;background:var(--navy3);
+  border:2px solid var(--amber);display:flex;align-items:center;justify-content:center;
+  font-size:24px;font-weight:700;color:var(--amber);margin-bottom:14px;
+}
+.prog-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:6px;}
+.prog-fill{height:100%;background:var(--green);border-radius:3px;transition:width .4s;}
+
+/* ══ GAME PAGE ═════════════════════════════════════════ */
+#page-game{background:var(--navy);}
+#canvas-container{flex-shrink:0;height:54vh;background:#f5e6d0;position:relative;}
 #game-canvas{display:block;width:100%;height:100%;}
 
-/* Game top bar (inside game page, below global nav) */
+/* Game top bar */
 #game-topbar{
   display:flex;align-items:center;justify-content:space-between;
-  padding:0 14px;height:38px;background:rgba(8,8,18,0.95);
+  padding:0 12px;height:36px;background:rgba(26,27,52,.98);
   border-bottom:1px solid var(--border);flex-shrink:0;
 }
-#game-topbar .level-name{font-family:var(--font);font-size:11px;color:var(--gold);letter-spacing:0.5px;}
-#game-topbar .level-right{display:flex;align-items:center;gap:10px;}
-#progress-dots{display:flex;gap:5px;}
-.prog-dot{width:7px;height:7px;border-radius:50%;background:var(--border);border:1px solid var(--border2);transition:all 0.3s;}
+#lvl-name-bar{font-family:var(--f);font-size:11px;color:var(--amber);letter-spacing:.5px;}
+.game-topbar-right{display:flex;align-items:center;gap:8px;}
+#prog-dots{display:flex;gap:5px;}
+.prog-dot{width:7px;height:7px;border-radius:50%;background:var(--border);border:1px solid var(--border2);transition:all .3s;}
 .prog-dot.done{background:var(--green);border-color:var(--green);}
-.prog-dot.active{background:var(--gold);border-color:var(--gold);box-shadow:0 0 5px rgba(226,199,122,0.6);}
-#reset-btn{
-  background:transparent;color:var(--text3);border:1px solid var(--border);
-  padding:4px 10px;border-radius:4px;font-family:var(--font);font-size:10px;
-  cursor:pointer;transition:all 0.15s;touch-action:manipulation;
+.prog-dot.cur{background:var(--amber);border-color:var(--amber);box-shadow:0 0 5px rgba(244,168,34,.6);}
+.tbtn{
+  background:transparent;color:var(--cream3);border:1px solid var(--border);
+  padding:4px 9px;border-radius:4px;font-family:var(--f);font-size:10px;
+  cursor:pointer;transition:all .15s;touch-action:manipulation;
 }
-#reset-btn:hover{color:var(--gold);border-color:var(--gold);}
+.tbtn:hover{color:var(--amber);border-color:var(--amber);}
 
 /* Code area */
-#code-area{
-  flex:1;display:flex;flex-direction:column;background:var(--bg);
-  border-top:1px solid var(--border);overflow:hidden;min-height:0;
-}
+#code-area{flex:1;display:flex;flex-direction:column;background:var(--navy);border-top:1px solid var(--border);overflow:hidden;min-height:0;}
 #tray-bar{
-  height:30px;min-height:30px;background:#060610;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;padding:0 12px;gap:8px;flex-shrink:0;
+  height:28px;min-height:28px;background:#13152a;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 10px;gap:5px;flex-shrink:0;
 }
 .tray-dot{width:8px;height:8px;border-radius:50%;}
 .td-r{background:#ff5f57;}.td-y{background:#ffbd2e;}.td-g{background:#28ca41;}
-#tray-file{font-family:var(--font);font-size:10px;color:var(--text3);margin-left:6px;}
-#hint-toggle-btn{
-  margin-left:auto;font-size:10px;color:var(--text3);padding:2px 8px;
+#tray-file{font-family:var(--f);font-size:10px;color:var(--cream3);margin-left:5px;}
+#hint-btn{
+  margin-left:auto;font-size:10px;color:var(--cream3);padding:2px 8px;
   border:1px solid var(--border);border-radius:3px;cursor:pointer;
-  font-family:var(--font);background:transparent;transition:all 0.15s;
+  font-family:var(--f);background:transparent;transition:all .15s;
 }
-#hint-toggle-btn:hover{color:var(--gold);border-color:var(--gold);}
-#hint-toggle-btn.on{color:var(--gold);border-color:rgba(226,199,122,0.4);}
-
-/* Recipe hint strip */
-#recipe-strip{
-  background:#04040e;border-bottom:1px solid var(--border);
-  overflow:hidden;max-height:0;transition:max-height 0.25s ease;flex-shrink:0;
-}
-#recipe-strip.open{max-height:70px;}
-#recipe-strip-inner{padding:8px 14px;}
-#rs-goal{font-size:11px;font-weight:700;color:var(--gold);margin-bottom:2px;}
-#rs-desc{font-size:10px;color:var(--text3);line-height:1.5;}
-
-/* Blocks layout */
+#hint-btn:hover{color:var(--amber);border-color:var(--amber);}
+#hint-btn.on{color:var(--amber);border-color:rgba(244,168,34,.4);}
+#recipe-strip{background:#0e1020;border-bottom:1px solid var(--border);overflow:hidden;max-height:0;transition:max-height .25s;flex-shrink:0;}
+#recipe-strip.open{max-height:68px;}
+#rs-inner{padding:7px 12px;}
+#rs-goal{font-size:11px;font-weight:700;color:var(--amber);margin-bottom:2px;}
+#rs-desc{font-size:10px;color:var(--cream3);line-height:1.5;}
 #blocks-row{display:flex;flex:1;overflow:hidden;min-height:0;}
 
 /* Available column */
-#avail-col{
-  width:48%;display:flex;flex-direction:column;border-right:1px solid var(--border);
+#avail-col{width:47%;display:flex;flex-direction:column;border-right:1px solid var(--border);}
+#avail-hdr{
+  height:24px;min-height:24px;background:#13152a;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 9px;justify-content:space-between;flex-shrink:0;
 }
-#avail-header{
-  height:26px;min-height:26px;background:#04040e;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;padding:0 10px;justify-content:space-between;flex-shrink:0;
-}
-.col-lbl{font-size:9px;color:var(--text4);letter-spacing:1.5px;text-transform:uppercase;}
-#avail-count-badge{font-size:9px;color:var(--text3);}
-#avail-blocks{
-  flex:1;padding:6px;overflow-y:auto;display:flex;flex-direction:column;gap:5px;
-}
+.col-lbl{font-size:9px;color:var(--cream3);letter-spacing:1.5px;text-transform:uppercase;}
+#avail-count{font-size:9px;color:var(--cream3);}
+#avail-blocks{flex:1;padding:5px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;}
 
 /* Sequence column */
-#seq-col{
-  width:52%;display:flex;flex-direction:column;transition:background 0.2s;
+#seq-col{width:53%;display:flex;flex-direction:column;transition:background .2s;}
+#seq-col.drag-over{background:rgba(244,168,34,.04);}
+#seq-hdr{
+  height:24px;min-height:24px;background:#13152a;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 9px;justify-content:space-between;flex-shrink:0;
 }
-#seq-col.drag-over{background:#0a0a22;}
-#seq-header{
-  height:26px;min-height:26px;background:#04040e;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;padding:0 10px;justify-content:space-between;flex-shrink:0;
-}
-#seq-count{font-size:9px;color:var(--text3);transition:color 0.3s;}
-#seq-count.partial{color:var(--orange);}
+#seq-count{font-size:9px;color:var(--cream3);transition:color .3s;}
+#seq-count.partial{color:var(--amber);}
 #seq-count.full{color:var(--green);}
-#seq-blocks{
-  flex:1;padding:6px;overflow-y:auto;display:flex;flex-direction:column;gap:5px;
-}
+#seq-blocks{flex:1;padding:5px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;}
 
 /* Empty state */
 #seq-empty{
   flex:1;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;gap:6px;pointer-events:none;padding:10px;
+  justify-content:center;gap:5px;pointer-events:none;padding:10px;
 }
-.seq-empty-arrow{font-size:16px;color:var(--text4);animation:bob 1.6s ease-in-out infinite;}
-@keyframes bob{0%,100%{transform:translateX(-4px);opacity:.4;}50%{transform:translateX(4px);opacity:.9;}}
-.seq-empty-text{font-size:10px;color:var(--text4);text-align:center;line-height:1.5;}
+.seq-empty-arr{font-size:16px;color:var(--border2);animation:bob 1.6s ease-in-out infinite;}
+@keyframes bob{0%,100%{transform:translateX(-4px);opacity:.4;}50%{transform:translateX(4px);opacity:1;}}
+.seq-empty-txt{font-size:10px;color:var(--cream3);text-align:center;line-height:1.5;}
 
-/* Blocks */
+/* Game blocks */
 .block{
-  background:var(--surface2);border:1px solid var(--border);border-left:3px solid var(--purple);
-  border-radius:var(--radius-sm);padding:8px 10px;
-  font-family:var(--font);font-size:11px;color:var(--text);user-select:none;
-  min-height:40px;display:flex;align-items:center;gap:5px;
+  background:var(--navy2);border:1px solid var(--border);border-left:3px solid var(--amber);
+  border-radius:var(--r-sm);padding:8px 9px;
+  font-family:var(--f);font-size:11px;color:var(--cream);user-select:none;
+  min-height:38px;display:flex;align-items:center;gap:5px;
   touch-action:none;cursor:pointer;
-  transition:background 0.12s,border-color 0.12s,opacity 0.2s,transform 0.1s;
-  position:relative;
+  transition:background .12s,border-color .12s,opacity .2s,transform .1s;
 }
 .block:active{transform:scale(0.97);}
-.block.t-cond{border-left-color:var(--pink);}
+.block.t-cond{border-left-color:#f78166;}
 .block.t-loop{border-left-color:var(--green);}
-.block.t-basic{border-left-color:var(--purple);}
-
-.block .b-icon{font-size:10px;flex-shrink:0;opacity:.7;}
-.block.t-cond .b-icon{color:var(--pink);}
+.block.t-basic{border-left-color:var(--amber);}
+.block .b-icon{font-size:9px;flex-shrink:0;opacity:.7;}
+.block.t-cond .b-icon{color:#f78166;}
 .block.t-loop .b-icon{color:var(--green);}
-.block.t-basic .b-icon{color:var(--purple);}
-
-.block .b-num{
-  font-size:9px;background:var(--border);color:var(--text3);
-  border-radius:3px;padding:1px 5px;min-width:18px;text-align:center;flex-shrink:0;
-}
-.block .b-name{color:var(--blue);font-weight:bold;}
-.block.t-cond .b-name{color:var(--pink);}
+.block.t-basic .b-icon{color:var(--amber);}
+.block .b-num{font-size:9px;background:var(--border);color:var(--cream3);border-radius:3px;padding:1px 5px;min-width:16px;text-align:center;flex-shrink:0;}
+.block .b-name{color:#79c0ff;font-weight:bold;}
+.block.t-cond .b-name{color:#f78166;}
 .block.t-loop .b-name{color:var(--green);}
-.block .b-paren{color:var(--text3);}
-.block .b-arg{color:var(--orange);}
-.block .b-rm{
-  margin-left:auto;color:var(--text4);font-size:15px;padding:2px 6px;
-  flex-shrink:0;cursor:pointer;transition:color 0.15s;
-}
+.block .b-paren{color:var(--cream3);}
+.block .b-arg{color:#ffa657;}
+.block .b-rm{margin-left:auto;color:var(--cream3);font-size:14px;padding:2px 6px;flex-shrink:0;cursor:pointer;transition:color .15s;}
 .block .b-rm:hover{color:var(--red);}
-
-/* Block states */
-.block.used{opacity:.25;cursor:not-allowed;pointer-events:none;border-left-color:var(--text4) !important;}
-.block.dragging{opacity:.2;}
+.block.used{opacity:.22;cursor:not-allowed;pointer-events:none;border-left-color:var(--border2) !important;}
+.block.dragging{opacity:.15;}
 .block.executing{
-  border-left-color:var(--gold) !important;background:#1a160a;
+  border-left-color:var(--amber-lt) !important;background:rgba(244,168,34,.06);
   animation:bpulse .55s ease-in-out infinite alternate;
 }
-@keyframes bpulse{from{box-shadow:0 0 0 0 rgba(226,199,122,.25);}to{box-shadow:0 0 10px 2px rgba(226,199,122,.1);}}
-.block.err-hl{border-left-color:var(--red) !important;background:#1a0808;}
+@keyframes bpulse{from{box-shadow:0 0 0 0 rgba(244,168,34,.2);}to{box-shadow:0 0 10px 2px rgba(244,168,34,.1);}}
+.block.err-hl{border-left-color:var(--red) !important;background:rgba(239,83,80,.06);}
 @keyframes popIn{0%{transform:scale(.82);opacity:0;}65%{transform:scale(1.04);}100%{transform:scale(1);opacity:1;}}
-.block.pop{animation:popIn .22s ease-out;}
+.block.pop{animation:popIn .2s ease-out;}
 
 /* Bottom bar */
 #game-bottom{
-  height:44px;min-height:44px;padding:0 14px;display:flex;align-items:center;
-  justify-content:space-between;border-top:1px solid var(--border);background:#04040e;flex-shrink:0;
+  height:42px;min-height:42px;padding:0 12px;display:flex;align-items:center;
+  justify-content:space-between;border-top:1px solid var(--border);background:#13152a;flex-shrink:0;
 }
-#status-txt{
-  font-family:var(--font);font-size:10px;color:var(--text3);flex:1;margin-right:10px;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:color 0.2s;
-}
+#status-txt{font-family:var(--f);font-size:10px;color:var(--cream3);flex:1;margin-right:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:color .2s;}
 #status-txt.s-ok{color:var(--green);}
-#status-txt.s-warn{color:var(--orange);}
+#status-txt.s-warn{color:var(--amber);}
 #status-txt.s-err{color:var(--red);}
 #run-btn{
-  background:#12291a;color:var(--green);border:1px solid #1e5c2e;
-  padding:0 20px;height:32px;border-radius:var(--radius-sm);
-  font-family:var(--font);font-size:12px;font-weight:bold;letter-spacing:1px;
-  cursor:pointer;touch-action:manipulation;transition:all 0.2s;
+  background:#14311a;color:var(--green);border:1px solid #1e5c2e;
+  padding:0 18px;height:30px;border-radius:var(--r-sm);
+  font-family:var(--f);font-size:12px;font-weight:bold;letter-spacing:1px;
+  cursor:pointer;touch-action:manipulation;transition:all .2s;
 }
-#run-btn:hover:not(:disabled){background:var(--green);color:#fff;box-shadow:0 0 16px rgba(63,185,80,.3);}
+#run-btn:hover:not(:disabled){background:var(--green);color:#fff;box-shadow:0 0 14px rgba(76,175,80,.3);}
 #run-btn:disabled{background:#0a1a0f;color:#1e4025;border-color:#0e2016;cursor:not-allowed;}
 
-/* ============================================================
-   OVERLAYS (shared)
-============================================================ */
-.overlay{
-  display:none;position:fixed;inset:0;z-index:2000;
-  align-items:center;justify-content:center;
-  background:rgba(0,0,0,.82);backdrop-filter:blur(8px);
-}
+/* ══ OVERLAYS ══════════════════════════════════════════ */
+.overlay{display:none;position:fixed;inset:0;z-index:2000;align-items:center;justify-content:center;background:rgba(0,0,0,.84);backdrop-filter:blur(8px);}
 .overlay.open{display:flex;}
-.ov-box{
-  background:var(--surface);border:1px solid var(--border2);border-radius:10px;
-  padding:28px 24px;max-width:340px;width:90%;text-align:center;
-}
+.ov-box{background:var(--navy2);border:1px solid var(--border2);border-radius:12px;padding:26px 22px;max-width:320px;width:90%;text-align:center;}
 
 /* Tutorial */
-#tut-overlay .ov-box{max-width:320px;}
-#tut-overlay .tut-title{font-size:20px;font-weight:800;margin-bottom:6px;font-family:var(--font-ui);}
-#tut-overlay .tut-sub{font-size:12px;color:var(--text2);margin-bottom:22px;}
-.tut-step{
-  display:flex;align-items:center;gap:12px;padding:10px 14px;
-  background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);
-  margin-bottom:8px;text-align:left;
-}
-.tut-step-icon{font-size:20px;flex-shrink:0;}
-.tut-step-txt{font-size:12px;color:var(--text2);line-height:1.5;}
-.tut-step-txt strong{color:var(--text);}
-.tut-start-btn{
-  width:100%;margin-top:18px;padding:12px;border-radius:var(--radius-sm);
-  background:var(--green);color:#fff;font-size:14px;font-weight:700;
-  border:none;cursor:pointer;transition:background 0.15s;
-  font-family:var(--font-ui);
-}
-.tut-start-btn:hover{background:#2ea043;}
+#tut-ov .tut-title{font-size:18px;font-weight:800;margin-bottom:4px;}
+#tut-ov .tut-sub{font-size:12px;color:var(--cream2);margin-bottom:20px;}
+.tut-step{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--navy3);border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:7px;text-align:left;}
+.tut-step-ico{font-size:18px;flex-shrink:0;}
+.tut-step-txt{font-size:11px;color:var(--cream2);line-height:1.5;}
+.tut-step-txt strong{color:var(--cream);}
+.tut-go{width:100%;margin-top:16px;padding:12px;border-radius:var(--r-sm);background:var(--amber);color:var(--brown2);font-size:14px;font-weight:800;border:none;cursor:pointer;transition:background .15s;}
+.tut-go:hover{background:var(--amber-lt);}
 
-/* Game result overlay */
-#result-overlay .ov-box.ov-error{border-color:var(--red);}
-#result-overlay .ov-box.ov-success{border-color:var(--green);}
-#ov-title{font-size:15px;font-weight:800;margin-bottom:8px;letter-spacing:.5px;}
-.ov-error #ov-title{color:var(--red);}
-.ov-success #ov-title{color:var(--green);}
-#ov-msg{font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.7;}
-#ov-errcode{
-  background:#040408;border-radius:4px;padding:10px;text-align:left;
-  font-family:var(--font);font-size:10px;color:var(--pink);margin-bottom:14px;
+/* Result overlay */
+#result-ov .ov-box.ov-err{border-color:var(--red);}
+#result-ov .ov-box.ov-ok{border-color:var(--green);}
+#ov-title{font-size:15px;font-weight:800;margin-bottom:8px;}
+.ov-err #ov-title{color:var(--red);}
+.ov-ok #ov-title{color:var(--green);}
+#ov-msg{font-size:12px;color:var(--cream2);margin-bottom:12px;line-height:1.7;}
+#ov-code{
+  background:#080a14;border-radius:4px;padding:10px;text-align:left;
+  font-family:var(--f);font-size:10px;color:#f78166;margin-bottom:14px;
   border-left:3px solid var(--red);display:none;
-  white-space:pre-wrap;word-break:break-word;line-height:1.6;max-height:100px;overflow-y:auto;
+  white-space:pre-wrap;word-break:break-word;line-height:1.6;max-height:90px;overflow-y:auto;
 }
 .ov-actions{display:flex;gap:8px;justify-content:center;}
-.ov-btn{
-  padding:9px 18px;border-radius:var(--radius-sm);font-size:12px;font-weight:700;
-  cursor:pointer;border:none;transition:opacity 0.15s;font-family:var(--font-ui);
-}
-.ov-btn:hover{opacity:.85;}
-.ov-btn.retry{background:var(--surface2);color:var(--text);border:1px solid var(--border2);}
-.ov-btn.next{background:#1f6feb;color:#fff;}
+.ov-btn{padding:9px 18px;border-radius:var(--r-sm);font-size:12px;font-weight:700;cursor:pointer;border:none;transition:opacity .15s;}
+.ov-btn.retry{background:var(--navy3);color:var(--cream);border:1px solid var(--border2);}
+.ov-btn.nxt{background:#1976D2;color:#fff;}
 
 /* Login modal */
-#login-modal .ov-box{max-width:360px;}
-#login-modal .lm-logo{font-size:32px;margin-bottom:8px;}
-#login-modal .lm-title{font-size:18px;font-weight:800;margin-bottom:6px;}
-#login-modal .lm-sub{font-size:13px;color:var(--text2);margin-bottom:24px;}
+#login-ov .ov-box{max-width:340px;position:relative;}
+.lm-logo-img{width:56px;height:56px;border-radius:14px;margin-bottom:12px;}
+.lm-title{font-size:17px;font-weight:800;margin-bottom:5px;}
+.lm-sub{font-size:12px;color:var(--cream2);margin-bottom:22px;}
 .lm-btn{
-  width:100%;padding:12px;border-radius:var(--radius-sm);font-size:14px;font-weight:600;
-  cursor:pointer;border:none;margin-bottom:10px;transition:all 0.15s;
+  width:100%;padding:12px;border-radius:var(--r-sm);font-size:13px;font-weight:700;
+  cursor:pointer;border:none;margin-bottom:10px;transition:all .15s;
   display:flex;align-items:center;justify-content:center;gap:8px;
 }
-.lm-btn.ory{background:var(--purple);color:#fff;}
-.lm-btn.ory:hover{background:#6a5ce6;}
-.lm-btn.guest{background:var(--surface2);color:var(--text2);border:1px solid var(--border2);}
-.lm-btn.guest:hover{color:var(--text);}
-.lm-divider{display:flex;align-items:center;gap:10px;margin:14px 0;}
+.lm-ory{background:var(--amber);color:var(--brown2);}
+.lm-ory:hover{background:var(--amber-lt);}
+.lm-guest{background:var(--navy3);color:var(--cream2);border:1px solid var(--border2);}
+.lm-guest:hover{color:var(--cream);}
+.lm-divider{display:flex;align-items:center;gap:10px;margin:12px 0;font-size:11px;color:var(--cream3);}
 .lm-divider::before,.lm-divider::after{content:'';flex:1;height:1px;background:var(--border);}
-.lm-divider span{font-size:11px;color:var(--text3);}
-.lm-close{
-  position:absolute;top:12px;right:14px;background:transparent;border:none;
-  color:var(--text3);font-size:18px;cursor:pointer;line-height:1;padding:4px;
-}
-.lm-close:hover{color:var(--text);}
-.lm-terms{font-size:10px;color:var(--text3);margin-top:14px;line-height:1.5;}
-.lm-terms a{color:var(--text2);}
+.lm-close{position:absolute;top:10px;right:12px;background:transparent;border:none;color:var(--cream3);font-size:17px;cursor:pointer;padding:4px;line-height:1;}
+.lm-close:hover{color:var(--cream);}
+.lm-terms{font-size:10px;color:var(--cream3);margin-top:12px;line-height:1.5;}
 
 /* Drag clone */
-#drag-clone{
-  position:fixed;z-index:9999;pointer-events:none;display:none;
-  opacity:.9;transform:scale(1.05) rotate(1.5deg);
-  box-shadow:0 10px 30px rgba(0,0,0,.7);border-radius:var(--radius-sm);
-}
-
+#drag-clone{position:fixed;z-index:9999;pointer-events:none;display:none;opacity:.9;transform:scale(1.05) rotate(1.5deg);box-shadow:0 10px 28px rgba(0,0,0,.7);border-radius:var(--r-sm);}
 /* Confetti */
-.confetti-p{
-  position:fixed;width:7px;height:7px;border-radius:2px;
-  pointer-events:none;z-index:3000;animation:fall 1.6s ease-in forwards;
-}
-@keyframes fall{0%{transform:translateY(-20px) rotate(0deg);opacity:1;}100%{transform:translateY(105vh) rotate(720deg);opacity:0;}}
+.cfp{position:fixed;width:7px;height:7px;border-radius:2px;pointer-events:none;z-index:3000;animation:cffall 1.6s ease-in forwards;}
+@keyframes cffall{0%{transform:translateY(-20px) rotate(0deg);opacity:1;}100%{transform:translateY(105vh) rotate(720deg);opacity:0;}}
 
-/* ============================================================
-   RESPONSIVE
-============================================================ */
-@media(max-width:600px){
-  #nav-links .nav-link:not(.primary){display:none;}
+/* ══ RESPONSIVE ════════════════════════════════════════ */
+@media(max-width:580px){
+  #nav-links .nav-lnk:not(.play-btn){display:none;}
   .hero h1{font-size:28px;}
-  .hero-preview{gap:8px;}
-  .preview-card{min-width:140px;padding:10px 12px;}
-  .section{padding:50px 16px;}
-  .up-card,.pricing-card{min-width:100%;max-width:100%;}
-  #avail-col{width:45%;}
-  #seq-col{width:55%;}
+  .price-card,.feat-card{min-width:100%;max-width:100%;}
+  #avail-col{width:45%;}#seq-col{width:55%;}
 }
 </style>
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════ NAV ═══ -->
+<!-- ═══ NAV ═══════════════════════════════════════════ -->
 <nav id="nav">
-  <div id="nav-logo" onclick="showPage('home')">
-    <span class="logo-icon">🍳</span>
-    <span class="logo-text">DevKitchen</span>
+  <div id="nav-logo" onclick="goPage('home')">
+    <img src="logo.png" alt="DevKitchen">
+    <div>
+      <div class="logo-text">DevKitchen</div>
+      <div class="logo-sq">SQUARE</div>
+    </div>
   </div>
   <div id="nav-links">
-    <span class="nav-link" onclick="showPage('home');scrollTo('#section-htp')">How to Play</span>
-    <span class="nav-link" onclick="showPage('home');scrollTo('#section-about')">About</span>
-    <span class="nav-link" onclick="showPage('upgrade')">Upgrade</span>
-    <span class="nav-link primary" onclick="startPlaying()">▶ Play</span>
+    <span class="nav-lnk" onclick="goPage('home');goScroll('#sec-htp')">How to Play</span>
+    <span class="nav-lnk" onclick="goPage('home');goScroll('#sec-about')">About</span>
+    <span class="nav-lnk" onclick="goPage('upgrade')">Upgrade</span>
+    <span class="nav-lnk play-btn" onclick="startGame()">▶ Play</span>
   </div>
   <div id="nav-user">
-    <div id="nav-avatar" style="display:none" onclick="showPage('profile')">?</div>
-    <span id="nav-username" style="display:none"></span>
-    <button id="nav-login-btn" onclick="openLoginModal()">Sign in</button>
+    <div id="nav-avatar" onclick="goPage('profile')">?</div>
+    <span id="nav-username"></span>
+    <button id="nav-signin" onclick="openLogin()">Sign in</button>
   </div>
 </nav>
 
-<!-- ═══════════════════════════════════ HOME PAGE ═══ -->
+<!-- ═══ HOME ═══════════════════════════════════════════ -->
 <div id="page-home" class="page active">
 
   <!-- Hero -->
   <section class="hero">
+    <img src="logo.png" alt="DevKitchen Square" class="hero-logo-img">
     <div class="hero-tag">🎮 Learn • Code • Cook</div>
-    <h1>Code your way<br>to a perfect <span>dish</span></h1>
-    <p class="hero-sub">DevKitchen teaches programming logic through cooking. Drag, arrange, and run code blocks to bring your dish to life in 3D.</p>
+    <h1>Cook your way to<br>a perfect <em>dish</em></h1>
+    <p class="hero-sub">DevKitchen teaches programming logic through cooking. Arrange code blocks in the right order to bring your dish to life in 3D.</p>
     <div class="hero-cta">
-      <button class="btn btn-primary" onclick="startPlaying()">▶ Play Now — It's Free</button>
-      <button class="btn btn-secondary" onclick="scrollTo('#section-htp')">How it works ↓</button>
+      <button class="btn btn-amber" onclick="startGame()">▶ Play Now — It's Free</button>
+      <button class="btn btn-outline" onclick="goScroll('#sec-htp')">How it works ↓</button>
     </div>
-    <div class="hero-preview">
-      <div class="preview-card"><span class="pc-icon">🧠</span><div><div>Logic Puzzles</div><div class="pc-label">if/else · loops · sequences</div></div></div>
-      <div class="preview-card"><span class="pc-icon">🍳</span><div><div>3D Kitchen</div><div class="pc-label">Watch your chef cook live</div></div></div>
-      <div class="preview-card"><span class="pc-icon">📈</span><div><div>3 Levels Free</div><div class="pc-label">More coming with Pro</div></div></div>
+    <div class="hero-stats">
+      <div class="stat-pill"><span class="sp-icon">🧠</span><div><div>Logic Puzzles</div><div class="sp-label">if/else · loops · sequences</div></div></div>
+      <div class="stat-pill"><span class="sp-icon">🍳</span><div><div>3D Kitchen</div><div class="sp-label">Watch your chef cook live</div></div></div>
+      <div class="stat-pill"><span class="sp-icon">🆓</span><div><div>3 Levels Free</div><div class="sp-label">No account needed</div></div></div>
     </div>
   </section>
 
-  <!-- How to Play -->
-  <section class="section" id="section-htp" style="background:var(--surface);">
-    <div class="section-inner">
-      <span class="section-tag" style="background:rgba(63,185,80,.1);color:var(--green);">HOW TO PLAY</span>
-      <h2 class="section-title">Four steps to serve the perfect dish</h2>
-      <p class="section-sub">No prior coding experience needed. Just logic, order, and a bit of culinary creativity.</p>
+  <!-- How to Play + interactive demo -->
+  <section class="sec" id="sec-htp" style="background:var(--navy2);">
+    <div class="sec-inner">
+      <span class="sec-tag" style="background:rgba(76,175,80,.1);color:var(--green);">HOW TO PLAY</span>
+      <h2 class="sec-title">Four steps to serve the perfect dish</h2>
+      <p class="sec-sub">No coding experience needed — just logic, order, and a pinch of creativity.</p>
 
-      <div class="steps-grid">
-        <div class="step-card">
-          <span class="step-num-big">1</span>
-          <span class="step-icon-big">👆</span>
-          <h3>Tap to add</h3>
-          <p>Tap any block on the left panel to instantly add it to your recipe sequence.</p>
-        </div>
-        <div class="step-card">
-          <span class="step-num-big">2</span>
-          <span class="step-icon-big">↕️</span>
-          <h3>Drag to reorder</h3>
-          <p>Drag blocks up or down in the sequence to change their order. Drag back left to remove.</p>
-        </div>
-        <div class="step-card">
-          <span class="step-num-big">3</span>
-          <span class="step-icon-big">✅</span>
-          <h3>Use all blocks</h3>
-          <p>Every block in the level must be used — no shortcuts. Think carefully about order!</p>
-        </div>
-        <div class="step-card">
-          <span class="step-num-big">4</span>
-          <span class="step-icon-big">▶️</span>
-          <h3>Run & watch</h3>
-          <p>Hit Run and watch your 3D chef execute your code in real time. Fix errors and retry.</p>
-        </div>
+      <div class="htp-steps">
+        <div class="htp-card"><span class="htp-num">1</span><span class="htp-icon">👆</span><h3>Tap to add</h3><p>Tap any block on the left to add it to your cooking sequence.</p></div>
+        <div class="htp-card"><span class="htp-num">2</span><span class="htp-icon">↕️</span><h3>Drag to reorder</h3><p>Drag blocks up or down to change their position. Drag left to remove.</p></div>
+        <div class="htp-card"><span class="htp-num">3</span><span class="htp-icon">✅</span><h3>Use all blocks</h3><p>Every block in the level must be used in the correct order!</p></div>
+        <div class="htp-card"><span class="htp-num">4</span><span class="htp-icon">▶️</span><h3>Run & watch</h3><p>Hit Run and watch your 3D chef execute your code in real time.</p></div>
       </div>
 
-      <!-- Live block demo -->
-      <div class="block-demo" style="margin-top:32px;">
-        <div class="block-demo-header">
-          <div class="bd-dot r"></div><div class="bd-dot y"></div><div class="bd-dot g"></div>
-          <span class="bd-filename">devkitchen.js — example sequence</span>
+      <!-- INTERACTIVE MINI DEMO -->
+      <div id="demo-wrap">
+        <div id="demo-header">
+          <div class="ddot r"></div><div class="ddot y" style="margin:0 4px;"></div><div class="ddot g"></div>
+          <span id="demo-filename">devkitchen.js — try it yourself!</span>
         </div>
-        <div class="block-demo-body">
-          <div class="demo-block"><span class="d-num">1</span><span class="d-name">chop</span><span class="d-paren">(</span><span class="d-arg">onion</span><span class="d-paren">)</span></div>
-          <div class="demo-block"><span class="d-num">2</span><span class="d-name">heat</span><span class="d-paren">(</span><span class="d-arg">pan</span><span class="d-paren">)</span></div>
-          <div class="demo-block"><span class="d-num">3</span><span class="d-name">add</span><span class="d-paren">(</span><span class="d-arg">oil</span><span class="d-paren">)</span></div>
-          <div class="demo-block"><span class="d-num">4</span><span class="d-name">add</span><span class="d-paren">(</span><span class="d-arg">onion</span><span class="d-paren">)</span></div>
-          <div class="demo-block cond"><span class="d-num">5</span><span class="d-name">if</span><span class="d-paren">(</span><span class="d-arg">spicy</span><span class="d-paren">)</span></div>
-          <div class="demo-block loop"><span class="d-num">6</span><span class="d-name">repeat</span><span class="d-paren">(</span><span class="d-arg">stir×3</span><span class="d-paren">)</span></div>
+        <div id="demo-body">
+          <div id="demo-avail-col">
+            <div class="demo-col-label">Available Blocks</div>
+            <div id="demo-avail-blocks"></div>
+          </div>
+          <div id="demo-seq-col">
+            <div class="demo-col-label">Your Sequence</div>
+            <div id="demo-seq-blocks"><div id="demo-empty">← Tap a block<br>to add it here</div></div>
+          </div>
+        </div>
+        <div id="demo-footer">
+          <span id="demo-status">// tap a block to start</span>
+          <button id="demo-reset" onclick="demoReset()">↺ Reset</button>
+          <button id="demo-run" onclick="demoRun()" disabled>▶ Run</button>
         </div>
       </div>
-
-      <div style="margin-top:32px;text-align:center;">
-        <button class="btn btn-primary" style="font-size:15px;padding:14px 32px;" onclick="startPlaying()">Try it now — free →</button>
+      <div class="demo-cta-row">
+        <button class="btn btn-amber" style="font-size:14px;padding:12px 28px;margin-top:8px;" onclick="startGame()">Play the full game →</button>
       </div>
     </div>
   </section>
 
   <!-- About -->
-  <section class="section" id="section-about">
-    <div class="section-inner">
-      <span class="section-tag" style="background:rgba(226,199,122,.1);color:var(--gold);">ABOUT</span>
-      <h2 class="section-title">Why DevKitchen?</h2>
-      <p class="section-sub">We believe the best way to learn programming fundamentals is through something everyone understands — food.</p>
+  <section class="sec" id="sec-about">
+    <div class="sec-inner">
+      <span class="sec-tag" style="background:rgba(244,168,34,.1);color:var(--amber);">ABOUT</span>
+      <h2 class="sec-title">Why DevKitchen Square?</h2>
+      <p class="sec-sub">We believe the best way to understand programming is through something everyone already knows — cooking.</p>
       <div class="about-grid">
-        <div class="about-card">
-          <div class="ac-icon">🧩</div>
-          <h3>Logic-first learning</h3>
-          <p>Each level teaches real programming concepts: sequencing, conditionals (if/else), and loops — disguised as cooking steps.</p>
-        </div>
-        <div class="about-card">
-          <div class="ac-icon">🎮</div>
-          <h3>Immediate feedback</h3>
-          <p>Every mistake shows a real-looking error message with a hint. You learn by debugging, just like real developers.</p>
-        </div>
-        <div class="about-card">
-          <div class="ac-icon">🌍</div>
-          <h3>Works everywhere</h3>
-          <p>Runs in any browser on desktop or mobile. No install, no account required to play the free levels.</p>
-        </div>
-        <div class="about-card">
-          <div class="ac-icon">📚</div>
-          <h3>Built by developers</h3>
-          <p>Created by engineers who learned programming the hard way and wanted something lighter, more visual, and more fun.</p>
-        </div>
+        <div class="about-card"><div class="ac-icon">🧩</div><h3>Logic-first learning</h3><p>Each level teaches real programming concepts: sequencing, conditionals, and loops — disguised as cooking steps.</p></div>
+        <div class="about-card"><div class="ac-icon">⚡</div><h3>Instant feedback</h3><p>Wrong order? You'll see a real-looking error message — just like a real debugger. Learn by fixing.</p></div>
+        <div class="about-card"><div class="ac-icon">🌍</div><h3>Works everywhere</h3><p>Runs in any browser on mobile or desktop. No install, no setup — just open and play.</p></div>
+        <div class="about-card"><div class="ac-icon">🎮</div><h3>Game feel</h3><p>3D chef, kitchen animations, confetti on success — it feels like a real game, not a tutorial.</p></div>
       </div>
     </div>
   </section>
 
-  <!-- Upgrade preview on landing -->
-  <section class="section" id="section-upgrade-preview" style="background:linear-gradient(135deg,#0f0a2a 0%,var(--bg) 60%);border-top:1px solid var(--border);">
-    <div class="section-inner" style="text-align:center;">
-      <span class="section-tag" style="background:rgba(226,199,122,.1);color:var(--gold);">UPGRADE</span>
-      <h2 class="section-title">Unlock the full kitchen</h2>
-      <p class="section-sub" style="margin:0 auto;">Free gets you started. Pro unlocks more levels, a leaderboard, and achievements.</p>
-      <div class="upgrade-preview-cards" style="justify-content:center;">
-        <div class="up-card">
-          <span class="up-badge free">FREE</span>
-          <div class="up-price">$0 <span>/ month</span></div>
-          <div class="up-desc">Perfect for beginners</div>
-          <ul class="up-features">
+  <!-- Upgrade preview -->
+  <section class="sec" id="sec-upgrade-prev" style="background:linear-gradient(135deg,#1a1f45 0%,var(--navy) 60%);border-top:1px solid var(--border);">
+    <div class="sec-inner" style="text-align:center;">
+      <span class="sec-tag" style="background:rgba(244,168,34,.1);color:var(--amber);">UPGRADE</span>
+      <h2 class="sec-title">Unlock the full kitchen</h2>
+      <p class="sec-sub" style="margin:0 auto 0;">Free gets you started. Pro unlocks more levels, achievements, and a leaderboard.</p>
+      <div class="pricing-row">
+        <div class="price-card">
+          <div class="tier-badge tb-free">FREE</div>
+          <div class="price-amt">$0 <span>/ month</span></div>
+          <div class="price-desc">Perfect for beginners</div>
+          <ul class="feat-list">
             <li>3 levels (Fried Rice, Noodles, Risotto)</li>
-            <li>All block types</li>
-            <li>Detailed error messages</li>
+            <li>All block types (basic, if, loop)</li>
+            <li>3D chef animations</li>
             <li class="na">Leaderboard</li>
             <li class="na">Achievements</li>
             <li class="na">More levels</li>
           </ul>
-          <button class="up-btn free" onclick="startPlaying()">Play Free</button>
+          <button class="price-btn pb-free" onclick="startGame()">Play Free</button>
         </div>
-        <div class="up-card featured">
-          <span class="up-badge pro">PRO</span>
-          <div class="up-price">$5 <span>/ month</span></div>
-          <div class="up-desc">For serious learners</div>
-          <ul class="up-features">
+        <div class="price-card featured">
+          <div class="feat-chip">POPULAR</div>
+          <div class="tier-badge tb-pro">PRO</div>
+          <div class="price-amt">$5 <span>/ month</span></div>
+          <div class="price-desc">For serious learners</div>
+          <ul class="feat-list">
             <li>Everything in Free</li>
             <li>10+ levels (coming soon)</li>
             <li>Global leaderboard</li>
-            <li>Achievements & badges</li>
-            <li>Priority support</li>
+            <li>12 achievements & badges</li>
+            <li>Chef skin customization</li>
             <li class="na">Team features</li>
           </ul>
-          <button class="up-btn pro" onclick="showPage('upgrade')">Get Pro →</button>
+          <button class="price-btn pb-pro" onclick="goPage('upgrade')">Get Pro →</button>
         </div>
-        <div class="up-card">
-          <span class="up-badge team">TEAM</span>
-          <div class="up-price">$15 <span>/ month</span></div>
-          <div class="up-desc">For classrooms & teams</div>
-          <ul class="up-features">
+        <div class="price-card">
+          <div class="tier-badge tb-team">TEAM</div>
+          <div class="price-amt">$15 <span>/ month</span></div>
+          <div class="price-desc">For classrooms & teams</div>
+          <ul class="feat-list">
             <li>Everything in Pro</li>
             <li>Up to 30 seats</li>
             <li>Teacher dashboard</li>
-            <li>Progress tracking</li>
-            <li>Custom levels (beta)</li>
+            <li>Student progress tracking</li>
+            <li>Custom level builder (beta)</li>
             <li>Dedicated support</li>
           </ul>
-          <button class="up-btn team" onclick="showPage('upgrade')">Contact Us</button>
+          <button class="price-btn pb-team" onclick="openLogin()">Contact Sales</button>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Footer -->
   <footer>
-    <p>© 2026 DevKitchen · Built with 🍳 and code · <a href="#" onclick="showPage('upgrade')">Upgrade</a> · <a href="#" onclick="scrollTo('#section-about')">About</a> · <a href="#" onclick="openLoginModal()">Sign in</a></p>
+    <p>© 2026 DevKitchen Square &nbsp;·&nbsp; <a href="#" onclick="goPage('upgrade')">Upgrade</a> &nbsp;·&nbsp; <a href="#" onclick="goScroll('#sec-about')">About</a> &nbsp;·&nbsp; <a href="#" onclick="openLogin()">Sign in</a></p>
+    <div class="ory-badge">🔐 Verified by Ory &nbsp;·&nbsp; orynth.dev</div>
   </footer>
 </div>
 
-<!-- ═══════════════════════════════════ UPGRADE PAGE ═══ -->
+<!-- ═══ UPGRADE PAGE ════════════════════════════════════ -->
 <div id="page-upgrade" class="page">
   <div class="upgrade-hero">
+    <img src="logo.png" alt="" style="width:64px;height:64px;border-radius:16px;margin-bottom:16px;">
     <h1>🍳 DevKitchen Pro</h1>
     <p>Unlock more levels, achievements, and a global leaderboard</p>
   </div>
   <div class="upgrade-section">
-    <div class="pricing-grid">
-      <div class="pricing-card">
-        <span class="up-badge free" style="margin-bottom:16px;display:inline-block;">FREE</span>
-        <div class="up-price">$0 <span>/ month</span></div>
-        <div class="up-desc" style="margin-bottom:20px;">Start cooking for free</div>
-        <ul class="up-features" style="margin-bottom:24px;">
-          <li>3 levels</li>
-          <li>All block types (basic, if, loop)</li>
-          <li>3D chef animations</li>
-          <li>Detailed error messages</li>
-          <li class="na">Leaderboard access</li>
-          <li class="na">Achievements</li>
-          <li class="na">More levels</li>
+    <div class="pricing-row">
+      <div class="price-card">
+        <div class="tier-badge tb-free">FREE</div>
+        <div class="price-amt">$0 <span>/ month</span></div>
+        <div class="price-desc" style="margin-bottom:18px;">Start cooking for free</div>
+        <ul class="feat-list" style="margin-bottom:22px;">
+          <li>3 levels</li><li>All block types</li><li>3D chef animations</li><li>Error messages</li>
+          <li class="na">Leaderboard</li><li class="na">Achievements</li><li class="na">More levels</li>
         </ul>
-        <button class="up-btn free" style="width:100%;padding:11px;" onclick="startPlaying()">Play Now</button>
+        <button class="price-btn pb-free" style="padding:11px;" onclick="startGame()">Play Now</button>
       </div>
-      <div class="pricing-card featured">
-        <div class="featured-label">MOST POPULAR</div>
-        <span class="up-badge pro" style="margin-top:8px;margin-bottom:16px;display:inline-block;">PRO</span>
-        <div class="up-price">$5 <span>/ month</span></div>
-        <div class="up-desc" style="margin-bottom:20px;">For learners who want more</div>
-        <ul class="up-features" style="margin-bottom:24px;">
-          <li>Everything in Free</li>
-          <li>10+ levels (launching soon)</li>
-          <li>Global leaderboard</li>
-          <li>12 achievements & badges</li>
-          <li>Chef customization skins</li>
-          <li>Progress dashboard</li>
+      <div class="price-card featured">
+        <div class="feat-chip">MOST POPULAR</div>
+        <div class="tier-badge tb-pro">PRO</div>
+        <div class="price-amt">$5 <span>/ month</span></div>
+        <div class="price-desc" style="margin-bottom:18px;">For learners who want more</div>
+        <ul class="feat-list" style="margin-bottom:22px;">
+          <li>Everything in Free</li><li>10+ levels (launching soon)</li><li>Global leaderboard</li>
+          <li>12 achievements & badges</li><li>Chef skin customization</li><li>Progress dashboard</li>
           <li class="na">Team features</li>
         </ul>
-        <button class="up-btn pro" style="width:100%;padding:11px;" onclick="openLoginModal()">Get Pro — $5/mo</button>
+        <button class="price-btn pb-pro" style="padding:11px;" onclick="openLogin()">Get Pro — $5/mo</button>
       </div>
-      <div class="pricing-card">
-        <span class="up-badge team" style="margin-bottom:16px;display:inline-block;">TEAM</span>
-        <div class="up-price">$15 <span>/ month</span></div>
-        <div class="up-desc" style="margin-bottom:20px;">For classrooms & teams</div>
-        <ul class="up-features" style="margin-bottom:24px;">
-          <li>Everything in Pro</li>
-          <li>Up to 30 seats</li>
-          <li>Teacher dashboard</li>
-          <li>Student progress tracking</li>
-          <li>Custom level builder (beta)</li>
-          <li>Dedicated Slack support</li>
-          <li>Custom invoicing</li>
+      <div class="price-card">
+        <div class="tier-badge tb-team">TEAM</div>
+        <div class="price-amt">$15 <span>/ month</span></div>
+        <div class="price-desc" style="margin-bottom:18px;">For classrooms & teams</div>
+        <ul class="feat-list" style="margin-bottom:22px;">
+          <li>Everything in Pro</li><li>Up to 30 seats</li><li>Teacher dashboard</li>
+          <li>Student progress tracking</li><li>Custom level builder (beta)</li>
+          <li>Dedicated Slack support</li><li>Custom invoicing</li>
         </ul>
-        <button class="up-btn team" style="width:100%;padding:11px;" onclick="openLoginModal()">Contact Sales</button>
+        <button class="price-btn pb-team" style="padding:11px;" onclick="openLogin()">Contact Sales</button>
       </div>
     </div>
-    <div style="text-align:center;margin-top:40px;padding:24px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);">
-      <div style="font-size:22px;margin-bottom:8px;">🔒</div>
-      <div style="font-weight:700;margin-bottom:6px;">Payments powered by Stripe</div>
-      <div style="font-size:13px;color:var(--text2);">Cancel anytime. No hidden fees. 7-day money-back guarantee.</div>
+    <div style="text-align:center;margin-top:36px;padding:22px;background:var(--navy2);border-radius:var(--r);border:1px solid var(--border);">
+      <div style="font-size:20px;margin-bottom:6px;">🔒</div>
+      <div style="font-weight:700;margin-bottom:5px;">Secured by Stripe</div>
+      <div style="font-size:12px;color:var(--cream2);">Cancel anytime. No hidden fees. 7-day money-back guarantee.</div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════ PROFILE PAGE ═══ -->
+<!-- ═══ PROFILE PAGE ════════════════════════════════════ -->
 <div id="page-profile" class="page">
-  <div style="max-width:600px;margin:40px auto;padding:0 20px;">
-    <div class="profile-card">
-      <div class="profile-avatar-lg" id="profile-avatar-lg">?</div>
-      <div style="font-size:18px;font-weight:700;margin-bottom:4px;" id="profile-name">—</div>
-      <div style="font-size:12px;color:var(--text2);margin-bottom:16px;" id="profile-email">—</div>
-      <div style="font-size:12px;color:var(--text3);margin-bottom:6px;">Level Progress</div>
-      <div class="progress-bar"><div class="progress-fill" id="profile-progress" style="width:33%"></div></div>
-      <div style="font-size:11px;color:var(--text3);margin-top:4px;" id="profile-progress-label">1 / 3 levels completed</div>
+  <div class="profile-wrap">
+    <div class="p-card">
+      <div class="p-avatar" id="p-avatar">?</div>
+      <div style="font-size:17px;font-weight:700;margin-bottom:4px;" id="p-name">—</div>
+      <div style="font-size:12px;color:var(--cream2);margin-bottom:14px;" id="p-email">—</div>
+      <div style="font-size:11px;color:var(--cream3);margin-bottom:5px;">Level Progress</div>
+      <div class="prog-bar"><div class="prog-fill" id="p-prog" style="width:33%"></div></div>
+      <div style="font-size:10px;color:var(--cream3);margin-top:4px;">1 / 3 levels completed</div>
     </div>
-    <div class="profile-card">
+    <div class="p-card">
       <div style="font-weight:700;margin-bottom:14px;">Account</div>
-      <button class="btn btn-secondary" style="width:100%;justify-content:center;margin-bottom:10px;" onclick="showPage('upgrade')">⬆ Upgrade to Pro</button>
-      <button class="btn" style="width:100%;justify-content:center;background:transparent;color:var(--red);border:1px solid rgba(255,95,87,.3);" onclick="logoutOry()">Sign out</button>
+      <button class="btn btn-outline" style="width:100%;justify-content:center;margin-bottom:10px;" onclick="goPage('upgrade')">⬆ Upgrade to Pro</button>
+      <button class="btn" style="width:100%;justify-content:center;background:transparent;color:var(--red);border:1px solid rgba(239,83,80,.3);" onclick="logoutOry()">Sign out</button>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════ GAME PAGE ═══ -->
+<!-- ═══ GAME PAGE ═══════════════════════════════════════ -->
 <div id="page-game" class="page">
-
-  <!-- Level bar -->
   <div id="game-topbar">
-    <div class="level-name" id="level-name-bar">LEVEL 1: FRIED RICE</div>
-    <div class="level-right">
-      <div id="progress-dots">
-        <div class="prog-dot active" id="dot-0"></div>
+    <div id="lvl-name-bar">LEVEL 1: FRIED RICE</div>
+    <div class="game-topbar-right">
+      <div id="prog-dots">
+        <div class="prog-dot cur" id="dot-0"></div>
         <div class="prog-dot" id="dot-1"></div>
         <div class="prog-dot" id="dot-2"></div>
       </div>
-      <button id="reset-btn" onclick="resetLevel()">↺ Reset</button>
-      <button onclick="showPage('home')" style="background:transparent;border:1px solid var(--border);color:var(--text3);padding:4px 10px;border-radius:4px;font-size:10px;cursor:pointer;font-family:var(--font);">✕ Exit</button>
+      <button class="tbtn" onclick="resetLevel()">↺ Reset</button>
+      <button class="tbtn" onclick="goPage('home')">✕ Exit</button>
     </div>
   </div>
-
-  <!-- 3D Canvas -->
-  <div id="canvas-container">
-    <canvas id="game-canvas"></canvas>
-  </div>
-
-  <!-- Code area -->
+  <div id="canvas-container"><canvas id="game-canvas"></canvas></div>
   <div id="code-area">
     <div id="tray-bar">
       <div class="tray-dot td-r"></div>
       <div class="tray-dot td-y" style="margin:0 4px;"></div>
       <div class="tray-dot td-g"></div>
       <span id="tray-file">devkitchen.js</span>
-      <button id="hint-toggle-btn" onclick="toggleHint()">💡 hint</button>
+      <button id="hint-btn" onclick="toggleHint()">💡 hint</button>
     </div>
-    <div id="recipe-strip"><div id="recipe-strip-inner">
-      <div id="rs-goal"></div>
-      <div id="rs-desc"></div>
-    </div></div>
+    <div id="recipe-strip"><div id="rs-inner"><div id="rs-goal"></div><div id="rs-desc"></div></div></div>
     <div id="blocks-row">
       <div id="avail-col">
-        <div id="avail-header">
-          <span class="col-lbl">Available</span>
-          <span id="avail-count-badge"></span>
-        </div>
+        <div id="avail-hdr"><span class="col-lbl">Available</span><span id="avail-count"></span></div>
         <div id="avail-blocks"></div>
       </div>
       <div id="seq-col">
-        <div id="seq-header">
-          <span class="col-lbl">Sequence</span>
-          <span id="seq-count">0 / 0</span>
-        </div>
+        <div id="seq-hdr"><span class="col-lbl">Sequence</span><span id="seq-count">0 / 0</span></div>
         <div id="seq-blocks"></div>
       </div>
     </div>
@@ -899,161 +786,256 @@ footer a{color:var(--text2);}footer a:hover{color:var(--text);}
   </div>
 </div>
 
-<!-- ═══════════════════════════════════ OVERLAYS ═══ -->
-
-<!-- Tutorial -->
-<div class="overlay" id="tut-overlay">
+<!-- ═══ OVERLAYS ════════════════════════════════════════ -->
+<div class="overlay" id="tut-ov">
   <div class="ov-box">
     <div class="tut-title">🍳 How to Play</div>
     <div class="tut-sub">Arrange all code blocks in the correct order to cook the dish</div>
-    <div class="tut-step"><span class="tut-step-icon">👆</span><div class="tut-step-txt"><strong>Tap</strong> any block on the left to add it to your sequence</div></div>
-    <div class="tut-step"><span class="tut-step-icon">↕️</span><div class="tut-step-txt"><strong>Drag</strong> blocks in the sequence to reorder them</div></div>
-    <div class="tut-step"><span class="tut-step-icon">✕</span><div class="tut-step-txt">Tap <strong>×</strong> or drag a block back left to remove it</div></div>
-    <div class="tut-step"><span class="tut-step-icon">▶️</span><div class="tut-step-txt">Use <strong>all</strong> blocks, then press <strong>Run</strong> to cook!</div></div>
-    <button class="tut-start-btn" onclick="dismissTutorial()">Let's Cook! 🔪</button>
+    <div class="tut-step"><span class="tut-step-ico">👆</span><div class="tut-step-txt"><strong>Tap</strong> any block on the left to add it to your sequence</div></div>
+    <div class="tut-step"><span class="tut-step-ico">↕️</span><div class="tut-step-txt"><strong>Drag</strong> blocks in the sequence to reorder them</div></div>
+    <div class="tut-step"><span class="tut-step-ico">✕</span><div class="tut-step-txt">Tap <strong>×</strong> or drag a block back left to remove it</div></div>
+    <div class="tut-step"><span class="tut-step-ico">▶️</span><div class="tut-step-txt">Use <strong>all</strong> blocks, then press <strong>Run</strong> to cook!</div></div>
+    <button class="tut-go" onclick="closeTutorial()">Let's Cook! 🔪</button>
   </div>
 </div>
 
-<!-- Result (error/success) -->
-<div class="overlay" id="result-overlay">
+<div class="overlay" id="result-ov">
   <div class="ov-box" id="ov-box">
     <div id="ov-title"></div>
     <div id="ov-msg"></div>
-    <div id="ov-errcode"></div>
+    <div id="ov-code"></div>
     <div class="ov-actions">
       <button class="ov-btn retry" onclick="resetLevel()">↺ Retry</button>
-      <button class="ov-btn next" id="ov-next" onclick="nextLevel()">Next Level →</button>
+      <button class="ov-btn nxt" id="ov-next" onclick="nextLevel()">Next Level →</button>
     </div>
   </div>
 </div>
 
-<!-- Login modal -->
-<div class="overlay" id="login-modal">
+<div class="overlay" id="login-ov">
   <div class="ov-box" style="position:relative;">
-    <button class="lm-close" onclick="closeLoginModal()">✕</button>
-    <div class="lm-logo">🍳</div>
+    <button class="lm-close" onclick="closeLogin()">✕</button>
+    <img src="logo.png" alt="" class="lm-logo-img">
     <div class="lm-title">Sign in to DevKitchen</div>
     <div class="lm-sub">Save your progress and unlock achievements</div>
-    <button class="lm-btn ory" onclick="loginOry()">
-      <span>🔐</span> Continue with Ory
-    </button>
+    <button class="lm-btn lm-ory" onclick="loginOry()">🔐 Continue with Ory</button>
     <div class="lm-divider"><span>or</span></div>
-    <button class="lm-btn guest" onclick="playAsGuest()">
-      <span>👤</span> Continue as Guest
-    </button>
+    <button class="lm-btn lm-guest" onclick="guestPlay()">👤 Continue as Guest</button>
     <div class="lm-terms">By signing in, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</div>
   </div>
 </div>
 
-<!-- Drag clone -->
 <div id="drag-clone" class="block"></div>
 
-<!-- ═══════════════════════════════════ SCRIPTS ═══ -->
+<!-- ═══ SCRIPTS ══════════════════════════════════════════ -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-'use strict';
-
-// ─── ORY AUTH ───────────────────────────────────────────
+// ════════════════════════════════════════════════════════
+// ORY AUTH
+// ════════════════════════════════════════════════════════
 const ORY_URL = 'https://orynth.dev';
 let currentUser = null;
 
 async function initAuth() {
   try {
-    const res = await fetch(`${ORY_URL}/sessions/whoami`, { credentials: 'include' });
-    if (res.ok) {
-      const s = await res.json();
-      currentUser = s.identity || null;
-      if (currentUser) updateNavForUser();
-    }
-  } catch(e) { /* not logged in */ }
+    const r = await fetch(ORY_URL + '/sessions/whoami', {credentials:'include'});
+    if (r.ok) { const s = await r.json(); currentUser = s.identity||null; if(currentUser) applyUser(); }
+  } catch(e) {}
 }
-
-function updateNavForUser() {
+function applyUser() {
   if (!currentUser) return;
   const name = currentUser.traits?.name || currentUser.traits?.email?.split('@')[0] || 'User';
-  const initials = name.charAt(0).toUpperCase();
-  document.getElementById('nav-avatar').textContent = initials;
-  document.getElementById('nav-avatar').style.display = 'flex';
+  const init = name.charAt(0).toUpperCase();
+  const av = document.getElementById('nav-avatar');
+  av.textContent = init; av.style.display = 'flex';
   document.getElementById('nav-username').textContent = name;
   document.getElementById('nav-username').style.display = 'block';
-  document.getElementById('nav-login-btn').style.display = 'none';
-  document.getElementById('profile-name').textContent = name;
-  document.getElementById('profile-email').textContent = currentUser.traits?.email || '';
-  document.getElementById('profile-avatar-lg').textContent = initials;
+  document.getElementById('nav-signin').style.display = 'none';
+  document.getElementById('p-name').textContent = name;
+  document.getElementById('p-email').textContent = currentUser.traits?.email || '';
+  document.getElementById('p-avatar').textContent = init;
 }
-
 function loginOry() {
-  const ret = encodeURIComponent(window.location.href);
-  window.location.href = `${ORY_URL}/self-service/login/browser?return_to=${ret}`;
+  window.location.href = ORY_URL + '/self-service/login/browser?return_to=' + encodeURIComponent(location.href);
 }
-
 function logoutOry() {
-  fetch(`${ORY_URL}/self-service/logout/browser`, { credentials: 'include' })
-    .then(r => r.json())
-    .then(d => { if (d.logout_url) window.location.href = d.logout_url; else location.reload(); })
-    .catch(() => location.reload());
+  fetch(ORY_URL + '/self-service/logout/browser', {credentials:'include'})
+    .then(r=>r.json()).then(d=>{ window.location.href = d.logout_url || location.href; })
+    .catch(()=>location.reload());
 }
 
-function playAsGuest() { closeLoginModal(); startPlaying(); }
+// ════════════════════════════════════════════════════════
+// ROUTER — single definition, no duplicates
+// ════════════════════════════════════════════════════════
+let activePage = 'home';
+let sceneReady = false;
+let tutShown = false;
 
-// ─── ROUTING ────────────────────────────────────────────
-let currentPage = 'home';
-const PAGES = { home:'page-home', game:'page-game', upgrade:'page-upgrade', profile:'page-profile' };
+const PAGES = {home:'page-home',game:'page-game',upgrade:'page-upgrade',profile:'page-profile'};
 
-function showPage(id) {
-  Object.values(PAGES).forEach(p => { const el = document.getElementById(p); if(el) el.classList.remove('active'); });
-  const target = document.getElementById(PAGES[id]);
-  if (target) { target.classList.add('active'); currentPage = id; }
-  // Update nav active state
-  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+function goPage(id) {
+  Object.values(PAGES).forEach(p => {
+    const el = document.getElementById(p);
+    if (el) el.classList.remove('active');
+  });
+  const el = document.getElementById(PAGES[id]);
+  if (el) { el.classList.add('active'); activePage = id; }
   if (id === 'home') window.scrollTo(0,0);
-  if (id === 'game' && !sceneReady) { initScene(); sceneReady = true; }
-  if (id === 'game') { setTimeout(onResize, 50); }
+  if (id === 'game') {
+    if (!sceneReady) { initScene(); sceneReady = true; }
+    setTimeout(onResize, 60);
+    if (!tutShown) { tutShown = true; setTimeout(() => document.getElementById('tut-ov').classList.add('open'), 350); }
+  }
 }
 
-function scrollTo(selector) {
-  setTimeout(() => { const el = document.querySelector(selector); if(el) el.scrollIntoView({behavior:'smooth'}); }, 100);
+function goScroll(sel) {
+  setTimeout(() => { const el = document.querySelector(sel); if(el) el.scrollIntoView({behavior:'smooth'}); }, 100);
 }
 
-function startPlaying() { showPage('game'); }
+function startGame() { goPage('game'); }
 
-// ─── LOGIN MODAL ────────────────────────────────────────
-function openLoginModal() { document.getElementById('login-modal').classList.add('open'); }
-function closeLoginModal() { document.getElementById('login-modal').classList.remove('open'); }
+// ════════════════════════════════════════════════════════
+// MODALS
+// ════════════════════════════════════════════════════════
+function openLogin()  { document.getElementById('login-ov').classList.add('open'); }
+function closeLogin() { document.getElementById('login-ov').classList.remove('open'); }
+function guestPlay()  { closeLogin(); startGame(); }
+function closeTutorial() { document.getElementById('tut-ov').classList.remove('open'); }
 
-// ─── TUTORIAL ───────────────────────────────────────────
-let tutorialDone = false;
-function openTutorial() {
-  if (!tutorialDone) document.getElementById('tut-overlay').classList.add('open');
-}
-function dismissTutorial() {
-  tutorialDone = true;
-  document.getElementById('tut-overlay').classList.remove('open');
-}
-
-// ─── HINT TOGGLE ────────────────────────────────────────
+// ════════════════════════════════════════════════════════
+// HINT TOGGLE
+// ════════════════════════════════════════════════════════
 let hintOpen = false;
 function toggleHint() {
   hintOpen = !hintOpen;
   document.getElementById('recipe-strip').classList.toggle('open', hintOpen);
-  const btn = document.getElementById('hint-toggle-btn');
+  const btn = document.getElementById('hint-btn');
   btn.textContent = hintOpen ? '💡 hide' : '💡 hint';
   btn.classList.toggle('on', hintOpen);
 }
 
-// ─── STATUS ─────────────────────────────────────────────
 function setStatus(msg, type) {
   const el = document.getElementById('status-txt');
   el.textContent = msg;
-  el.className = type ? `s-${type}` : '';
+  el.className = type ? 's-' + type : '';
 }
 
-// ─── LEVEL DATA ─────────────────────────────────────────
+// ════════════════════════════════════════════════════════
+// MINI DEMO (landing page — fully interactive)
+// ════════════════════════════════════════════════════════
+const DEMO_BLOCKS = [
+  {id:'d_heat', label:'heat', arg:'pan'},
+  {id:'d_oil',  label:'add',  arg:'oil'},
+  {id:'d_rice', label:'add',  arg:'rice'},
+  {id:'d_stir', label:'stir', arg:'rice'},
+];
+const DEMO_CORRECT = ['d_heat','d_oil','d_rice','d_stir'];
+let demoSeq = [];
+
+function demoInit() {
+  demoSeq = [];
+  renderDemoAvail();
+  renderDemoSeq();
+  setDemoStatus('// tap a block to start', '');
+  document.getElementById('demo-run').disabled = true;
+}
+
+function renderDemoAvail() {
+  const cont = document.getElementById('demo-avail-blocks');
+  cont.innerHTML = '';
+  DEMO_BLOCKS.forEach(b => {
+    const used = demoSeq.includes(b.id);
+    const el = document.createElement('div');
+    el.className = 'd-block' + (used ? ' used' : '');
+    el.dataset.id = b.id;
+    el.innerHTML = '<span class="db-name">' + b.label + '</span>' +
+      '<span class="db-paren">(</span><span class="db-arg">' + b.arg + '</span><span class="db-paren">)</span>';
+    if (!used) {
+      el.addEventListener('click', () => demoAdd(b.id));
+      el.addEventListener('touchend', e => { e.preventDefault(); demoAdd(b.id); });
+    }
+    cont.appendChild(el);
+  });
+}
+
+function renderDemoSeq() {
+  const cont = document.getElementById('demo-seq-blocks');
+  cont.innerHTML = '';
+  if (demoSeq.length === 0) {
+    cont.innerHTML = '<div id="demo-empty">← Tap a block<br>to add it here</div>';
+    document.getElementById('demo-run').disabled = true;
+    setDemoStatus('// tap a block to start', '');
+    return;
+  }
+  demoSeq.forEach((id, idx) => {
+    const b = DEMO_BLOCKS.find(x => x.id === id);
+    if (!b) return;
+    const el = document.createElement('div');
+    el.className = 'd-block';
+    el.innerHTML = '<span class="db-num">' + (idx+1) + '</span>' +
+      '<span class="db-name">' + b.label + '</span>' +
+      '<span class="db-paren">(</span><span class="db-arg">' + b.arg + '</span><span class="db-paren">)</span>' +
+      '<span class="db-rm" data-id="' + id + '">×</span>';
+    el.querySelector('.db-rm').addEventListener('click', e => { e.stopPropagation(); demoRemove(id); });
+    cont.appendChild(el);
+  });
+  const total = DEMO_BLOCKS.length;
+  const used = demoSeq.length;
+  document.getElementById('demo-run').disabled = used < total;
+  if (used < total) setDemoStatus('// ' + (total - used) + ' more block' + (total-used>1?'s':'') + ' needed', 'warn');
+  else setDemoStatus('// all blocks placed — press Run!', 'ok');
+}
+
+function demoAdd(id) {
+  if (demoSeq.includes(id)) return;
+  demoSeq.push(id);
+  renderDemoAvail();
+  renderDemoSeq();
+}
+
+function demoRemove(id) {
+  const i = demoSeq.indexOf(id);
+  if (i !== -1) { demoSeq.splice(i, 1); renderDemoAvail(); renderDemoSeq(); }
+}
+
+function demoRun() {
+  const isCorrect = JSON.stringify(demoSeq) === JSON.stringify(DEMO_CORRECT);
+  const status = document.getElementById('demo-status');
+  if (isCorrect) {
+    setDemoStatus('// ✓ Perfect order! Fried rice cooked! 🍳', 'ok');
+    // Flash success on blocks
+    document.querySelectorAll('#demo-seq-blocks .d-block').forEach((el, i) => {
+      setTimeout(() => { el.style.borderLeftColor = 'var(--green)'; el.style.background = 'rgba(76,175,80,.08)'; }, i * 80);
+    });
+  } else {
+    // Find first wrong block
+    let badIdx = -1;
+    for (let i = 0; i < demoSeq.length; i++) {
+      if (demoSeq[i] !== DEMO_CORRECT[i]) { badIdx = i; break; }
+    }
+    setDemoStatus('// ✗ Wrong order — check step ' + (badIdx+1), 'err');
+    const blocks = document.querySelectorAll('#demo-seq-blocks .d-block');
+    if (blocks[badIdx]) { blocks[badIdx].style.borderLeftColor = 'var(--red)'; blocks[badIdx].style.background = 'rgba(239,83,80,.08)'; }
+  }
+}
+
+function demoReset() {
+  document.querySelectorAll('#demo-seq-blocks .d-block').forEach(el => { el.style.borderLeftColor = ''; el.style.background = ''; });
+  demoInit();
+}
+
+function setDemoStatus(msg, type) {
+  const el = document.getElementById('demo-status');
+  el.textContent = msg;
+  el.className = type || '';
+}
+
+// ════════════════════════════════════════════════════════
+// LEVEL DATA
+// ════════════════════════════════════════════════════════
 const LEVELS = [
   {
     name:'LEVEL 1: FRIED RICE', goal:'Cook Fried Rice',
     desc:'Arrange all 6 steps in the correct order to cook fried rice.',
-    icon:'🍳',
     blocks:[
       {id:'heat_pan',   label:'heat',  arg:'pan',   type:'basic'},
       {id:'add_oil',    label:'add',   arg:'oil',   type:'basic'},
@@ -1073,19 +1055,18 @@ const LEVELS = [
   {
     name:'LEVEL 2: SPICY NOODLES', goal:'Cook Spicy Noodles',
     desc:'Use all 6 blocks. Place the if-block in the right position for the spice check.',
-    icon:'🍜',
     blocks:[
-      {id:'boil_water',   label:'boil',  arg:'water',              type:'basic'},
-      {id:'add_noodles',  label:'add',   arg:'noodles',            type:'basic'},
-      {id:'drain_water',  label:'drain', arg:'water',              type:'basic'},
-      {id:'if_spicy',     label:'if',    arg:'spicy→add(chili)',   type:'conditional'},
-      {id:'add_sauce',    label:'add',   arg:'sauce',              type:'basic'},
-      {id:'toss_noodles', label:'toss',  arg:'noodles',            type:'basic'},
+      {id:'boil_water',   label:'boil',  arg:'water',            type:'basic'},
+      {id:'add_noodles',  label:'add',   arg:'noodles',          type:'basic'},
+      {id:'drain_water',  label:'drain', arg:'water',            type:'basic'},
+      {id:'if_spicy',     label:'if',    arg:'spicy→chili',      type:'conditional'},
+      {id:'add_sauce',    label:'add',   arg:'sauce',            type:'basic'},
+      {id:'toss_noodles', label:'toss',  arg:'noodles',          type:'basic'},
     ],
     rules:[
       {before:'boil_water',  after:'add_noodles',  err:'TypeError: Cannot cook noodles\n  at add(noodles) — water.state !== "boiling"'},
       {before:'add_noodles', after:'drain_water',  err:'TypeError: Noodles not ready\n  at drain(water) — noodles.done === false'},
-      {before:'drain_water', after:'if_spicy',     err:'LogicError: Must drain before spice check\n  at if(spicy) — context.noodles === wet'},
+      {before:'drain_water', after:'if_spicy',     err:'LogicError: Drain before spice check\n  at if(spicy) — context.wet === true'},
       {before:'if_spicy',    after:'add_sauce',    err:'ReferenceError: chili not applied\n  at add(sauce) — spice.level is undefined'},
       {before:'add_sauce',   after:'toss_noodles', err:'TypeError: Cannot toss without sauce\n  at toss(noodles) — sauce is undefined'},
     ],
@@ -1093,7 +1074,6 @@ const LEVELS = [
   {
     name:'LEVEL 3: PERFECT RISOTTO', goal:'Cook Perfect Risotto',
     desc:'Use all 6 blocks. The repeat-block stirs 3× — timing matters for creaminess.',
-    icon:'🍚',
     blocks:[
       {id:'heat_broth',  label:'heat',   arg:'broth',    type:'basic'},
       {id:'saute_onion', label:'saute',  arg:'onion',    type:'basic'},
@@ -1106,524 +1086,381 @@ const LEVELS = [
       {before:'heat_broth',  after:'saute_onion', err:'TypeError: Cannot saute without warm broth\n  at saute(onion) — broth.temp < OPTIMAL'},
       {before:'saute_onion', after:'add_rice2',   err:'TypeError: Base not ready\n  at add(rice) — onion.state !== "sauteed"'},
       {before:'add_rice2',   after:'add_wine',    err:'LogicError: Rice must go in first\n  at add(wine) — rice not in pan'},
-      {before:'add_wine',    after:'repeat_stir', err:'TypeError: Wine must absorb before stirring\n  at repeat(stir,3) — wine.absorbed === false'},
+      {before:'add_wine',    after:'repeat_stir', err:'TypeError: Wine must absorb first\n  at repeat(stir,3) — wine.absorbed === false'},
       {before:'repeat_stir', after:'add_cheese',  err:'TypeError: Risotto not creamy\n  at add(parmesan) — stir.count < 3'},
     ],
   },
 ];
 
-// ─── GAME STATE ─────────────────────────────────────────
-let currentLevel = 0;
-let sequenceIds = [];
+// ════════════════════════════════════════════════════════
+// GAME STATE
+// ════════════════════════════════════════════════════════
+let curLevel = 0;
+let seqIds = [];
 let isRunning = false;
-let sceneReady = false;
 
-// ─── THREE.JS SCENE ──────────────────────────────────────
-let scene, camera, renderer, animFrameId;
-let chef = null, pan = null;
-let ingredientMeshes = {};
-let chefState = {x:0,targetX:0,y:0.3,action:'idle'};
+// ════════════════════════════════════════════════════════
+// THREE.JS SCENE
+// ════════════════════════════════════════════════════════
+let scene, camera, renderer;
+let chef = null, pan = null, ingredientMeshes = {};
+let chefSt = {x:0, targetX:0, y:0.3, action:'idle'};
 
 function initScene() {
   const canvas = document.getElementById('game-canvas');
-  const container = document.getElementById('canvas-container');
+  const cont = document.getElementById('canvas-container');
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0xfff3e0);
   scene.fog = new THREE.Fog(0xfff3e0, 12, 22);
-  camera = new THREE.PerspectiveCamera(45, container.clientWidth/container.clientHeight, 0.1, 50);
+  camera = new THREE.PerspectiveCamera(45, cont.clientWidth/cont.clientHeight, 0.1, 50);
   camera.position.set(0,5,7); camera.lookAt(0,0,0);
   renderer = new THREE.WebGLRenderer({canvas, antialias:true});
-  renderer.setSize(container.clientWidth, container.clientHeight);
+  renderer.setSize(cont.clientWidth, cont.clientHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   scene.add(new THREE.AmbientLight(0xfff5e0, 0.7));
-  const dl = new THREE.DirectionalLight(0xfff0d0, 1.0);
-  dl.position.set(5,8,5); dl.castShadow = true;
-  dl.shadow.mapSize.set(512,512);
-  dl.shadow.camera.left=-8;dl.shadow.camera.right=8;dl.shadow.camera.top=8;dl.shadow.camera.bottom=-8;
-  scene.add(dl);
-  const pl = new THREE.PointLight(0xffd080, 0.5, 12);
-  pl.position.set(-3,4,2); scene.add(pl);
-
-  buildKitchen(); buildChef(); startRenderLoop();
+  const dl = new THREE.DirectionalLight(0xfff0d0, 1.0); dl.position.set(5,8,5); dl.castShadow = true;
+  dl.shadow.mapSize.set(512,512); dl.shadow.camera.left=dl.shadow.camera.bottom=-8; dl.shadow.camera.right=dl.shadow.camera.top=8;
+  scene.add(dl); const pl = new THREE.PointLight(0xffd080, 0.5, 12); pl.position.set(-3,4,2); scene.add(pl);
+  buildKitchen(); buildChef(); startLoop();
 }
 
-function mat(c){ return new THREE.MeshLambertMaterial({color:c}); }
-function box(w,h,d,c,shadow){ const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat(c)); if(shadow){m.castShadow=true;m.receiveShadow=true;} return m; }
-function cyl(r1,r2,h,s,c){ return new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,s||12),mat(c)); }
+function M(c){ return new THREE.MeshLambertMaterial({color:c}); }
+function BOX(w,h,d,c,sh){ const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),M(c)); if(sh){m.castShadow=true;m.receiveShadow=true;} return m; }
+function CYL(r1,r2,h,s,c){ return new THREE.Mesh(new THREE.CylinderGeometry(r1,r2,h,s||12),M(c)); }
 
 function buildKitchen() {
-  const add = o=>{scene.add(o);return o;};
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(14,12),mat(0xd4a96a));
-  floor.rotation.x=-Math.PI/2; floor.receiveShadow=true; add(floor);
-  for(let i=-3;i<=3;i++) for(let j=-2;j<=2;j++) if((i+j)%2===0){
-    const t=new THREE.Mesh(new THREE.PlaneGeometry(1.98,1.98),mat(0xc49050));
-    t.rotation.x=-Math.PI/2; t.position.set(i*2,.001,j*2); add(t);
-  }
-  const wall=box(14,4,.2,0xe8d5b0,true); wall.position.set(0,2,-4); add(wall);
-  const ctr=box(10,.2,2,0xc8a87a,true); ctr.position.set(0,.9,-2.5); add(ctr);
-  const ctrb=box(10,.9,2,0x8b6340,true); ctrb.position.set(0,.45,-2.5); add(ctrb);
-  const stove=box(2.2,.05,1.4,0x555577,true); stove.position.set(-2,1.02,-2.5); add(stove);
-  [-2.5,-1.5].forEach(bx=>{const b=cyl(.28,.28,.05,12,0x333344);b.position.set(bx,1.05,-2.5);add(b);});
-
-  const pg=new THREE.Group();
-  const pb=cyl(.45,.4,.12,16,0x222233); const ph=box(.6,.07,.1,0x1a1a22);
-  ph.position.set(.7,0,0); pg.add(pb,ph); pg.position.set(-2.5,1.12,-2.5); pan=pg; add(pg);
-
-  const cb=box(1.2,.06,.8,0xa0724a,true); cb.position.set(1.5,1.01,-2.5); add(cb);
-  [0xe74c3c,0xf39c12,0x27ae60,0x8e44ad].forEach((c,i)=>{const b=cyl(.2,.18,.35,10,c);b.position.set(-4+i*.6,1.1,-3.6);b.castShadow=true;add(b);});
-
-  const sh=box(10,.12,.5,0x7d5a3c); sh.position.set(0,2.8,-3.8); add(sh);
-  for(let i=-2;i<=2;i++){const p=cyl(.18,.15,.3,10,i%2?0x556677:0x888899);p.position.set(i*1.5,3.1,-3.8);add(p);}
-
-  const pot2=cyl(.3,.26,.4,12,0x445566); pot2.position.set(-1.5,1.22,-2.5); add(pot2);
-  const tbl=cyl(.8,.8,.08,16,0xa07850); tbl.position.set(2,.7,.5);tbl.castShadow=true;add(tbl);
-  const tleg=cyl(.06,.06,.7,8,0x7a5830); tleg.position.set(2,.35,.5); add(tleg);
-  const plate=cyl(.5,.5,.04,20,0xf0f0f0); plate.position.set(2,.75,.5); add(plate);
+  const A = o => { scene.add(o); return o; };
+  const fl = new THREE.Mesh(new THREE.PlaneGeometry(14,12),M(0xd4a96a)); fl.rotation.x=-Math.PI/2; fl.receiveShadow=true; A(fl);
+  for(let i=-3;i<=3;i++) for(let j=-2;j<=2;j++) if((i+j)%2===0){ const t=new THREE.Mesh(new THREE.PlaneGeometry(1.98,1.98),M(0xc49050)); t.rotation.x=-Math.PI/2; t.position.set(i*2,.001,j*2); A(t); }
+  A(BOX(14,4,.2,0xe8d5b0,true)).position.set(0,2,-4);
+  A(BOX(10,.2,2,0xc8a87a,true)).position.set(0,.9,-2.5);
+  A(BOX(10,.9,2,0x8b6340,true)).position.set(0,.45,-2.5);
+  A(BOX(2.2,.05,1.4,0x555577,true)).position.set(-2,1.02,-2.5);
+  [-2.5,-1.5].forEach(bx=>{ const b=CYL(.28,.28,.05,12,0x333344); b.position.set(bx,1.05,-2.5); A(b); });
+  const pg=new THREE.Group(); const pb=CYL(.45,.4,.12,16,0x222233); const ph=BOX(.6,.07,.1,0x1a1a22); ph.position.set(.7,0,0); pg.add(pb,ph); pg.position.set(-2.5,1.12,-2.5); pan=pg; A(pg);
+  A(BOX(1.2,.06,.8,0xa0724a,true)).position.set(1.5,1.01,-2.5);
+  [0xe74c3c,0xf39c12,0x27ae60,0x8e44ad].forEach((c,i)=>{ const b=CYL(.2,.18,.35,10,c); b.position.set(-4+i*.6,1.1,-3.6); b.castShadow=true; A(b); });
+  A(BOX(10,.12,.5,0x7d5a3c)).position.set(0,2.8,-3.8);
+  for(let i=-2;i<=2;i++){ const p=CYL(.18,.15,.3,10,i%2?0x556677:0x888899); p.position.set(i*1.5,3.1,-3.8); A(p); }
+  A(CYL(.3,.26,.4,12,0x445566)).position.set(-1.5,1.22,-2.5);
+  const tbl=CYL(.8,.8,.08,16,0xa07850); tbl.position.set(2,.7,.5); tbl.castShadow=true; A(tbl);
+  A(CYL(.06,.06,.7,8,0x7a5830)).position.set(2,.35,.5);
+  A(CYL(.5,.5,.04,20,0xf0f0f0)).position.set(2,.75,.5);
 }
 
 function buildChef() {
-  const cg=new THREE.Group();
-  const m=c=>new THREE.MeshLambertMaterial({color:c});
-  const mk=(g,c)=>new THREE.Mesh(g,m(c));
+  const cg = new THREE.Group();
+  const mk=(g,c)=>new THREE.Mesh(g,M(c));
   const hb=mk(new THREE.CylinderGeometry(.22,.22,.04,12),0xffffff); hb.position.set(0,.42,0);
   const ht=mk(new THREE.CylinderGeometry(.16,.16,.28,12),0xffffff); ht.position.set(0,.57,0);
   const hd=mk(new THREE.SphereGeometry(.18,10,10),0xf5cba7); hd.position.set(0,.23,0);
-  [-0.07,0.07].forEach(ex=>{const e=mk(new THREE.SphereGeometry(.03,6,6),0x222222);e.position.set(ex,.27,.16);cg.add(e);});
+  [-0.07,0.07].forEach(ex=>{ const e=mk(new THREE.SphereGeometry(.03,6,6),0x222222); e.position.set(ex,.27,.16); cg.add(e); });
   const bd=mk(new THREE.BoxGeometry(.3,.38,.22),0xfafafa); bd.position.set(0,-.04,0);
   const ap=mk(new THREE.BoxGeometry(.22,.28,.12),0x3498db); ap.position.set(0,-.04,.06);
-  const am=m(0xfafafa);
+  const am=M(0xfafafa);
   const la=new THREE.Mesh(new THREE.BoxGeometry(.1,.3,.1),am); la.position.set(-.2,-.02,0);
   const ra=new THREE.Mesh(new THREE.BoxGeometry(.1,.3,.1),am); ra.position.set(.2,-.02,0);
-  chef={group:cg,leftArm:la,rightArm:ra};
+  chef = {group:cg, leftArm:la, rightArm:ra};
   const pt=mk(new THREE.BoxGeometry(.28,.22,.2),0x2c3e50); pt.position.set(0,-.28,0);
-  [-0.08,0.08].forEach(lx=>{const l=new THREE.Mesh(new THREE.BoxGeometry(.1,.22,.12),m(0x2c3e50));l.position.set(lx,-.47,0);cg.add(l);});
-  cg.add(hb,ht,hd,bd,ap,la,ra,pt);
-  cg.position.set(0,.3,0); cg.castShadow=true; scene.add(cg);
+  [-0.08,0.08].forEach(lx=>{ const l=new THREE.Mesh(new THREE.BoxGeometry(.1,.22,.12),M(0x2c3e50)); l.position.set(lx,-.47,0); cg.add(l); });
+  cg.add(hb,ht,hd,bd,ap,la,ra,pt); cg.position.set(0,.3,0); cg.castShadow=true; scene.add(cg);
 }
 
 const clock = new THREE.Clock();
-function startRenderLoop(){
-  (function loop(){
-    animFrameId=requestAnimationFrame(loop);
-    const t=clock.getElapsedTime();
-    if(chef){
-      if(chefState.action==='idle'){
-        chef.group.position.y=chefState.y+Math.sin(t*1.8)*.015;
-        chef.leftArm.rotation.x=Math.sin(t*1.8)*.08;
-        chef.rightArm.rotation.x=-Math.sin(t*1.8)*.08;
+function startLoop() {
+  (function loop() {
+    requestAnimationFrame(loop);
+    const t = clock.getElapsedTime();
+    if (chef) {
+      if (chefSt.action==='idle') { chef.group.position.y=chefSt.y+Math.sin(t*1.8)*.015; chef.leftArm.rotation.x=Math.sin(t*1.8)*.08; chef.rightArm.rotation.x=-Math.sin(t*1.8)*.08; }
+      if (chefSt.action==='walk') {
+        const dx=chefSt.targetX-chef.group.position.x;
+        if(Math.abs(dx)>.05){ chef.group.position.x+=dx*.07; chef.leftArm.rotation.x=Math.sin(t*8)*.4; chef.rightArm.rotation.x=-Math.sin(t*8)*.4; chef.group.rotation.y=dx>0?.3:-.3; }
+        else { chef.group.position.x=chefSt.targetX; chefSt.action='arrived'; chef.group.rotation.y=0; }
       }
-      if(chefState.action==='walk'){
-        const dx=chefState.targetX-chef.group.position.x;
-        if(Math.abs(dx)>.05){
-          chef.group.position.x+=dx*.07;
-          chef.leftArm.rotation.x=Math.sin(t*8)*.4;
-          chef.rightArm.rotation.x=-Math.sin(t*8)*.4;
-          chef.group.rotation.y=dx>0?.3:-.3;
-        } else {
-          chef.group.position.x=chefState.targetX;
-          chefState.action='arrived';
-          chef.group.rotation.y=0;
-        }
-      }
-      if(chefState.action==='chop')  chef.rightArm.rotation.x=Math.sin(t*10)*.6-.3;
-      if(chefState.action==='stir'){ chef.rightArm.rotation.z=Math.sin(t*6)*.5; chef.rightArm.rotation.x=-.5; }
-      if(chefState.action==='heat' && pan) pan.children[0].material.color.setHSL(0,1,.15+Math.sin(t*4)*.05);
+      if(chefSt.action==='chop') chef.rightArm.rotation.x=Math.sin(t*10)*.6-.3;
+      if(chefSt.action==='stir'){ chef.rightArm.rotation.z=Math.sin(t*6)*.5; chef.rightArm.rotation.x=-.5; }
+      if(chefSt.action==='heat'&&pan) pan.children[0].material.color.setHSL(0,1,.15+Math.sin(t*4)*.05);
     }
-    if(renderer && scene && camera) renderer.render(scene,camera);
+    if(renderer&&scene&&camera) renderer.render(scene,camera);
   })();
 }
 
-function onResize(){
-  const c=document.getElementById('canvas-container');
+function onResize() {
+  const c = document.getElementById('canvas-container');
   if(!c||!camera||!renderer) return;
-  camera.aspect=c.clientWidth/c.clientHeight;
+  camera.aspect = c.clientWidth/c.clientHeight;
   camera.updateProjectionMatrix();
-  renderer.setSize(c.clientWidth,c.clientHeight);
+  renderer.setSize(c.clientWidth, c.clientHeight);
 }
 
-// ─── INGREDIENTS ─────────────────────────────────────────
-function spawnIngredient(type){
+// ════════════════════════════════════════════════════════
+// INGREDIENTS
+// ════════════════════════════════════════════════════════
+function spawnIngredient(type) {
   if(ingredientMeshes[type]) scene.remove(ingredientMeshes[type]);
+  const m=(c,o)=>new THREE.MeshLambertMaterial({color:c,...(o||{})});
   let mesh;
-  const m=(c,opts)=>new THREE.MeshLambertMaterial({color:c,...(opts||{})});
-  switch(type){
-    case 'onion_pieces':{const g=new THREE.Group();for(let i=0;i<5;i++){const p=new THREE.Mesh(new THREE.BoxGeometry(.1,.05,.1),m(0xf5cba7));p.position.set((Math.random()-.5)*.6,0,(Math.random()-.5)*.4);g.add(p);}g.position.set(1.5,1.09,-2.5);mesh=g;break;}
-    case 'oil':{mesh=new THREE.Mesh(new THREE.CylinderGeometry(.15,.15,.04,12),m(0xffe066,{transparent:true,opacity:.8}));mesh.position.set(-2.5,1.19,-2.5);break;}
-    case 'rice':{const g=new THREE.Group();for(let i=0;i<12;i++){const r=new THREE.Mesh(new THREE.SphereGeometry(.035,4,4),m(0xfff8dc));r.position.set((Math.random()-.5)*.5,0,(Math.random()-.5)*.4);g.add(r);}g.position.set(-2.5,1.19,-2.5);mesh=g;break;}
-    case 'noodles':{const g=new THREE.Group();for(let i=0;i<8;i++){const n=new THREE.Mesh(new THREE.TorusGeometry(.1+i*.02,.02,4,8),m(0xffd700));n.position.set((Math.random()-.5)*.3,0,(Math.random()-.5)*.3);n.rotation.x=Math.PI/2;g.add(n);}g.position.set(-2.5,1.22,-2.5);mesh=g;break;}
-    case 'dish':{const g=new THREE.Group();const colors=[0xd4a017,0xe74c3c,0xf5f0e0];const base=new THREE.Mesh(new THREE.CylinderGeometry(.35,.35,.08,16),m(colors[currentLevel]));base.position.set(0,.06,0);g.add(base);for(let i=0;i<3;i++){const s=new THREE.Mesh(new THREE.SphereGeometry(.05,6,6),m(0xffffff,{transparent:true,opacity:.5}));s.position.set((i-1)*.12,.18+i*.05,0);g.add(s);}g.position.set(2,.76,.5);mesh=g;break;}
-    default:return;
+  switch(type) {
+    case 'onion_pieces':{ const g=new THREE.Group(); for(let i=0;i<5;i++){ const p=new THREE.Mesh(new THREE.BoxGeometry(.1,.05,.1),m(0xf5cba7)); p.position.set((Math.random()-.5)*.6,0,(Math.random()-.5)*.4); g.add(p); } g.position.set(1.5,1.09,-2.5); mesh=g; break; }
+    case 'oil':{ mesh=new THREE.Mesh(new THREE.CylinderGeometry(.15,.15,.04,12),m(0xffe066,{transparent:true,opacity:.8})); mesh.position.set(-2.5,1.19,-2.5); break; }
+    case 'rice':{ const g=new THREE.Group(); for(let i=0;i<12;i++){ const r=new THREE.Mesh(new THREE.SphereGeometry(.035,4,4),m(0xfff8dc)); r.position.set((Math.random()-.5)*.5,0,(Math.random()-.5)*.4); g.add(r); } g.position.set(-2.5,1.19,-2.5); mesh=g; break; }
+    case 'noodles':{ const g=new THREE.Group(); for(let i=0;i<8;i++){ const n=new THREE.Mesh(new THREE.TorusGeometry(.1+i*.02,.02,4,8),m(0xffd700)); n.position.set((Math.random()-.5)*.3,0,(Math.random()-.5)*.3); n.rotation.x=Math.PI/2; g.add(n); } g.position.set(-2.5,1.22,-2.5); mesh=g; break; }
+    case 'dish':{ const g=new THREE.Group(); const cols=[0xd4a017,0xe74c3c,0xf5f0e0]; const base=new THREE.Mesh(new THREE.CylinderGeometry(.35,.35,.08,16),m(cols[curLevel])); base.position.set(0,.06,0); g.add(base); for(let i=0;i<3;i++){ const s=new THREE.Mesh(new THREE.SphereGeometry(.05,6,6),m(0xffffff,{transparent:true,opacity:.5})); s.position.set((i-1)*.12,.18+i*.05,0); g.add(s); } g.position.set(2,.76,.5); mesh=g; break; }
+    default: return;
   }
   mesh.castShadow=true; scene.add(mesh); ingredientMeshes[type]=mesh;
 }
-
-function clearIngredients(){
-  for(const k in ingredientMeshes){if(ingredientMeshes[k])scene.remove(ingredientMeshes[k]);}
+function clearIngredients() {
+  for(const k in ingredientMeshes){ if(ingredientMeshes[k]) scene.remove(ingredientMeshes[k]); }
   ingredientMeshes={};
   if(pan) pan.children[0].material.color.set(0x222233);
 }
 
-// ─── CHEF ACTIONS ────────────────────────────────────────
-function walkTo(tx){
-  return new Promise(r=>{
-    chefState.targetX=tx; chefState.action='walk';
-    const iv=setInterval(()=>{if(chefState.action==='arrived'){chefState.action='idle';clearInterval(iv);r();}},50);
+// ════════════════════════════════════════════════════════
+// CHEF ANIMATIONS
+// ════════════════════════════════════════════════════════
+function walkTo(tx) {
+  return new Promise(r => {
+    chefSt.targetX=tx; chefSt.action='walk';
+    const iv=setInterval(()=>{ if(chefSt.action==='arrived'){ chefSt.action='idle'; clearInterval(iv); r(); } },50);
   });
 }
-function animate(action,ms){
-  return new Promise(r=>{
-    chefState.action=action;
-    setTimeout(()=>{chefState.action='idle';if(chef){chef.rightArm.rotation.x=0;chef.rightArm.rotation.z=0;}r();},ms);
+function animChef(action, ms) {
+  return new Promise(r => {
+    chefSt.action=action;
+    setTimeout(()=>{ chefSt.action='idle'; if(chef){ chef.rightArm.rotation.x=0; chef.rightArm.rotation.z=0; } r(); }, ms);
   });
 }
-const wait=ms=>new Promise(r=>setTimeout(r,ms));
+const wait = ms => new Promise(r => setTimeout(r,ms));
 
-// ─── EXECUTE BLOCK ────────────────────────────────────────
-async function execBlock(id){
-  switch(id){
-    case 'chop_onion':   await walkTo(1.5);  await animate('chop',900); spawnIngredient('onion_pieces'); break;
+async function execBlock(id) {
+  switch(id) {
+    case 'chop_onion':   await walkTo(1.5);  await animChef('chop',900); spawnIngredient('onion_pieces'); break;
     case 'heat_pan':
-    case 'heat_broth':   await walkTo(-2.5); await animate('heat',900); pan.children[0].material.color.set(0xff6622); break;
-    case 'add_oil':      await walkTo(-2.5); await animate('stir',700); spawnIngredient('oil'); break;
+    case 'heat_broth':   await walkTo(-2.5); await animChef('heat',900); pan.children[0].material.color.set(0xff6622); break;
+    case 'add_oil':      await walkTo(-2.5); await animChef('stir',700); spawnIngredient('oil'); break;
     case 'add_onion':
-    case 'saute_onion':  await walkTo(-2.5); await animate('stir',700); break;
+    case 'saute_onion':  await walkTo(-2.5); await animChef('stir',700); break;
     case 'add_rice':
-    case 'add_rice2':    await walkTo(-2.5); await animate('stir',700); spawnIngredient('rice'); break;
+    case 'add_rice2':    await walkTo(-2.5); await animChef('stir',700); spawnIngredient('rice'); break;
     case 'stir_rice':
-    case 'toss_noodles': await walkTo(-2.5); await animate('stir',1000); break;
-    case 'repeat_stir':  await walkTo(-2.5); for(let r=0;r<3;r++){await animate('stir',500);await wait(100);} break;
-    case 'boil_water':   await walkTo(-1.5); await animate('heat',800); pan.children[0].material.color.set(0x4488ff); break;
-    case 'add_noodles':  await walkTo(-2.5); await animate('stir',700); spawnIngredient('noodles'); break;
-    case 'drain_water':  await walkTo(-2.5); await animate('chop',700); break;
-    case 'if_spicy':     await walkTo(0);    await animate('stir',600); break;
+    case 'toss_noodles': await walkTo(-2.5); await animChef('stir',1000); break;
+    case 'repeat_stir':  await walkTo(-2.5); for(let i=0;i<3;i++){await animChef('stir',500);await wait(100);} break;
+    case 'boil_water':   await walkTo(-1.5); await animChef('heat',800); pan.children[0].material.color.set(0x4488ff); break;
+    case 'add_noodles':  await walkTo(-2.5); await animChef('stir',700); spawnIngredient('noodles'); break;
+    case 'drain_water':  await walkTo(-2.5); await animChef('chop',700); break;
+    case 'if_spicy':     await walkTo(0);    await animChef('stir',600); break;
     case 'add_sauce':
     case 'add_wine':
-    case 'add_cheese':   await walkTo(-2.5); await animate('stir',650); break;
+    case 'add_cheese':   await walkTo(-2.5); await animChef('stir',650); break;
     default: await walkTo(0); await wait(400);
   }
 }
 
-// ─── VALIDATION ───────────────────────────────────────────
-function validate(level, seq){
-  // Must have all blocks
-  for(const b of level.blocks){
-    if(!seq.includes(b.id)) return {ok:false,err:`IncompleteError: Missing "${b.label}(${b.arg})"\n  All ${level.blocks.length} blocks required`,bad:null};
-  }
-  // Order rules
-  for(const r of level.rules){
-    const bi=seq.indexOf(r.before), ai=seq.indexOf(r.after);
-    if(bi!==-1 && ai!==-1 && bi>=ai) return {ok:false,err:r.err,bad:r.after};
-  }
+// ════════════════════════════════════════════════════════
+// VALIDATION & RUN
+// ════════════════════════════════════════════════════════
+function validate(level, seq) {
+  for(const b of level.blocks) if(!seq.includes(b.id)) return {ok:false,err:'IncompleteError: Missing "'+b.label+'('+b.arg+')"\n  All '+level.blocks.length+' blocks required',bad:null};
+  for(const r of level.rules) { const bi=seq.indexOf(r.before),ai=seq.indexOf(r.after); if(bi!==-1&&ai!==-1&&bi>=ai) return {ok:false,err:r.err,bad:r.after}; }
   return {ok:true};
 }
 
-// ─── RUN ──────────────────────────────────────────────────
-async function runSequence(){
-  if(isRunning) return;
-  const level=LEVELS[currentLevel];
-  if(!sequenceIds.length){setStatus('Add some blocks first!','err');return;}
-  const v=validate(level,sequenceIds);
-  if(!v.ok){showError(v.err,v.bad);return;}
-
-  isRunning=true;
-  document.getElementById('run-btn').disabled=true;
-  setStatus('// executing sequence…','');
-  clearIngredients();
-
-  const slots=document.querySelectorAll('#seq-blocks .block');
-  for(let i=0;i<slots.length;i++){
-    const sl=slots[i];
-    sl.classList.add('executing');
-    await execBlock(sequenceIds[i]);
-    sl.classList.remove('executing');
-    await wait(160);
-  }
-
-  await wait(280);
-  spawnIngredient('dish');
-  await wait(360);
-  showSuccess();
+async function runSequence() {
+  if (isRunning) return;
+  const level = LEVELS[curLevel];
+  if (!seqIds.length) { setStatus('Add some blocks first!','err'); return; }
+  const v = validate(level, seqIds);
+  if (!v.ok) { showError(v.err, v.bad); return; }
+  isRunning=true; document.getElementById('run-btn').disabled=true;
+  setStatus('// executing sequence…',''); clearIngredients();
+  const slots = document.querySelectorAll('#seq-blocks .block');
+  for(let i=0;i<slots.length;i++) { slots[i].classList.add('executing'); await execBlock(seqIds[i]); slots[i].classList.remove('executing'); await wait(160); }
+  await wait(280); spawnIngredient('dish'); await wait(350); showSuccess();
 }
 
-// ─── OVERLAYS ────────────────────────────────────────────
-function showError(errMsg, badId){
-  if(chef){chef.group.position.x+=(Math.random()-.5)*.2;setTimeout(()=>{if(chef)chef.group.position.x=chefState.targetX||0;},500);}
-  if(badId) document.querySelectorAll('#seq-blocks .block').forEach(el=>{if(el.dataset.id===badId)el.classList.add('err-hl');});
-  const box=document.getElementById('ov-box');
-  box.className='ov-box ov-error';
+// ════════════════════════════════════════════════════════
+// RESULT OVERLAYS
+// ════════════════════════════════════════════════════════
+function showError(errMsg, badId) {
+  if(chef){ chef.group.position.x+=(Math.random()-.5)*.2; setTimeout(()=>{ if(chef) chef.group.position.x=chefSt.targetX||0; },500); }
+  if(badId) document.querySelectorAll('#seq-blocks .block').forEach(el=>{ if(el.dataset.id===badId) el.classList.add('err-hl'); });
+  document.getElementById('ov-box').className='ov-box ov-err';
   document.getElementById('ov-title').textContent='✗ Runtime Error';
   document.getElementById('ov-msg').textContent='Wrong order! Fix your sequence and retry.';
-  const ec=document.getElementById('ov-errcode');
-  ec.style.display='block'; ec.textContent=errMsg;
+  const ec=document.getElementById('ov-code'); ec.style.display='block'; ec.textContent=errMsg;
   document.getElementById('ov-next').style.display='none';
-  document.getElementById('result-overlay').classList.add('open');
-  isRunning=false;
-  document.getElementById('run-btn').disabled=sequenceIds.length===0;
-  setStatus('// error — fix sequence and retry','err');
+  document.getElementById('result-ov').classList.add('open');
+  isRunning=false; document.getElementById('run-btn').disabled=seqIds.length===0;
+  setStatus('// error — fix the sequence and retry','err');
 }
 
-function showSuccess(){
-  const level=LEVELS[currentLevel];
-  const box=document.getElementById('ov-box');
-  box.className='ov-box ov-success';
+function showSuccess() {
+  const level=LEVELS[curLevel];
+  document.getElementById('ov-box').className='ov-box ov-ok';
   document.getElementById('ov-title').textContent='✓ Dish Served!';
-  document.getElementById('ov-msg').textContent=level.goal+' completed successfully!';
-  document.getElementById('ov-errcode').style.display='none';
-  const isLast=currentLevel>=LEVELS.length-1;
-  document.getElementById('ov-next').style.display=isLast?'none':'inline-block';
-  document.getElementById('result-overlay').classList.add('open');
-  spawnConfetti();
-  isRunning=false;
-  setStatus('// success! dish served 🎉','ok');
-  const dot=document.getElementById(`dot-${currentLevel}`);
-  if(dot){dot.classList.remove('active');dot.classList.add('done');}
+  document.getElementById('ov-msg').textContent=level.goal+' completed!';
+  document.getElementById('ov-code').style.display='none';
+  document.getElementById('ov-next').style.display=curLevel>=LEVELS.length-1?'none':'inline-block';
+  document.getElementById('result-ov').classList.add('open');
+  confetti(); isRunning=false; setStatus('// success! 🎉','ok');
+  const d=document.getElementById('dot-'+curLevel); if(d){ d.classList.remove('cur'); d.classList.add('done'); }
 }
 
-function nextLevel(){
-  document.getElementById('result-overlay').classList.remove('open');
-  if(currentLevel+1<LEVELS.length) loadLevel(currentLevel+1);
+function nextLevel() { document.getElementById('result-ov').classList.remove('open'); if(curLevel+1<LEVELS.length) loadLevel(curLevel+1); }
+
+function confetti() {
+  const cols=['#F4A822','#4CAF50','#79c0ff','#ffa657','#f78166','#FFD252'];
+  for(let i=0;i<50;i++){ const el=document.createElement('div'); el.className='cfp'; el.style.cssText='left:'+Math.random()*100+'vw;top:-20px;background:'+cols[i%cols.length]+';animation-delay:'+Math.random()*.9+'s;transform:rotate('+Math.random()*360+'deg);'; document.body.appendChild(el); setTimeout(()=>el.remove(),2700); }
 }
 
-function spawnConfetti(){
-  const colors=['#e2c77a','#3fb950','#79c0ff','#ffa657','#f78166','#d2a8ff','#ff5f57'];
-  for(let i=0;i<48;i++){
-    const el=document.createElement('div');
-    el.className='confetti-p';
-    el.style.cssText=`left:${Math.random()*100}vw;top:-20px;background:${colors[i%colors.length]};animation-delay:${Math.random()*.9}s;transform:rotate(${Math.random()*360}deg);`;
-    document.body.appendChild(el);
-    setTimeout(()=>el.remove(),2700);
-  }
-}
+// ════════════════════════════════════════════════════════
+// BLOCK RENDERING
+// ════════════════════════════════════════════════════════
+function tClass(t){ return t==='conditional'?'t-cond':t==='loop'?'t-loop':'t-basic'; }
+function tIcon(t){ return t==='conditional'?'◇':t==='loop'?'↺':'○'; }
 
-// ─── BLOCK RENDERING ─────────────────────────────────────
-function typeClass(t){ return t==='conditional'?'t-cond':t==='loop'?'t-loop':'t-basic'; }
-function typeIcon(t){ return t==='conditional'?'◇':t==='loop'?'↺':'○'; }
-
-function renderAvail(){
-  const level=LEVELS[currentLevel];
-  const cont=document.getElementById('avail-blocks');
+function renderAvail() {
+  const level=LEVELS[curLevel], cont=document.getElementById('avail-blocks');
   cont.innerHTML='';
-  const rem=level.blocks.filter(b=>!sequenceIds.includes(b.id)).length;
-  document.getElementById('avail-count-badge').textContent=rem?`${rem} left`:'all used ✓';
-
+  const rem=level.blocks.filter(b=>!seqIds.includes(b.id)).length;
+  document.getElementById('avail-count').textContent=rem?rem+' left':'all used ✓';
   level.blocks.forEach(bd=>{
-    const used=sequenceIds.includes(bd.id);
+    const used=seqIds.includes(bd.id);
     const el=document.createElement('div');
-    el.className=`block ${typeClass(bd.type)}${used?' used':''}`;
+    el.className='block '+tClass(bd.type)+(used?' used':'');
     el.dataset.id=bd.id;
-    el.innerHTML=`<span class="b-icon">${typeIcon(bd.type)}</span><span class="b-name">${bd.label}</span><span class="b-paren">(</span><span class="b-arg">${bd.arg}</span><span class="b-paren">)</span>`;
-    if(!used){
-      el.addEventListener('pointerup',()=>{ if(!dragMoved&&!isRunning) addToSeq(bd.id); });
-      initDrag(el,'avail',bd.id,null);
-    }
+    el.innerHTML='<span class="b-icon">'+tIcon(bd.type)+'</span><span class="b-name">'+bd.label+'</span><span class="b-paren">(</span><span class="b-arg">'+bd.arg+'</span><span class="b-paren">)</span>';
+    if(!used){ el.addEventListener('pointerup',()=>{ if(!dragMoved&&!isRunning) addToSeq(bd.id); }); initDrag(el,'avail',bd.id,null); }
     cont.appendChild(el);
   });
 }
 
-function renderSeq(){
-  const level=LEVELS[currentLevel];
-  const total=level.blocks.length;
-  const used=sequenceIds.length;
-  const cont=document.getElementById('seq-blocks');
-  cont.innerHTML='';
-
-  const cnt=document.getElementById('seq-count');
-  cnt.textContent=`${used} / ${total}`;
-  cnt.className=used===0?'':used===total?'full':'partial';
-
-  const runBtn=document.getElementById('run-btn');
-  runBtn.disabled=isRunning||used===0;
-
-  if(used===0){
-    const e=document.createElement('div');
-    e.id='seq-empty';
-    e.innerHTML='<div class="seq-empty-arrow">←</div><div class="seq-empty-text">Tap a block on the left<br>to add it here</div>';
-    cont.appendChild(e);
-    setStatus('// tap a block to start →','');
-    return;
-  }
-
-  sequenceIds.forEach((id,idx)=>{
-    const bd=level.blocks.find(b=>b.id===id); if(!bd)return;
+function renderSeq() {
+  const level=LEVELS[curLevel], total=level.blocks.length, used=seqIds.length;
+  const cont=document.getElementById('seq-blocks'); cont.innerHTML='';
+  const sc=document.getElementById('seq-count');
+  sc.textContent=used+' / '+total;
+  sc.className=used===0?'':used===total?'full':'partial';
+  document.getElementById('run-btn').disabled=isRunning||used===0;
+  if(used===0){ const e=document.createElement('div'); e.id='seq-empty'; e.innerHTML='<div class="seq-empty-arr">←</div><div class="seq-empty-txt">Tap a block on the left<br>to add it here</div>'; cont.appendChild(e); setStatus('// tap a block to start →',''); return; }
+  seqIds.forEach((id,idx)=>{
+    const bd=level.blocks.find(b=>b.id===id); if(!bd) return;
     const el=document.createElement('div');
-    el.className=`block ${typeClass(bd.type)} pop`;
-    el.dataset.id=id; el.dataset.idx=idx;
-
-    const num=document.createElement('span');
-    num.className='b-num'; num.textContent=idx+1;
-
-    el.innerHTML=`<span class="b-name">${bd.label}</span><span class="b-paren">(</span><span class="b-arg">${bd.arg}</span><span class="b-paren">)</span>`;
-    el.insertBefore(num, el.firstChild);
-
-    const rm=document.createElement('span');
-    rm.className='b-rm'; rm.textContent='×';
-    rm.addEventListener('pointerdown',e=>{e.stopPropagation();if(!isRunning)removeFromSeq(id);});
-    el.appendChild(rm);
-
-    initDrag(el,'seq',id,idx);
-    cont.appendChild(el);
+    el.className='block '+tClass(bd.type)+' pop'; el.dataset.id=id; el.dataset.idx=idx;
+    const num=document.createElement('span'); num.className='b-num'; num.textContent=idx+1;
+    el.innerHTML='<span class="b-name">'+bd.label+'</span><span class="b-paren">(</span><span class="b-arg">'+bd.arg+'</span><span class="b-paren">)</span>';
+    el.insertBefore(num,el.firstChild);
+    const rm=document.createElement('span'); rm.className='b-rm'; rm.textContent='×';
+    rm.addEventListener('pointerdown',e=>{ e.stopPropagation(); if(!isRunning) removeFromSeq(id); }); el.appendChild(rm);
+    initDrag(el,'seq',id,idx); cont.appendChild(el);
   });
-
-  if(used>0&&used<total) setStatus(`// ${total-used} more block${total-used>1?'s':''} needed`,'warn');
+  if(used>0&&used<total) setStatus('// '+(total-used)+' more block'+(total-used>1?'s':'')+' needed','warn');
   else if(used===total) setStatus('// all blocks placed — press Run!','ok');
 }
 
-// ─── BLOCK MANAGEMENT ────────────────────────────────────
-function addToSeq(id){
-  if(sequenceIds.includes(id)||isRunning) return;
-  sequenceIds.push(id);
-  renderSeq(); renderAvail();
-}
-
-function removeFromSeq(id){
-  const i=sequenceIds.indexOf(id);
-  if(i!==-1){ sequenceIds.splice(i,1); renderSeq(); renderAvail(); }
-}
-
-function moveInSeq(fromIdx, insertIdx){
-  if(fromIdx===insertIdx) return;
-  const [item]=sequenceIds.splice(fromIdx,1);
-  const target=insertIdx>fromIdx?insertIdx-1:insertIdx;
-  sequenceIds.splice(target,0,item);
+// ════════════════════════════════════════════════════════
+// SEQUENCE MANAGEMENT
+// ════════════════════════════════════════════════════════
+function addToSeq(id)    { if(seqIds.includes(id)||isRunning) return; seqIds.push(id); renderSeq(); renderAvail(); }
+function removeFromSeq(id){ const i=seqIds.indexOf(id); if(i!==-1){ seqIds.splice(i,1); renderSeq(); renderAvail(); } }
+function moveInSeq(from, ins) {
+  if(from===ins) return;
+  const [item]=seqIds.splice(from,1);
+  seqIds.splice(ins>from?ins-1:ins,0,item);
   renderSeq();
 }
 
-// ─── LEVEL LOAD ───────────────────────────────────────────
-function loadLevel(idx){
-  currentLevel=idx; sequenceIds=[];
-  const level=LEVELS[idx];
-  document.getElementById('level-name-bar').textContent=level.name;
-  document.getElementById('rs-goal').textContent=level.goal;
-  document.getElementById('rs-desc').textContent=level.desc;
-  for(let i=0;i<LEVELS.length;i++){
-    const d=document.getElementById(`dot-${i}`);
-    if(!d) continue;
-    d.classList.remove('active','done');
-    if(i<idx) d.classList.add('done');
-    else if(i===idx) d.classList.add('active');
-  }
-  if(chef){chef.group.position.set(0,chefState.y,0);chef.group.rotation.y=0;chefState.action='idle';chefState.targetX=0;}
-  clearIngredients(); isRunning=false;
-  document.getElementById('run-btn').disabled=true;
-  document.getElementById('result-overlay').classList.remove('open');
-  if(hintOpen){ document.getElementById('recipe-strip').classList.remove('open'); hintOpen=false; const btn=document.getElementById('hint-toggle-btn');btn.textContent='💡 hint';btn.classList.remove('on'); }
-  renderAvail(); renderSeq();
-  setStatus('// tap a block to start →','');
-}
-
-function resetLevel(){ document.getElementById('result-overlay').classList.remove('open'); loadLevel(currentLevel); }
-
-// ─── DRAG & DROP ─────────────────────────────────────────
-let dragId=null,dragSrc=null,dragFromIdx=null;
-let dragOffX=0,dragOffY=0,dragMoved=false,ptStartX=0,ptStartY=0;
-const DRAG_THRESH=8;
+// ════════════════════════════════════════════════════════
+// DRAG & DROP
+// ════════════════════════════════════════════════════════
+let dragId=null,dragSrc=null,dragFromIdx=null,dragOffX=0,dragOffY=0,dragMoved=false,ptSX=0,ptSY=0;
+const THRESH=8;
 
 function initDrag(el,src,blockId,idx){
   el.addEventListener('pointerdown',e=>{
     if(isRunning||e.target.classList.contains('b-rm')) return;
-    e.preventDefault();
-    dragMoved=false; ptStartX=e.clientX; ptStartY=e.clientY;
+    e.preventDefault(); dragMoved=false; ptSX=e.clientX; ptSY=e.clientY;
     dragId=blockId; dragSrc=src; dragFromIdx=idx;
-    const rect=el.getBoundingClientRect();
-    dragOffX=e.clientX-rect.left; dragOffY=e.clientY-rect.top;
-
+    const rect=el.getBoundingClientRect(); dragOffX=e.clientX-rect.left; dragOffY=e.clientY-rect.top;
     const clone=document.getElementById('drag-clone');
-    const level=LEVELS[currentLevel];
-    const bd=level.blocks.find(b=>b.id===blockId);
-    clone.className=`block ${typeClass(bd?.type||'basic')}`;
+    const bd=LEVELS[curLevel].blocks.find(b=>b.id===blockId);
+    clone.className='block '+tClass(bd?.type||'basic');
     clone.style.width=rect.width+'px';
-    clone.style.left=(e.clientX-dragOffX)+'px';
-    clone.style.top=(e.clientY-dragOffY)+'px';
-    clone.innerHTML=`<span class="b-icon">${typeIcon(bd?.type||'basic')}</span><span class="b-name">${bd?.label||''}</span><span class="b-paren">(</span><span class="b-arg">${bd?.arg||''}</span><span class="b-paren">)</span>`;
-    clone.style.display='none';
-    el.classList.add('dragging');
+    clone.style.left=(e.clientX-dragOffX)+'px'; clone.style.top=(e.clientY-dragOffY)+'px';
+    clone.innerHTML='<span class="b-icon">'+tIcon(bd?.type||'basic')+'</span><span class="b-name">'+(bd?.label||'')+'</span><span class="b-paren">(</span><span class="b-arg">'+(bd?.arg||'')+'</span><span class="b-paren">)</span>';
+    clone.style.display='none'; el.classList.add('dragging');
   });
 }
 
 document.addEventListener('pointermove',e=>{
   if(!dragId) return;
-  const dx=e.clientX-ptStartX, dy=e.clientY-ptStartY;
-  if(!dragMoved&&Math.sqrt(dx*dx+dy*dy)>DRAG_THRESH){
-    dragMoved=true;
-    document.getElementById('drag-clone').style.display='block';
-  }
+  const dx=e.clientX-ptSX,dy=e.clientY-ptSY;
+  if(!dragMoved&&Math.sqrt(dx*dx+dy*dy)>THRESH){ dragMoved=true; document.getElementById('drag-clone').style.display='block'; }
   if(!dragMoved) return;
-  const clone=document.getElementById('drag-clone');
-  clone.style.left=(e.clientX-dragOffX)+'px';
-  clone.style.top=(e.clientY-dragOffY)+'px';
-
-  const seqCol=document.getElementById('seq-col');
-  if(seqCol){
-    const r=seqCol.getBoundingClientRect();
-    const over=e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom;
-    seqCol.classList.toggle('drag-over',over);
-  }
+  const clone=document.getElementById('drag-clone'); clone.style.left=(e.clientX-dragOffX)+'px'; clone.style.top=(e.clientY-dragOffY)+'px';
+  const sc=document.getElementById('seq-col'); if(sc){ const r=sc.getBoundingClientRect(); sc.classList.toggle('drag-over',e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom); }
 });
 
 document.addEventListener('pointerup',e=>{
   if(!dragId) return;
   document.getElementById('drag-clone').style.display='none';
-  const seqCol=document.getElementById('seq-col');
-  if(seqCol) seqCol.classList.remove('drag-over');
+  const sc=document.getElementById('seq-col'); if(sc) sc.classList.remove('drag-over');
   document.querySelectorAll('.block.dragging').forEach(el=>el.classList.remove('dragging'));
-
   if(dragMoved){
-    const target=document.elementFromPoint(e.clientX,e.clientY);
-    const seqEl=document.getElementById('seq-col');
-    const availEl=document.getElementById('avail-col');
-    if(seqEl&&seqEl.contains(target)){
-      if(dragSrc==='avail'){
-        if(!sequenceIds.includes(dragId)){
-          const ins=getInsertIndex(e.clientY);
-          sequenceIds.splice(ins,0,dragId);
-          renderSeq(); renderAvail();
-        }
-      } else if(dragSrc==='seq'){
-        const ins=getInsertIndex(e.clientY);
-        moveInSeq(dragFromIdx,ins);
-      }
-    } else if(availEl&&availEl.contains(target)){
-      if(dragSrc==='seq') removeFromSeq(dragId);
-    }
+    const tgt=document.elementFromPoint(e.clientX,e.clientY);
+    const seqEl=document.getElementById('seq-col'), availEl=document.getElementById('avail-col');
+    if(seqEl&&seqEl.contains(tgt)){
+      if(dragSrc==='avail'&&!seqIds.includes(dragId)){ seqIds.splice(getInsertIdx(e.clientY),0,dragId); renderSeq(); renderAvail(); }
+      else if(dragSrc==='seq'){ moveInSeq(dragFromIdx,getInsertIdx(e.clientY)); }
+    } else if(availEl&&availEl.contains(tgt)&&dragSrc==='seq') { removeFromSeq(dragId); }
   }
   dragId=null; dragSrc=null; dragFromIdx=null; dragMoved=false;
 });
 
-function getInsertIndex(clientY){
+function getInsertIdx(clientY){
   const blocks=Array.from(document.querySelectorAll('#seq-blocks .block'));
-  for(let i=0;i<blocks.length;i++){
-    const r=blocks[i].getBoundingClientRect();
-    if(clientY<r.top+r.height/2) return i;
-  }
+  for(let i=0;i<blocks.length;i++){ const r=blocks[i].getBoundingClientRect(); if(clientY<r.top+r.height/2) return i; }
   return blocks.length;
 }
 
-// ─── INIT ────────────────────────────────────────────────
-window.addEventListener('load',()=>{
-  showPage('home');
+// ════════════════════════════════════════════════════════
+// LEVEL LOAD / RESET
+// ════════════════════════════════════════════════════════
+function loadLevel(idx) {
+  curLevel=idx; seqIds=[];
+  const level=LEVELS[idx];
+  document.getElementById('lvl-name-bar').textContent=level.name;
+  document.getElementById('rs-goal').textContent=level.goal;
+  document.getElementById('rs-desc').textContent=level.desc;
+  for(let i=0;i<LEVELS.length;i++){
+    const d=document.getElementById('dot-'+i); if(!d) continue;
+    d.classList.remove('cur','done');
+    if(i<idx) d.classList.add('done'); else if(i===idx) d.classList.add('cur');
+  }
+  if(chef){ chef.group.position.set(0,chefSt.y,0); chef.group.rotation.y=0; chefSt.action='idle'; chefSt.targetX=0; }
+  clearIngredients(); isRunning=false;
+  document.getElementById('result-ov').classList.remove('open');
+  if(hintOpen){ document.getElementById('recipe-strip').classList.remove('open'); hintOpen=false; document.getElementById('hint-btn').textContent='💡 hint'; document.getElementById('hint-btn').classList.remove('on'); }
+  renderAvail(); renderSeq();
+  setStatus('// tap a block to start →','');
+}
+
+function resetLevel() { document.getElementById('result-ov').classList.remove('open'); loadLevel(curLevel); }
+
+// ════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════
+window.addEventListener('load', () => {
+  goPage('home');
   initAuth();
   loadLevel(0);
+  demoInit();
 });
-
-window.addEventListener('resize',()=>{ if(currentPage==='game') onResize(); });
-document.addEventListener('DOMContentLoaded',()=>{
-  const canvas=document.getElementById('game-canvas');
-  if(canvas) canvas.addEventListener('touchstart',e=>e.preventDefault(),{passive:false});
-});
-
-// Show tutorial when entering game page for first time
-const _origShowPage=showPage;
-let firstGame=true;
-function showPage(id){
-  _origShowPage(id);
-  if(id==='game'&&firstGame&&!tutorialDone){
-    firstGame=false;
-    setTimeout(()=>openTutorial(),300);
-  }
-}
+window.addEventListener('resize', () => { if(activePage==='game') onResize(); });
+document.getElementById('game-canvas').addEventListener('touchstart', e=>e.preventDefault(), {passive:false});
 </script>
 </body>
 </html>
