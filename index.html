@@ -3,190 +3,306 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="ory-verify" content="orynth-b14d01bbe0ab4be4801bf261a1e8d33a">
 <title>DevKitchen 3D</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: #1a1a2e; font-family: 'Courier New', monospace; overflow: hidden; height: 100vh; touch-action: none; }
+  body { background: #0d0d1a; font-family: 'Courier New', monospace; overflow: hidden; height: 100vh; touch-action: none; }
 
+  /* ── 3D VIEWPORT ── */
   #canvas-container {
-    position: fixed; top: 0; left: 0; width: 100%; height: 60vh;
+    position: fixed; top: 0; left: 0; width: 100%; height: 58vh;
     background: #f5e6d0;
   }
   #game-canvas { display: block; width: 100%; height: 100%; }
 
-  /* Top Bar */
+  /* ── TOP BAR ── */
   #top-bar {
-    position: fixed; top: 0; left: 0; right: 0; height: 44px;
-    background: rgba(16,16,32,0.92); backdrop-filter: blur(8px);
+    position: fixed; top: 0; left: 0; right: 0; height: 46px;
+    background: rgba(10,10,22,0.95); backdrop-filter: blur(10px);
     display: flex; align-items: center; justify-content: space-between;
-    padding: 0 12px; z-index: 100; border-bottom: 1px solid #333;
+    padding: 0 14px; z-index: 100; border-bottom: 1px solid #1e1e3a;
   }
-  #level-name { color: #e2c77a; font-size: 13px; font-weight: bold; letter-spacing: 1px; }
-  #reset-btn {
-    background: #2d2d4e; color: #e2c77a; border: 1px solid #e2c77a;
-    padding: 6px 14px; border-radius: 4px; font-family: 'Courier New', monospace;
-    font-size: 12px; cursor: pointer; touch-action: manipulation; min-width: 44px; min-height: 36px;
-  }
-  #reset-btn:active { background: #e2c77a; color: #1a1a2e; }
-
-  /* Code Block Tray */
-  #code-area {
-    position: fixed; bottom: 0; left: 0; right: 0; height: 40vh;
-    background: #12121f; border-top: 2px solid #333; display: flex; flex-direction: column;
-    z-index: 50;
-  }
-  #tray-label {
-    padding: 6px 12px; font-size: 11px; color: #666;
-    border-bottom: 1px solid #222; background: #0e0e1a;
+  #level-badge {
     display: flex; align-items: center; gap: 8px;
   }
-  .tray-dot { width: 8px; height: 8px; border-radius: 50%; }
+  #level-icon { font-size: 16px; }
+  #level-name { color: #e2c77a; font-size: 12px; font-weight: bold; letter-spacing: 0.5px; }
+  #top-right { display: flex; align-items: center; gap: 10px; }
+  #progress { display: flex; gap: 5px; align-items: center; }
+  .prog-dot {
+    width: 7px; height: 7px; border-radius: 50%; background: #2a2a42;
+    border: 1px solid #333; transition: all 0.3s;
+  }
+  .prog-dot.done { background: #3fb950; border-color: #3fb950; }
+  .prog-dot.active { background: #e2c77a; border-color: #e2c77a; box-shadow: 0 0 6px #e2c77a88; }
+  #reset-btn {
+    background: transparent; color: #555; border: 1px solid #2a2a42;
+    padding: 5px 12px; border-radius: 4px; font-family: 'Courier New', monospace;
+    font-size: 11px; cursor: pointer; touch-action: manipulation;
+    min-width: 40px; min-height: 34px; transition: all 0.15s; letter-spacing: 0.5px;
+  }
+  #reset-btn:hover, #reset-btn:active { border-color: #e2c77a; color: #e2c77a; }
+
+  /* ── CODE AREA ── */
+  #code-area {
+    position: fixed; bottom: 0; left: 0; right: 0; height: 42vh;
+    background: #0d0d1a; border-top: 1px solid #1a1a2e;
+    display: flex; flex-direction: column; z-index: 50;
+  }
+
+  /* ── TRAY HEADER ── */
+  #tray-header {
+    padding: 0 14px; height: 36px; min-height: 36px;
+    background: #090912; border-bottom: 1px solid #1a1a2e;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  #tray-dots { display: flex; gap: 5px; align-items: center; }
+  .tray-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
   .dot-red { background: #ff5f57; } .dot-yellow { background: #ffbd2e; } .dot-green { background: #28ca41; }
-  #tray-label span { color: #555; font-size: 11px; margin-left: 6px; }
+  #tray-file { font-size: 11px; color: #444; margin-left: 8px; }
+  #hint-toggle {
+    font-size: 10px; color: #444; cursor: pointer; padding: 3px 8px;
+    border: 1px solid #222; border-radius: 3px; touch-action: manipulation;
+    transition: all 0.15s; user-select: none;
+  }
+  #hint-toggle:hover { color: #79c0ff; border-color: #79c0ff; }
+  #hint-toggle.active { color: #e2c77a; border-color: #e2c77a; }
 
+  /* ── RECIPE HINT ── */
+  #recipe-hint {
+    background: #0a0a18; border-bottom: 1px solid #1a1a2e;
+    overflow: hidden; max-height: 0; transition: max-height 0.25s ease;
+  }
+  #recipe-hint.open { max-height: 80px; }
+  #recipe-hint-inner {
+    padding: 8px 14px; display: flex; align-items: flex-start; gap: 10px;
+  }
+  #recipe-goal { font-size: 11px; color: #e2c77a; font-weight: bold; margin-bottom: 3px; }
+  #recipe-desc { font-size: 10px; color: #555; line-height: 1.5; }
+
+  /* ── BLOCKS LAYOUT ── */
   #blocks-container {
-    display: flex; flex-direction: row; gap: 0; height: calc(100% - 80px); overflow: hidden;
+    display: flex; flex: 1; overflow: hidden; gap: 0;
   }
 
-  /* Available blocks (left side) */
+  /* Available (left) */
+  #available-col {
+    width: 48%; display: flex; flex-direction: column;
+    border-right: 1px solid #151525;
+  }
+  #available-header {
+    padding: 6px 10px; background: #090912;
+    border-bottom: 1px solid #151525;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .col-label { font-size: 9px; color: #3a3a5a; letter-spacing: 1.5px; text-transform: uppercase; }
   #available-blocks {
-    width: 50%; padding: 8px 6px; overflow-y: auto; border-right: 1px solid #222;
-    display: flex; flex-direction: column; gap: 6px;
-  }
-  #available-label { font-size: 10px; color: #555; margin-bottom: 4px; letter-spacing: 1px; }
-
-  /* Sequence area (right side) */
-  #sequence-area {
-    width: 50%; padding: 8px 6px; overflow-y: auto;
-    display: flex; flex-direction: column; gap: 6px;
-  }
-  #sequence-label { font-size: 10px; color: #555; margin-bottom: 4px; letter-spacing: 1px; }
-  #sequence-slots {
-    min-height: 60px; display: flex; flex-direction: column; gap: 6px;
-  }
-  #drop-hint {
-    border: 1px dashed #333; border-radius: 4px; padding: 10px;
-    color: #444; font-size: 11px; text-align: center;
-    min-height: 44px; display: flex; align-items: center; justify-content: center;
+    flex: 1; padding: 6px; overflow-y: auto; display: flex; flex-direction: column; gap: 5px;
+    scrollbar-width: thin; scrollbar-color: #1e1e3a transparent;
   }
 
-  /* Instruction blocks */
+  /* Sequence (right) */
+  #sequence-col {
+    width: 52%; display: flex; flex-direction: column;
+    transition: background 0.2s;
+  }
+  #sequence-col.drag-over { background: #0f0f22; }
+  #sequence-header {
+    padding: 6px 10px; background: #090912;
+    border-bottom: 1px solid #151525;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  #seq-counter { font-size: 9px; color: #333; letter-spacing: 0.5px; transition: color 0.3s; }
+  #seq-counter.partial { color: #ffa657; }
+  #seq-counter.complete { color: #3fb950; }
+  #sequence-blocks {
+    flex: 1; padding: 6px; overflow-y: auto; display: flex; flex-direction: column; gap: 5px;
+    scrollbar-width: thin; scrollbar-color: #1e1e3a transparent;
+  }
+
+  /* ── EMPTY STATE ── */
+  #empty-hint {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 6px; padding: 10px;
+    pointer-events: none;
+  }
+  #empty-arrow {
+    font-size: 18px; color: #2a2a42; animation: bob 1.5s ease-in-out infinite;
+  }
+  @keyframes bob { 0%,100% { transform: translateX(-3px); opacity: 0.5; } 50% { transform: translateX(3px); opacity: 1; } }
+  #empty-text { font-size: 10px; color: #2a2a42; text-align: center; line-height: 1.5; }
+
+  /* ── BLOCKS ── */
   .block {
-    background: #1e1e3a; border-left: 3px solid #7c6af7;
-    border-radius: 4px; padding: 10px 12px; cursor: grab;
-    font-size: 12px; color: #c9d1d9; user-select: none;
-    min-height: 44px; display: flex; align-items: center; gap: 6px;
-    touch-action: none; transition: opacity 0.15s, transform 0.1s, background 0.15s;
+    background: #131325; border: 1px solid #1e1e3a;
+    border-left: 3px solid #5a4fd6;
+    border-radius: 5px; padding: 8px 10px;
+    font-size: 11px; color: #c9d1d9; user-select: none;
+    min-height: 42px; display: flex; align-items: center; gap: 6px;
+    touch-action: none; cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s, opacity 0.2s;
     position: relative;
   }
   .block:active { transform: scale(0.97); }
-  .block.dragging { opacity: 0.3; }
-  .block .fn-name { color: #79c0ff; }
+
+  /* type variants */
+  .block.type-basic   { border-left-color: #7c6af7; }
+  .block.type-cond    { border-left-color: #f78166; }
+  .block.type-loop    { border-left-color: #3fb950; }
+
+  .block .b-icon { font-size: 10px; opacity: 0.6; flex-shrink: 0; }
+  .block.type-cond .b-icon { color: #f78166; }
+  .block.type-loop .b-icon { color: #3fb950; }
+  .block.type-basic .b-icon { color: #7c6af7; }
+
+  .block .fn-name { color: #79c0ff; font-weight: bold; }
+  .block.type-cond .fn-name { color: #f78166; }
+  .block.type-loop .fn-name { color: #3fb950; }
+  .block .fn-paren { color: #555; }
   .block .fn-arg { color: #ffa657; }
-  .block .fn-paren { color: #888; }
-  .block.conditional { border-left-color: #f78166; }
-  .block.conditional .fn-name { color: #f78166; }
-  .block.loop-block { border-left-color: #3fb950; }
-  .block.loop-block .fn-name { color: #3fb950; }
-  .block.in-sequence { cursor: grab; }
+
+  /* step number badge */
+  .block .step-num {
+    font-size: 9px; color: #3a3a5a; background: #1a1a30;
+    border-radius: 3px; padding: 1px 5px; min-width: 18px;
+    text-align: center; flex-shrink: 0; font-weight: bold;
+  }
+
   .block .remove-btn {
-    margin-left: auto; color: #555; font-size: 14px; padding: 2px 6px;
+    margin-left: auto; color: #2a2a42; font-size: 15px; padding: 2px 6px;
     touch-action: manipulation; cursor: pointer; flex-shrink: 0;
+    transition: color 0.15s;
   }
-  .block .remove-btn:hover { color: #ff5f57; }
+  .block .remove-btn:hover, .block .remove-btn:active { color: #ff5f57; }
 
-  /* Used / disabled block in available list */
+  /* states */
   .block.used {
-    opacity: 0.3; cursor: not-allowed; pointer-events: none;
+    opacity: 0.28; cursor: not-allowed; pointer-events: none;
+    border-left-color: #2a2a42 !important; background: #0e0e1e;
+  }
+  .block.dragging { opacity: 0.25; }
+  .block.executing {
+    border-left-color: #e2c77a !important; background: #1e1a0a;
+    animation: pulse 0.55s ease-in-out infinite alternate;
+  }
+  @keyframes pulse {
+    from { box-shadow: 0 0 0 0 rgba(226,199,122,0.3); }
+    to   { box-shadow: 0 0 10px 2px rgba(226,199,122,0.15); }
+  }
+  .block.error-highlight {
+    border-left-color: #ff5f57 !important; background: #1e0a0a;
   }
 
-  /* Drop indicator line between sequence items */
-  .drop-line {
-    height: 3px; background: #7c6af7; border-radius: 2px;
-    margin: -3px 0; opacity: 0; transition: opacity 0.1s;
+  /* pop-in animation when added */
+  @keyframes popIn {
+    0%   { transform: scale(0.85); opacity: 0; }
+    60%  { transform: scale(1.04); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .block.pop-in { animation: popIn 0.2s ease-out; }
+
+  /* drag-over indicator line */
+  .drop-indicator {
+    height: 2px; background: #7c6af7; border-radius: 2px;
+    margin: -2px 0; box-shadow: 0 0 6px #7c6af788;
     pointer-events: none;
   }
-  .drop-line.visible { opacity: 1; }
 
-  /* Bottom bar */
+  /* ── BOTTOM BAR ── */
   #bottom-bar {
-    height: 44px; padding: 6px 12px; display: flex; align-items: center;
-    justify-content: space-between; border-top: 1px solid #222; background: #0e0e1a;
+    height: 46px; padding: 6px 14px; display: flex; align-items: center;
+    justify-content: space-between; border-top: 1px solid #151525;
+    background: #090912;
   }
+  #status-text {
+    font-size: 10px; color: #3a3a5a; flex: 1; margin-right: 10px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    transition: color 0.3s;
+  }
+  #status-text.ok { color: #3fb950; }
+  #status-text.err { color: #ff5f57; }
+  #status-text.warn { color: #ffa657; }
   #run-btn {
-    background: #238636; color: #fff; border: none;
-    padding: 8px 24px; border-radius: 4px; font-family: 'Courier New', monospace;
-    font-size: 13px; font-weight: bold; cursor: pointer; min-height: 36px; min-width: 80px;
-    touch-action: manipulation; letter-spacing: 1px;
-    transition: background 0.15s;
+    background: #1a4a20; color: #3fb950; border: 1px solid #238636;
+    padding: 0 20px; border-radius: 5px; font-family: 'Courier New', monospace;
+    font-size: 12px; font-weight: bold; cursor: pointer;
+    height: 34px; min-width: 80px; touch-action: manipulation;
+    letter-spacing: 1px; transition: all 0.2s;
   }
-  #run-btn:active { background: #2ea043; }
-  #run-btn:disabled { background: #1a4a20; color: #555; cursor: not-allowed; }
-  #status-text { font-size: 11px; color: #555; flex: 1; margin-right: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #run-btn:hover:not(:disabled) { background: #238636; color: #fff; box-shadow: 0 0 12px #23863644; }
+  #run-btn:active:not(:disabled) { background: #2ea043; }
+  #run-btn:disabled { background: #0e1f10; color: #2a4a2a; border-color: #1a2a1a; cursor: not-allowed; }
 
-  /* Overlays */
-  #overlay {
+  /* ── OVERLAYS ── */
+  .overlay {
     display: none; position: fixed; inset: 0; z-index: 200;
     align-items: center; justify-content: center;
-    background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+    background: rgba(0,0,0,0.8); backdrop-filter: blur(6px);
   }
-  #overlay.active { display: flex; }
-  #overlay-box {
-    background: #12121f; border: 1px solid #333; border-radius: 8px;
-    padding: 24px 28px; max-width: 340px; width: 90%; text-align: center;
+  .overlay.active { display: flex; }
+
+  /* Tutorial overlay */
+  #tutorial-overlay .overlay-box {
+    background: #0e0e1e; border: 1px solid #2a2a4a; border-radius: 10px;
+    padding: 28px 24px; max-width: 320px; width: 90%; text-align: center;
   }
-  #overlay-box.error-box { border-color: #ff5f57; }
-  #overlay-box.success-box { border-color: #3fb950; }
-  #overlay-title { font-size: 14px; font-weight: bold; margin-bottom: 8px; letter-spacing: 1px; }
+  #tutorial-overlay .t-title { font-size: 15px; color: #e2c77a; font-weight: bold; margin-bottom: 16px; letter-spacing: 1px; }
+  .t-step { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 6px; background: #131325; margin-bottom: 8px; text-align: left; }
+  .t-step-icon { font-size: 20px; flex-shrink: 0; }
+  .t-step-text { font-size: 11px; color: #8b949e; line-height: 1.5; }
+  .t-step-text strong { color: #c9d1d9; }
+  #tutorial-overlay .start-btn {
+    margin-top: 16px; background: #238636; color: #fff; border: none;
+    padding: 10px 28px; border-radius: 5px; font-family: 'Courier New', monospace;
+    font-size: 13px; font-weight: bold; cursor: pointer; touch-action: manipulation;
+    letter-spacing: 1px; width: 100%;
+  }
+
+  /* Game overlay (error/success) */
+  #game-overlay .overlay-box {
+    background: #0e0e1e; border: 1px solid #333; border-radius: 10px;
+    padding: 24px 24px; max-width: 340px; width: 90%; text-align: center;
+  }
+  #game-overlay .overlay-box.error-box { border-color: #ff5f57; }
+  #game-overlay .overlay-box.success-box { border-color: #3fb950; }
+  #overlay-title { font-size: 15px; font-weight: bold; margin-bottom: 8px; letter-spacing: 1px; }
   .error-box #overlay-title { color: #ff5f57; }
   .success-box #overlay-title { color: #3fb950; }
-  #overlay-msg { font-size: 12px; color: #8b949e; margin-bottom: 16px; line-height: 1.6; }
+  #overlay-msg { font-size: 11px; color: #6a7280; margin-bottom: 14px; line-height: 1.7; }
   #overlay-error-code {
-    background: #0d1117; border-radius: 4px; padding: 10px; text-align: left;
-    font-size: 11px; color: #ff5f57; margin-bottom: 16px; border-left: 3px solid #ff5f57;
-    display: none; font-family: 'Courier New', monospace; white-space: pre-wrap; word-break: break-word;
+    background: #090912; border-radius: 4px; padding: 10px; text-align: left;
+    font-size: 10px; color: #f78166; margin-bottom: 14px; border-left: 3px solid #ff5f57;
+    display: none; white-space: pre-wrap; word-break: break-word; line-height: 1.6;
+    max-height: 100px; overflow-y: auto;
   }
+  .overlay-actions { display: flex; gap: 8px; justify-content: center; }
   .overlay-btn {
-    background: #238636; color: #fff; border: none; padding: 8px 20px;
-    border-radius: 4px; font-family: 'Courier New', monospace; font-size: 12px;
-    cursor: pointer; min-height: 36px; touch-action: manipulation;
+    border: none; padding: 9px 20px; border-radius: 5px;
+    font-family: 'Courier New', monospace; font-size: 12px; font-weight: bold;
+    cursor: pointer; touch-action: manipulation; transition: opacity 0.15s;
   }
-  .overlay-btn.next-btn { background: #1f6feb; }
-  .overlay-btn.retry-btn { background: #6e40c9; }
-
-  /* Execution step highlight */
-  .block.executing {
-    border-left-color: #e2c77a !important;
-    background: #2a2a1e;
-    animation: pulse 0.5s ease-in-out infinite alternate;
-  }
-  @keyframes pulse { from { box-shadow: 0 0 0 0 rgba(226,199,122,0.4); } to { box-shadow: 0 0 8px 2px rgba(226,199,122,0.2); } }
-
-  /* Progress dots */
-  #progress {
-    display: flex; gap: 6px; align-items: center;
-  }
-  .prog-dot {
-    width: 8px; height: 8px; border-radius: 50%; background: #333;
-    transition: background 0.3s;
-  }
-  .prog-dot.done { background: #3fb950; }
-  .prog-dot.active { background: #e2c77a; }
+  .overlay-btn:hover { opacity: 0.85; }
+  .overlay-btn.retry-btn { background: #2d2d4e; color: #c9d1d9; }
+  .overlay-btn.next-btn { background: #1f6feb; color: #fff; }
 
   /* Confetti */
   .confetti-particle {
-    position: fixed; width: 8px; height: 8px; border-radius: 2px;
-    pointer-events: none; z-index: 300; animation: fall 1.5s ease-in forwards;
+    position: fixed; width: 7px; height: 7px; border-radius: 2px;
+    pointer-events: none; z-index: 300; animation: fall 1.6s ease-in forwards;
   }
   @keyframes fall {
-    0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
-    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(105vh) rotate(720deg); opacity: 0; }
   }
 
-  /* Floating drag clone */
+  /* Drag clone */
   #drag-clone {
     position: fixed; z-index: 999; pointer-events: none;
-    transform: scale(1.05); opacity: 0.9; display: none;
+    display: none; opacity: 0.9;
+    transform: scale(1.04) rotate(1deg);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+    border-radius: 5px; will-change: transform;
   }
 </style>
 </head>
@@ -194,8 +310,11 @@
 
 <!-- Top Bar -->
 <div id="top-bar">
-  <div id="level-name">// LEVEL 1: FRIED RICE</div>
-  <div style="display:flex;align-items:center;gap:10px;">
+  <div id="level-badge">
+    <span id="level-icon">🍳</span>
+    <span id="level-name">LEVEL 1: FRIED RICE</span>
+  </div>
+  <div id="top-right">
     <div id="progress">
       <div class="prog-dot active" id="dot-0"></div>
       <div class="prog-dot" id="dot-1"></div>
@@ -212,45 +331,98 @@
 
 <!-- Code Area -->
 <div id="code-area">
-  <div id="tray-label">
-    <div class="tray-dot dot-red"></div>
-    <div class="tray-dot dot-yellow"></div>
-    <div class="tray-dot dot-green"></div>
-    <span>devkitchen.js — tap or drag blocks into sequence</span>
-  </div>
-  <div id="blocks-container">
-    <!-- Available blocks -->
-    <div id="available-blocks">
-      <div id="available-label">// AVAILABLE</div>
+
+  <!-- Tray Header -->
+  <div id="tray-header">
+    <div style="display:flex;align-items:center;gap:0;">
+      <div id="tray-dots">
+        <div class="tray-dot dot-red"></div>
+        <div class="tray-dot dot-yellow" style="margin:0 4px;"></div>
+        <div class="tray-dot dot-green"></div>
+      </div>
+      <span id="tray-file">devkitchen.js</span>
     </div>
-    <!-- Sequence area -->
-    <div id="sequence-area">
-      <div id="sequence-label">// SEQUENCE</div>
-      <div id="sequence-slots">
-        <div id="drop-hint">← tap or drag blocks here</div>
+    <span id="hint-toggle" onclick="toggleHint()">💡 hint</span>
+  </div>
+
+  <!-- Recipe Hint (collapsible) -->
+  <div id="recipe-hint">
+    <div id="recipe-hint-inner">
+      <div>
+        <div id="recipe-goal"></div>
+        <div id="recipe-desc"></div>
       </div>
     </div>
   </div>
+
+  <!-- Blocks Layout -->
+  <div id="blocks-container">
+
+    <!-- Available -->
+    <div id="available-col">
+      <div id="available-header">
+        <span class="col-label">Available</span>
+        <span style="font-size:9px;color:#2a2a42;" id="avail-count"></span>
+      </div>
+      <div id="available-blocks"></div>
+    </div>
+
+    <!-- Sequence -->
+    <div id="sequence-col" id="sequence-col">
+      <div id="sequence-header">
+        <span class="col-label">Sequence</span>
+        <span id="seq-counter">0 / 0</span>
+      </div>
+      <div id="sequence-blocks"></div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Bar -->
   <div id="bottom-bar">
-    <div id="status-text">// ready</div>
-    <button id="run-btn" onclick="runSequence()">▶ Run</button>
+    <span id="status-text">// tap a block to add it →</span>
+    <button id="run-btn" onclick="runSequence()" disabled>▶ Run</button>
   </div>
 </div>
 
-<!-- Overlay -->
-<div id="overlay">
-  <div id="overlay-box">
-    <div id="overlay-title">SUCCESS</div>
-    <div id="overlay-msg">Dish completed!</div>
+<!-- Tutorial Overlay -->
+<div class="overlay active" id="tutorial-overlay">
+  <div class="overlay-box">
+    <div class="t-title">🍳 DevKitchen</div>
+    <div class="t-step">
+      <div class="t-step-icon">👆</div>
+      <div class="t-step-text"><strong>Tap</strong> a block on the left to add it to your sequence</div>
+    </div>
+    <div class="t-step">
+      <div class="t-step-icon">↕️</div>
+      <div class="t-step-text"><strong>Drag</strong> blocks in the sequence to reorder them</div>
+    </div>
+    <div class="t-step">
+      <div class="t-step-icon">✕</div>
+      <div class="t-step-text">Tap <strong>×</strong> or drag back left to remove a block</div>
+    </div>
+    <div class="t-step">
+      <div class="t-step-icon">▶️</div>
+      <div class="t-step-text">Use <strong>all</strong> blocks in the right order, then hit <strong>Run</strong></div>
+    </div>
+    <button class="start-btn" onclick="dismissTutorial()">Let's Cook! 🔪</button>
+  </div>
+</div>
+
+<!-- Game Overlay (error / success) -->
+<div class="overlay" id="game-overlay">
+  <div class="overlay-box" id="overlay-box">
+    <div id="overlay-title"></div>
+    <div id="overlay-msg"></div>
     <div id="overlay-error-code"></div>
-    <div style="display:flex;gap:10px;justify-content:center;">
+    <div class="overlay-actions">
       <button class="overlay-btn retry-btn" onclick="resetLevel()">↺ Retry</button>
       <button class="overlay-btn next-btn" id="next-btn" onclick="nextLevel()">Next Level →</button>
     </div>
   </div>
 </div>
 
-<!-- Floating drag clone -->
+<!-- Drag clone -->
 <div id="drag-clone"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -263,279 +435,224 @@ let isRunning = false;
 let chef, pan, cuttingBoard, ingredientMeshes = {};
 let scene, camera, renderer, animFrameId;
 let chefState = { x: 0, targetX: 0, y: 0.3, z: 0, action: 'idle' };
+let sequenceIds = [];
+let hintOpen = false;
 
-// Sequence state
-let sequenceIds = []; // ordered list of block IDs currently in sequence
+const LEVEL_ICONS = ['🍳', '🍜', '🍚'];
 
 // =============================================
 // LEVEL DEFINITIONS
 // =============================================
 const LEVELS = [
   {
-    name: '// LEVEL 1: FRIED RICE',
+    name: 'LEVEL 1: FRIED RICE',
     goal: 'Cook Fried Rice',
-    description: 'Use ALL 6 blocks in the correct order to cook fried rice.',
+    description: 'Arrange all 6 steps in the correct cooking order.',
     blocks: [
-      { id: 'heat_pan',    label: 'heat',   arg: 'pan',    type: 'basic' },
-      { id: 'add_oil',     label: 'add',    arg: 'oil',    type: 'basic' },
-      { id: 'chop_onion',  label: 'chop',   arg: 'onion',  type: 'basic' },
-      { id: 'add_onion',   label: 'add',    arg: 'onion',  type: 'basic' },
-      { id: 'add_rice',    label: 'add',    arg: 'rice',   type: 'basic' },
-      { id: 'stir_rice',   label: 'stir',   arg: 'rice',   type: 'basic' },
+      { id: 'heat_pan',   label: 'heat',   arg: 'pan',   type: 'basic' },
+      { id: 'add_oil',    label: 'add',    arg: 'oil',   type: 'basic' },
+      { id: 'chop_onion', label: 'chop',   arg: 'onion', type: 'basic' },
+      { id: 'add_onion',  label: 'add',    arg: 'onion', type: 'basic' },
+      { id: 'add_rice',   label: 'add',    arg: 'rice',  type: 'basic' },
+      { id: 'stir_rice',  label: 'stir',   arg: 'rice',  type: 'basic' },
     ],
-    solution: ['chop_onion', 'heat_pan', 'add_oil', 'add_onion', 'add_rice', 'stir_rice'],
+    solution: ['chop_onion','heat_pan','add_oil','add_onion','add_rice','stir_rice'],
     rules: [
-      { before: 'heat_pan',   after: 'add_oil',    error: 'TypeError: Cannot add oil to cold pan\n  at add(oil) — pan.temperature < MIN_TEMP' },
-      { before: 'add_oil',    after: 'add_onion',  error: 'TypeError: Cannot fry without oil\n  at add(onion) — oil is undefined' },
-      { before: 'add_onion',  after: 'add_rice',   error: 'ReferenceError: onion is undefined\n  at add(rice) — onion not in pan' },
-      { before: 'add_rice',   after: 'stir_rice',  error: 'ReferenceError: rice is undefined\n  at stir(rice) — rice not in pan' },
-      { before: 'chop_onion', after: 'add_onion',  error: 'TypeError: Cannot add whole onion\n  at add(onion) — onion.state !== "chopped"' },
+      { before:'heat_pan',   after:'add_oil',   error:'TypeError: Cannot add oil to cold pan\n  at add(oil) — pan.temperature < MIN_TEMP' },
+      { before:'add_oil',    after:'add_onion', error:'TypeError: Cannot fry without oil\n  at add(onion) — oil is undefined' },
+      { before:'add_onion',  after:'add_rice',  error:'ReferenceError: onion is undefined\n  at add(rice) — onion not in pan' },
+      { before:'add_rice',   after:'stir_rice', error:'ReferenceError: rice is undefined\n  at stir(rice) — rice not in pan' },
+      { before:'chop_onion', after:'add_onion', error:'TypeError: Cannot add whole onion\n  at add(onion) — onion.state !== "chopped"' },
     ],
   },
   {
-    name: '// LEVEL 2: SPICY NOODLES',
+    name: 'LEVEL 2: SPICY NOODLES',
     goal: 'Cook Spicy Noodles',
-    description: 'Use ALL 6 blocks. Use the conditional block to handle the spice level correctly.',
+    description: 'Use all 6 blocks. The if-block handles spice level — place it carefully.',
     blocks: [
-      { id: 'boil_water',  label: 'boil',   arg: 'water',   type: 'basic' },
-      { id: 'add_noodles', label: 'add',    arg: 'noodles', type: 'basic' },
-      { id: 'drain_water', label: 'drain',  arg: 'water',   type: 'basic' },
-      { id: 'if_spicy',    label: 'if',     arg: 'spicy → add(chili)', type: 'conditional' },
-      { id: 'add_sauce',   label: 'add',    arg: 'sauce',   type: 'basic' },
-      { id: 'toss_noodles',label: 'toss',   arg: 'noodles', type: 'basic' },
+      { id:'boil_water',   label:'boil',   arg:'water',             type:'basic' },
+      { id:'add_noodles',  label:'add',    arg:'noodles',           type:'basic' },
+      { id:'drain_water',  label:'drain',  arg:'water',             type:'basic' },
+      { id:'if_spicy',     label:'if',     arg:'spicy → add(chili)',type:'conditional' },
+      { id:'add_sauce',    label:'add',    arg:'sauce',             type:'basic' },
+      { id:'toss_noodles', label:'toss',   arg:'noodles',           type:'basic' },
     ],
-    solution: ['boil_water', 'add_noodles', 'drain_water', 'if_spicy', 'add_sauce', 'toss_noodles'],
+    solution: ['boil_water','add_noodles','drain_water','if_spicy','add_sauce','toss_noodles'],
     rules: [
-      { before: 'boil_water',  after: 'add_noodles',  error: 'TypeError: Cannot cook noodles\n  at add(noodles) — water.state !== "boiling"' },
-      { before: 'add_noodles', after: 'drain_water',  error: 'TypeError: Noodles not ready\n  at drain(water) — noodles.done === false' },
-      { before: 'drain_water', after: 'if_spicy',     error: 'LogicError: Conditional must follow drain\n  at if(spicy) — context.noodles === wet' },
-      { before: 'if_spicy',    after: 'add_sauce',    error: 'ReferenceError: chili not applied\n  at add(sauce) — spice.level is undefined' },
-      { before: 'add_sauce',   after: 'toss_noodles', error: 'TypeError: Cannot toss without sauce\n  at toss(noodles) — sauce is undefined' },
+      { before:'boil_water',  after:'add_noodles',  error:'TypeError: Cannot cook noodles\n  at add(noodles) — water.state !== "boiling"' },
+      { before:'add_noodles', after:'drain_water',  error:'TypeError: Noodles not ready\n  at drain(water) — noodles.done === false' },
+      { before:'drain_water', after:'if_spicy',     error:'LogicError: Must drain before checking spice\n  at if(spicy) — context.noodles === wet' },
+      { before:'if_spicy',    after:'add_sauce',    error:'ReferenceError: chili not applied\n  at add(sauce) — spice.level is undefined' },
+      { before:'add_sauce',   after:'toss_noodles', error:'TypeError: Cannot toss without sauce\n  at toss(noodles) — sauce is undefined' },
     ],
   },
   {
-    name: '// LEVEL 3: PERFECT RISOTTO',
+    name: 'LEVEL 3: PERFECT RISOTTO',
     goal: 'Cook Perfect Risotto',
-    description: 'Use ALL 6 blocks. Use the loop block to stir the risotto the right number of times.',
+    description: 'Use all 6 blocks. The repeat-block stirs 3× — it must happen at the right time.',
     blocks: [
-      { id: 'heat_broth',  label: 'heat',   arg: 'broth',    type: 'basic' },
-      { id: 'saute_onion', label: 'saute',  arg: 'onion',    type: 'basic' },
-      { id: 'add_rice2',   label: 'add',    arg: 'rice',     type: 'basic' },
-      { id: 'add_wine',    label: 'add',    arg: 'wine',     type: 'basic' },
-      { id: 'repeat_stir', label: 'repeat', arg: 'stir × 3', type: 'loop' },
-      { id: 'add_cheese',  label: 'add',    arg: 'parmesan', type: 'basic' },
+      { id:'heat_broth',  label:'heat',   arg:'broth',    type:'basic' },
+      { id:'saute_onion', label:'saute',  arg:'onion',    type:'basic' },
+      { id:'add_rice2',   label:'add',    arg:'rice',     type:'basic' },
+      { id:'add_wine',    label:'add',    arg:'wine',     type:'basic' },
+      { id:'repeat_stir', label:'repeat', arg:'stir × 3', type:'loop' },
+      { id:'add_cheese',  label:'add',    arg:'parmesan', type:'basic' },
     ],
-    solution: ['heat_broth', 'saute_onion', 'add_rice2', 'add_wine', 'repeat_stir', 'add_cheese'],
+    solution: ['heat_broth','saute_onion','add_rice2','add_wine','repeat_stir','add_cheese'],
     rules: [
-      { before: 'heat_broth',  after: 'saute_onion', error: 'TypeError: Cannot saute without warm broth\n  at saute(onion) — broth.temp < OPTIMAL' },
-      { before: 'saute_onion', after: 'add_rice2',   error: 'TypeError: Base not prepared\n  at add(rice) — onion.state !== "sauteed"' },
-      { before: 'add_rice2',   after: 'add_wine',    error: 'LogicError: Rice must be added first\n  at add(wine) — rice not in pan' },
-      { before: 'add_wine',    after: 'repeat_stir', error: 'TypeError: Wine must be added before stirring\n  at repeat(stir,3) — wine.absorbed === false' },
-      { before: 'repeat_stir', after: 'add_cheese',  error: 'TypeError: Risotto not creamy\n  at add(parmesan) — stir.count < 3' },
+      { before:'heat_broth',  after:'saute_onion', error:'TypeError: Cannot saute without warm broth\n  at saute(onion) — broth.temp < OPTIMAL' },
+      { before:'saute_onion', after:'add_rice2',   error:'TypeError: Base not ready\n  at add(rice) — onion.state !== "sauteed"' },
+      { before:'add_rice2',   after:'add_wine',    error:'LogicError: Rice must be added first\n  at add(wine) — rice not in pan' },
+      { before:'add_wine',    after:'repeat_stir', error:'TypeError: Wine must be added before stirring\n  at repeat(stir,3) — wine.absorbed === false' },
+      { before:'repeat_stir', after:'add_cheese',  error:'TypeError: Risotto not creamy enough\n  at add(parmesan) — stir.count < 3' },
     ],
-  }
+  },
 ];
 
 // =============================================
-// 3D SCENE SETUP
+// 3D SCENE
 // =============================================
 function initScene() {
   const canvas = document.getElementById('game-canvas');
   const container = document.getElementById('canvas-container');
-
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0xfff3e0);
   scene.fog = new THREE.Fog(0xfff3e0, 12, 22);
-
   camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 50);
-  camera.position.set(0, 5, 7);
-  camera.lookAt(0, 0, 0);
-
+  camera.position.set(0, 5, 7); camera.lookAt(0, 0, 0);
   renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
   renderer.setSize(container.clientWidth, container.clientHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-  const ambient = new THREE.AmbientLight(0xfff5e0, 0.7);
-  scene.add(ambient);
-
+  const ambient = new THREE.AmbientLight(0xfff5e0, 0.7); scene.add(ambient);
   const dirLight = new THREE.DirectionalLight(0xfff0d0, 1.0);
-  dirLight.position.set(5, 8, 5);
-  dirLight.castShadow = true;
-  dirLight.shadow.mapSize.width = 512;
-  dirLight.shadow.mapSize.height = 512;
-  dirLight.shadow.camera.near = 0.5;
-  dirLight.shadow.camera.far = 30;
-  dirLight.shadow.camera.left = -8;
-  dirLight.shadow.camera.right = 8;
-  dirLight.shadow.camera.top = 8;
-  dirLight.shadow.camera.bottom = -8;
+  dirLight.position.set(5, 8, 5); dirLight.castShadow = true;
+  dirLight.shadow.mapSize.set(512, 512);
+  dirLight.shadow.camera.left = -8; dirLight.shadow.camera.right = 8;
+  dirLight.shadow.camera.top = 8; dirLight.shadow.camera.bottom = -8;
   scene.add(dirLight);
-
-  const fillLight = new THREE.PointLight(0xffd080, 0.5, 12);
-  fillLight.position.set(-3, 4, 2);
-  scene.add(fillLight);
-
-  buildKitchen();
-  buildChef();
-  startRenderLoop();
-
+  scene.add(new THREE.PointLight(0xffd080, 0.5, 12).translateX(-3).translateY(4).translateZ(2));
+  buildKitchen(); buildChef(); startRenderLoop();
   window.addEventListener('resize', onResize);
 }
 
 function buildKitchen() {
-  const mat = (color) => new THREE.MeshLambertMaterial({ color });
+  const mat = c => new THREE.MeshLambertMaterial({ color: c });
+  const add = m => scene.add(m);
+  const mesh = (geo, c) => { const m = new THREE.Mesh(geo, mat(c)); return m; };
 
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(14, 12), new THREE.MeshLambertMaterial({ color: 0xd4a96a }));
-  floor.rotation.x = -Math.PI / 2;
-  floor.receiveShadow = true;
-  scene.add(floor);
+  const floor = mesh(new THREE.PlaneGeometry(14, 12), 0xd4a96a);
+  floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; add(floor);
 
-  for (let i = -3; i <= 3; i++) {
-    for (let j = -2; j <= 2; j++) {
-      if ((i + j) % 2 === 0) {
-        const tile = new THREE.Mesh(new THREE.PlaneGeometry(1.98, 1.98), new THREE.MeshLambertMaterial({ color: 0xc49050 }));
-        tile.rotation.x = -Math.PI / 2;
-        tile.position.set(i * 2, 0.001, j * 2);
-        scene.add(tile);
-      }
+  for (let i = -3; i <= 3; i++) for (let j = -2; j <= 2; j++) {
+    if ((i + j) % 2 === 0) {
+      const t = mesh(new THREE.PlaneGeometry(1.98, 1.98), 0xc49050);
+      t.rotation.x = -Math.PI / 2; t.position.set(i*2, 0.001, j*2); add(t);
     }
   }
 
-  const wall = new THREE.Mesh(new THREE.BoxGeometry(14, 4, 0.2), mat(0xe8d5b0));
-  wall.position.set(0, 2, -4);
-  wall.receiveShadow = true;
-  scene.add(wall);
+  const wall = mesh(new THREE.BoxGeometry(14, 4, 0.2), 0xe8d5b0);
+  wall.position.set(0, 2, -4); wall.receiveShadow = true; add(wall);
 
-  const counter = new THREE.Mesh(new THREE.BoxGeometry(10, 0.2, 2), mat(0xc8a87a));
-  counter.position.set(0, 0.9, -2.5);
-  counter.castShadow = true; counter.receiveShadow = true;
-  scene.add(counter);
+  const counter = mesh(new THREE.BoxGeometry(10, 0.2, 2), 0xc8a87a);
+  counter.position.set(0, 0.9, -2.5); counter.castShadow = counter.receiveShadow = true; add(counter);
+  const counterBody = mesh(new THREE.BoxGeometry(10, 0.9, 2), 0x8b6340);
+  counterBody.position.set(0, 0.45, -2.5); counterBody.castShadow = true; add(counterBody);
 
-  const counterBody = new THREE.Mesh(new THREE.BoxGeometry(10, 0.9, 2), mat(0x8b6340));
-  counterBody.position.set(0, 0.45, -2.5);
-  counterBody.castShadow = true;
-  scene.add(counterBody);
-
-  const stove = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.05, 1.4), mat(0x555577));
-  stove.position.set(-2, 1.02, -2.5);
-  stove.castShadow = true;
-  scene.add(stove);
-
+  const stove = mesh(new THREE.BoxGeometry(2.2, 0.05, 1.4), 0x555577);
+  stove.position.set(-2, 1.02, -2.5); stove.castShadow = true; add(stove);
   for (let bx of [-2.5, -1.5]) {
-    const burner = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.28, 0.05, 12), new THREE.MeshLambertMaterial({ color: 0x333344 }));
-    burner.position.set(bx, 1.05, -2.5);
-    scene.add(burner);
+    const b = mesh(new THREE.CylinderGeometry(0.28, 0.28, 0.05, 12), 0x333344);
+    b.position.set(bx, 1.05, -2.5); add(b);
   }
 
   const panGroup = new THREE.Group();
-  const panBase = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.4, 0.12, 16), new THREE.MeshLambertMaterial({ color: 0x222233 }));
-  const panHandle = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.07, 0.1), new THREE.MeshLambertMaterial({ color: 0x1a1a22 }));
+  const panBase = mesh(new THREE.CylinderGeometry(0.45, 0.4, 0.12, 16), 0x222233);
+  const panHandle = mesh(new THREE.BoxGeometry(0.6, 0.07, 0.1), 0x1a1a22);
   panHandle.position.set(0.7, 0, 0);
-  panGroup.add(panBase);
-  panGroup.add(panHandle);
+  panGroup.add(panBase, panHandle);
   panGroup.position.set(-2.5, 1.12, -2.5);
-  pan = panGroup;
-  scene.add(panGroup);
+  pan = panGroup; add(panGroup);
 
-  cuttingBoard = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.06, 0.8), new THREE.MeshLambertMaterial({ color: 0xa0724a }));
-  cuttingBoard.position.set(1.5, 1.01, -2.5);
-  cuttingBoard.castShadow = true;
-  scene.add(cuttingBoard);
+  cuttingBoard = mesh(new THREE.BoxGeometry(1.2, 0.06, 0.8), 0xa0724a);
+  cuttingBoard.position.set(1.5, 1.01, -2.5); cuttingBoard.castShadow = true; add(cuttingBoard);
 
-  const binColors = [0xe74c3c, 0xf39c12, 0x27ae60, 0x8e44ad];
-  for (let i = 0; i < 4; i++) {
-    const bin = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.18, 0.35, 10), new THREE.MeshLambertMaterial({ color: binColors[i] }));
-    bin.position.set(-4 + i * 0.6, 1.1, -3.6);
-    bin.castShadow = true;
-    scene.add(bin);
-  }
+  [0xe74c3c, 0xf39c12, 0x27ae60, 0x8e44ad].forEach((c, i) => {
+    const bin = mesh(new THREE.CylinderGeometry(0.2, 0.18, 0.35, 10), c);
+    bin.position.set(-4 + i*0.6, 1.1, -3.6); bin.castShadow = true; add(bin);
+  });
 
-  const shelf = new THREE.Mesh(new THREE.BoxGeometry(10, 0.12, 0.5), mat(0x7d5a3c));
-  shelf.position.set(0, 2.8, -3.8);
-  scene.add(shelf);
-
+  const shelf = mesh(new THREE.BoxGeometry(10, 0.12, 0.5), 0x7d5a3c);
+  shelf.position.set(0, 2.8, -3.8); add(shelf);
   for (let i = -2; i <= 2; i++) {
-    const pot = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.15, 0.3, 10), new THREE.MeshLambertMaterial({ color: i % 2 === 0 ? 0x888899 : 0x556677 }));
-    pot.position.set(i * 1.5, 3.1, -3.8);
-    scene.add(pot);
+    const pot = mesh(new THREE.CylinderGeometry(0.18, 0.15, 0.3, 10), i%2===0 ? 0x888899 : 0x556677);
+    pot.position.set(i*1.5, 3.1, -3.8); add(pot);
   }
 
-  const pot2 = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.26, 0.4, 12), new THREE.MeshLambertMaterial({ color: 0x445566 }));
-  pot2.position.set(-1.5, 1.22, -2.5);
-  scene.add(pot2);
+  const pot2 = mesh(new THREE.CylinderGeometry(0.3, 0.26, 0.4, 12), 0x445566);
+  pot2.position.set(-1.5, 1.22, -2.5); add(pot2);
 
-  const table = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.8, 0.08, 16), mat(0xa07850));
-  table.position.set(2, 0.7, 0.5);
-  table.castShadow = true;
-  scene.add(table);
-  const tableLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.7, 8), mat(0x7a5830));
-  tableLeg.position.set(2, 0.35, 0.5);
-  scene.add(tableLeg);
+  const table = mesh(new THREE.CylinderGeometry(0.8, 0.8, 0.08, 16), 0xa07850);
+  table.position.set(2, 0.7, 0.5); table.castShadow = true; add(table);
+  const tableLeg = mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.7, 8), 0x7a5830);
+  tableLeg.position.set(2, 0.35, 0.5); add(tableLeg);
 
-  const plate = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 0.04, 20), new THREE.MeshLambertMaterial({ color: 0xf0f0f0 }));
-  plate.position.set(2, 0.75, 0.5);
-  scene.add(plate);
+  const plate = mesh(new THREE.CylinderGeometry(0.5, 0.5, 0.04, 20), 0xf0f0f0);
+  plate.position.set(2, 0.75, 0.5); add(plate);
 }
 
 function buildChef() {
   const chefGroup = new THREE.Group();
+  const mat = c => new THREE.MeshLambertMaterial({ color: c });
+  const mesh = (g, c) => new THREE.Mesh(g, mat(c));
 
-  const hatBrim = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.04, 12), new THREE.MeshLambertMaterial({ color: 0xffffff }));
+  const hatBrim = mesh(new THREE.CylinderGeometry(0.22,0.22,0.04,12), 0xffffff);
   hatBrim.position.set(0, 0.42, 0);
-  const hatTop = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 0.28, 12), new THREE.MeshLambertMaterial({ color: 0xffffff }));
+  const hatTop = mesh(new THREE.CylinderGeometry(0.16,0.16,0.28,12), 0xffffff);
   hatTop.position.set(0, 0.57, 0);
-
-  const head = new THREE.Mesh(new THREE.SphereGeometry(0.18, 10, 10), new THREE.MeshLambertMaterial({ color: 0xf5cba7 }));
+  const head = mesh(new THREE.SphereGeometry(0.18,10,10), 0xf5cba7);
   head.position.set(0, 0.23, 0);
 
   for (let ex of [-0.07, 0.07]) {
-    const eye = new THREE.Mesh(new THREE.SphereGeometry(0.03, 6, 6), new THREE.MeshLambertMaterial({ color: 0x222222 }));
-    eye.position.set(ex, 0.27, 0.16);
-    chefGroup.add(eye);
+    const eye = mesh(new THREE.SphereGeometry(0.03,6,6), 0x222222);
+    eye.position.set(ex, 0.27, 0.16); chefGroup.add(eye);
   }
 
-  const body = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.38, 0.22), new THREE.MeshLambertMaterial({ color: 0xfafafa }));
+  const body = mesh(new THREE.BoxGeometry(0.3,0.38,0.22), 0xfafafa);
   body.position.set(0, -0.04, 0);
-
-  const apron = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.28, 0.12), new THREE.MeshLambertMaterial({ color: 0x3498db }));
+  const apron = mesh(new THREE.BoxGeometry(0.22,0.28,0.12), 0x3498db);
   apron.position.set(0, -0.04, 0.06);
 
-  const armMat = new THREE.MeshLambertMaterial({ color: 0xfafafa });
-  const leftArm = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.3, 0.1), armMat);
+  const armMat = mat(0xfafafa);
+  const leftArm = new THREE.Mesh(new THREE.BoxGeometry(0.1,0.3,0.1), armMat);
   leftArm.position.set(-0.2, -0.02, 0);
-  const rightArm = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.3, 0.1), armMat);
+  const rightArm = new THREE.Mesh(new THREE.BoxGeometry(0.1,0.3,0.1), armMat);
   rightArm.position.set(0.2, -0.02, 0);
   chef = { group: chefGroup, leftArm, rightArm, head };
 
-  const pants = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.22, 0.2), new THREE.MeshLambertMaterial({ color: 0x2c3e50 }));
+  const pants = mesh(new THREE.BoxGeometry(0.28,0.22,0.2), 0x2c3e50);
   pants.position.set(0, -0.28, 0);
 
   for (let lx of [-0.08, 0.08]) {
-    const leg = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.22, 0.12), new THREE.MeshLambertMaterial({ color: 0x2c3e50 }));
-    leg.position.set(lx, -0.47, 0);
-    chefGroup.add(leg);
+    const leg = new THREE.Mesh(new THREE.BoxGeometry(0.1,0.22,0.12), mat(0x2c3e50));
+    leg.position.set(lx, -0.47, 0); chefGroup.add(leg);
   }
-
   chefGroup.add(hatBrim, hatTop, head, body, apron, leftArm, rightArm, pants);
-  chefGroup.position.set(0, 0.3, 0);
-  chefGroup.castShadow = true;
+  chefGroup.position.set(0, 0.3, 0); chefGroup.castShadow = true;
   scene.add(chefGroup);
 }
 
-let clock = new THREE.Clock();
+const clock = new THREE.Clock();
 function startRenderLoop() {
-  function animate() {
+  (function animate() {
     animFrameId = requestAnimationFrame(animate);
     const t = clock.getElapsedTime();
-
     if (chef && chefState.action === 'idle') {
       chef.group.position.y = chefState.y + Math.sin(t * 1.8) * 0.015;
       chef.leftArm.rotation.x = Math.sin(t * 1.8) * 0.08;
       chef.rightArm.rotation.x = -Math.sin(t * 1.8) * 0.08;
     }
-
     if (chefState.action === 'walk') {
       const dx = chefState.targetX - chef.group.position.x;
       if (Math.abs(dx) > 0.05) {
@@ -549,102 +666,74 @@ function startRenderLoop() {
         chef.group.rotation.y = 0;
       }
     }
-
-    if (chefState.action === 'chop') {
-      chef.rightArm.rotation.x = Math.sin(t * 10) * 0.6 - 0.3;
-    }
-
-    if (chefState.action === 'stir') {
-      chef.rightArm.rotation.z = Math.sin(t * 6) * 0.5;
-      chef.rightArm.rotation.x = -0.5;
-    }
-
-    if (chefState.action === 'heat') {
-      pan.children[0].material.color.setHSL(0.0, 1.0, 0.15 + Math.sin(t * 4) * 0.05);
-    }
-
+    if (chefState.action === 'chop')  chef.rightArm.rotation.x = Math.sin(t*10)*0.6 - 0.3;
+    if (chefState.action === 'stir') { chef.rightArm.rotation.z = Math.sin(t*6)*0.5; chef.rightArm.rotation.x = -0.5; }
+    if (chefState.action === 'heat')  pan.children[0].material.color.setHSL(0.0, 1.0, 0.15 + Math.sin(t*4)*0.05);
     renderer.render(scene, camera);
-  }
-  animate();
+  })();
 }
 
 function onResize() {
-  const container = document.getElementById('canvas-container');
-  camera.aspect = container.clientWidth / container.clientHeight;
+  const c = document.getElementById('canvas-container');
+  camera.aspect = c.clientWidth / c.clientHeight;
   camera.updateProjectionMatrix();
-  renderer.setSize(container.clientWidth, container.clientHeight);
+  renderer.setSize(c.clientWidth, c.clientHeight);
 }
 
 // =============================================
-// INGREDIENT VISUALS
+// INGREDIENTS
 // =============================================
 function spawnIngredient(type) {
   if (ingredientMeshes[type]) scene.remove(ingredientMeshes[type]);
-
+  const mat = c => new THREE.MeshLambertMaterial(c);
   let mesh;
   switch (type) {
     case 'onion_pieces': {
       const g = new THREE.Group();
-      for (let i = 0; i < 5; i++) {
-        const piece = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.05, 0.1), new THREE.MeshLambertMaterial({ color: 0xf5cba7 }));
-        piece.position.set((Math.random() - 0.5) * 0.6, 0, (Math.random() - 0.5) * 0.4);
-        g.add(piece);
+      for (let i=0;i<5;i++) {
+        const p = new THREE.Mesh(new THREE.BoxGeometry(0.1,0.05,0.1), mat({color:0xf5cba7}));
+        p.position.set((Math.random()-.5)*.6,0,(Math.random()-.5)*.4); g.add(p);
       }
-      g.position.set(1.5, 1.09, -2.5);
-      mesh = g; break;
+      g.position.set(1.5,1.09,-2.5); mesh=g; break;
     }
     case 'oil': {
-      mesh = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.04, 12), new THREE.MeshLambertMaterial({ color: 0xffe066, transparent: true, opacity: 0.8 }));
-      mesh.position.set(-2.5, 1.19, -2.5); break;
+      mesh = new THREE.Mesh(new THREE.CylinderGeometry(0.15,0.15,0.04,12), mat({color:0xffe066,transparent:true,opacity:0.8}));
+      mesh.position.set(-2.5,1.19,-2.5); break;
     }
     case 'rice': {
       const g = new THREE.Group();
-      for (let i = 0; i < 12; i++) {
-        const grain = new THREE.Mesh(new THREE.SphereGeometry(0.035, 4, 4), new THREE.MeshLambertMaterial({ color: 0xfff8dc }));
-        grain.position.set((Math.random() - 0.5) * 0.5, 0, (Math.random() - 0.5) * 0.4);
-        g.add(grain);
+      for (let i=0;i<12;i++) {
+        const grain = new THREE.Mesh(new THREE.SphereGeometry(0.035,4,4), mat({color:0xfff8dc}));
+        grain.position.set((Math.random()-.5)*.5,0,(Math.random()-.5)*.4); g.add(grain);
       }
-      g.position.set(-2.5, 1.19, -2.5);
-      mesh = g; break;
+      g.position.set(-2.5,1.19,-2.5); mesh=g; break;
     }
     case 'noodles': {
       const g = new THREE.Group();
-      for (let i = 0; i < 8; i++) {
-        const noodle = new THREE.Mesh(new THREE.TorusGeometry(0.1 + i * 0.02, 0.02, 4, 8), new THREE.MeshLambertMaterial({ color: 0xffd700 }));
-        noodle.position.set((Math.random()-0.5)*0.3, 0, (Math.random()-0.5)*0.3);
-        noodle.rotation.x = Math.PI/2;
-        g.add(noodle);
+      for (let i=0;i<8;i++) {
+        const n = new THREE.Mesh(new THREE.TorusGeometry(0.1+i*0.02,0.02,4,8), mat({color:0xffd700}));
+        n.position.set((Math.random()-.5)*.3,0,(Math.random()-.5)*.3); n.rotation.x=Math.PI/2; g.add(n);
       }
-      g.position.set(-2.5, 1.22, -2.5);
-      mesh = g; break;
+      g.position.set(-2.5,1.22,-2.5); mesh=g; break;
     }
     case 'dish': {
       const g = new THREE.Group();
-      const dishBase = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.35, 0.35, 0.08, 16),
-        new THREE.MeshLambertMaterial({ color: currentLevel === 0 ? 0xd4a017 : currentLevel === 1 ? 0xe74c3c : 0xf5f0e0 })
-      );
-      dishBase.position.set(0, 0.06, 0);
-      g.add(dishBase);
-      for (let i = 0; i < 3; i++) {
-        const steam = new THREE.Mesh(new THREE.SphereGeometry(0.05, 6, 6), new THREE.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.5 }));
-        steam.position.set((i-1)*0.12, 0.18 + i*0.05, 0);
-        g.add(steam);
+      const color = currentLevel===0 ? 0xd4a017 : currentLevel===1 ? 0xe74c3c : 0xf5f0e0;
+      const base = new THREE.Mesh(new THREE.CylinderGeometry(0.35,0.35,0.08,16), mat({color}));
+      base.position.set(0,0.06,0); g.add(base);
+      for (let i=0;i<3;i++) {
+        const s = new THREE.Mesh(new THREE.SphereGeometry(0.05,6,6), mat({color:0xffffff,transparent:true,opacity:0.5}));
+        s.position.set((i-1)*0.12, 0.18+i*0.05, 0); g.add(s);
       }
-      g.position.set(2, 0.76, 0.5);
-      mesh = g; break;
+      g.position.set(2,0.76,0.5); mesh=g; break;
     }
     default: return;
   }
-  mesh.castShadow = true;
-  scene.add(mesh);
-  ingredientMeshes[type] = mesh;
+  mesh.castShadow = true; scene.add(mesh); ingredientMeshes[type] = mesh;
 }
 
 function clearIngredients() {
-  for (const key in ingredientMeshes) {
-    if (ingredientMeshes[key]) scene.remove(ingredientMeshes[key]);
-  }
+  for (const k in ingredientMeshes) { if (ingredientMeshes[k]) scene.remove(ingredientMeshes[k]); }
   ingredientMeshes = {};
   if (pan) pan.children[0].material.color.set(0x222233);
 }
@@ -652,319 +741,277 @@ function clearIngredients() {
 // =============================================
 // CHEF ACTIONS
 // =============================================
-function chefWalkTo(targetX) {
-  return new Promise(resolve => {
-    chefState.targetX = targetX;
-    chefState.action = 'walk';
-    const check = setInterval(() => {
-      if (chefState.action === 'arrived') {
-        chefState.action = 'idle';
-        clearInterval(check);
-        resolve();
-      }
-    }, 50);
+function chefWalkTo(tx) {
+  return new Promise(r => {
+    chefState.targetX = tx; chefState.action = 'walk';
+    const iv = setInterval(() => { if (chefState.action==='arrived') { chefState.action='idle'; clearInterval(iv); r(); } }, 50);
   });
 }
-
-function chefAnimate(action, duration) {
-  return new Promise(resolve => {
+function chefAnimate(action, ms) {
+  return new Promise(r => {
     chefState.action = action;
-    setTimeout(() => {
-      chefState.action = 'idle';
-      chef.rightArm.rotation.x = 0;
-      chef.rightArm.rotation.z = 0;
-      resolve();
-    }, duration);
+    setTimeout(() => { chefState.action='idle'; chef.rightArm.rotation.x=chef.rightArm.rotation.z=0; r(); }, ms);
   });
 }
-
-function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+const wait = ms => new Promise(r => setTimeout(r, ms));
 
 // =============================================
-// SEQUENCE VALIDATION
+// VALIDATION
 // =============================================
-function validateSequence(level, sequence) {
-  // 1. Must use ALL blocks exactly once
-  const allIds = level.blocks.map(b => b.id);
-  for (const id of allIds) {
-    if (!sequence.includes(id)) {
-      const missing = level.blocks.find(b => b.id === id);
-      return {
-        valid: false,
-        error: `IncompleteError: Missing step in recipe\n  at sequence — "${missing.label}(${missing.arg})" not used\n  Hint: use all ${allIds.length} blocks`,
-        badBlock: null
-      };
+function validateSequence(level, seq) {
+  // All blocks must be present
+  for (const b of level.blocks) {
+    if (!seq.includes(b.id)) {
+      return { valid:false, error:`IncompleteError: Missing step — "${b.label}(${b.arg})" not used\n  Hint: all ${level.blocks.length} blocks required`, badBlock:null };
     }
   }
-
-  // 2. Check ordering rules
+  // Order rules
   for (const rule of level.rules) {
-    const beforeIdx = sequence.indexOf(rule.before);
-    const afterIdx = sequence.indexOf(rule.after);
-    if (beforeIdx !== -1 && afterIdx !== -1 && beforeIdx >= afterIdx) {
-      return { valid: false, error: rule.error, badBlock: rule.after };
-    }
+    const bi = seq.indexOf(rule.before), ai = seq.indexOf(rule.after);
+    if (bi !== -1 && ai !== -1 && bi >= ai) return { valid:false, error:rule.error, badBlock:rule.after };
   }
-
-  return { valid: true };
+  return { valid:true };
 }
 
 // =============================================
-// GAMEPLAY: RUN SEQUENCE
+// RUN SEQUENCE
 // =============================================
 async function runSequence() {
   const level = LEVELS[currentLevel];
-  if (sequenceIds.length === 0) {
-    setStatus('// error: sequence is empty');
-    return;
-  }
-
-  const validation = validateSequence(level, sequenceIds);
-  if (!validation.valid) {
-    showError(validation.error, validation.badBlock);
-    return;
-  }
+  if (sequenceIds.length === 0) { setStatus('Add some blocks first!', 'err'); return; }
+  const v = validateSequence(level, sequenceIds);
+  if (!v.valid) { showError(v.error, v.badBlock); return; }
 
   isRunning = true;
   document.getElementById('run-btn').disabled = true;
-  setStatus('// executing...');
+  setStatus('// executing sequence…', '');
   clearIngredients();
 
-  const slots = document.querySelectorAll('#sequence-slots .block');
+  const slots = document.querySelectorAll('#sequence-blocks .block');
   for (let i = 0; i < slots.length; i++) {
-    const blockEl = slots[i];
-    blockEl.classList.add('executing');
-    await executeBlock(sequenceIds[i], level);
-    blockEl.classList.remove('executing');
-    await wait(200);
+    slots[i].classList.add('executing');
+    await executeBlock(sequenceIds[i]);
+    slots[i].classList.remove('executing');
+    await wait(180);
   }
 
   await wait(300);
   spawnIngredient('dish');
-  await wait(400);
+  await wait(350);
   showSuccess();
 }
 
-async function executeBlock(blockId, level) {
-  switch (blockId) {
-    case 'chop_onion':
-      await chefWalkTo(1.5); await chefAnimate('chop', 900); spawnIngredient('onion_pieces'); break;
+async function executeBlock(id) {
+  switch (id) {
+    case 'chop_onion':   await chefWalkTo(1.5);  await chefAnimate('chop',900); spawnIngredient('onion_pieces'); break;
     case 'heat_pan':
-    case 'heat_broth':
-      await chefWalkTo(-2.5); await chefAnimate('heat', 900); pan.children[0].material.color.set(0xff6622); break;
-    case 'add_oil':
-      await chefWalkTo(-2.5); await chefAnimate('stir', 700); spawnIngredient('oil'); break;
+    case 'heat_broth':   await chefWalkTo(-2.5); await chefAnimate('heat',900); pan.children[0].material.color.set(0xff6622); break;
+    case 'add_oil':      await chefWalkTo(-2.5); await chefAnimate('stir',700); spawnIngredient('oil'); break;
     case 'add_onion':
-    case 'saute_onion':
-      await chefWalkTo(-2.5); await chefAnimate('stir', 700); break;
+    case 'saute_onion':  await chefWalkTo(-2.5); await chefAnimate('stir',700); break;
     case 'add_rice':
-    case 'add_rice2':
-      await chefWalkTo(-2.5); await chefAnimate('stir', 700); spawnIngredient('rice'); break;
+    case 'add_rice2':    await chefWalkTo(-2.5); await chefAnimate('stir',700); spawnIngredient('rice'); break;
     case 'stir_rice':
-    case 'toss_noodles':
-      await chefWalkTo(-2.5); await chefAnimate('stir', 1000); break;
-    case 'repeat_stir':
-      await chefWalkTo(-2.5);
-      for (let r = 0; r < 3; r++) { await chefAnimate('stir', 500); await wait(100); }
-      break;
-    case 'boil_water':
-      await chefWalkTo(-1.5); await chefAnimate('heat', 800); pan.children[0].material.color.set(0x4488ff); break;
-    case 'add_noodles':
-      await chefWalkTo(-2.5); await chefAnimate('stir', 700); spawnIngredient('noodles'); break;
-    case 'drain_water':
-      await chefWalkTo(-2.5); await chefAnimate('chop', 700); break;
-    case 'if_spicy':
-      await chefWalkTo(0); await chefAnimate('stir', 600); break;
+    case 'toss_noodles': await chefWalkTo(-2.5); await chefAnimate('stir',1000); break;
+    case 'repeat_stir':  await chefWalkTo(-2.5); for(let r=0;r<3;r++){await chefAnimate('stir',500);await wait(100);} break;
+    case 'boil_water':   await chefWalkTo(-1.5); await chefAnimate('heat',800); pan.children[0].material.color.set(0x4488ff); break;
+    case 'add_noodles':  await chefWalkTo(-2.5); await chefAnimate('stir',700); spawnIngredient('noodles'); break;
+    case 'drain_water':  await chefWalkTo(-2.5); await chefAnimate('chop',700); break;
+    case 'if_spicy':     await chefWalkTo(0);    await chefAnimate('stir',600); break;
     case 'add_sauce':
-      await chefWalkTo(-2.5); await chefAnimate('stir', 600); break;
     case 'add_wine':
-      await chefWalkTo(-2.5); await chefAnimate('stir', 600); break;
-    case 'add_cheese':
-      await chefWalkTo(-2.5); await chefAnimate('stir', 700); break;
-    default:
-      await chefWalkTo(0); await wait(500);
+    case 'add_cheese':   await chefWalkTo(-2.5); await chefAnimate('stir',650); break;
+    default: await chefWalkTo(0); await wait(500);
   }
 }
 
 // =============================================
-// ERROR / SUCCESS OVERLAYS
+// OVERLAYS
 // =============================================
 function showError(errorMsg, badBlockId) {
   chefState.action = 'idle';
-  if (chef) {
-    chef.group.position.x += (Math.random() - 0.5) * 0.2;
-    setTimeout(() => { if (chef) chef.group.position.x = chefState.targetX || 0; }, 500);
-  }
+  if (chef) { chef.group.position.x += (Math.random()-.5)*.2; setTimeout(()=>{ if(chef) chef.group.position.x=chefState.targetX||0; },500); }
 
   if (badBlockId) {
-    document.querySelectorAll('#sequence-slots .block').forEach(el => {
-      if (el.dataset.id === badBlockId) {
-        el.style.borderLeftColor = '#ff5f57';
-        el.style.background = '#2a1010';
-      }
+    document.querySelectorAll('#sequence-blocks .block').forEach(el => {
+      if (el.dataset.id === badBlockId) el.classList.add('error-highlight');
     });
   }
 
-  const overlay = document.getElementById('overlay');
   const box = document.getElementById('overlay-box');
+  box.className = 'overlay-box error-box';
   document.getElementById('overlay-title').textContent = '✗ Runtime Error';
-  document.getElementById('overlay-msg').textContent = 'The chef froze! Fix your sequence and try again.';
-  const errCode = document.getElementById('overlay-error-code');
-  errCode.style.display = 'block';
-  errCode.textContent = errorMsg;
+  document.getElementById('overlay-msg').textContent = 'Wrong order! Fix your sequence and try again.';
+  const ec = document.getElementById('overlay-error-code');
+  ec.style.display = 'block'; ec.textContent = errorMsg;
   document.getElementById('next-btn').style.display = 'none';
-  box.className = 'error-box';
-  overlay.classList.add('active');
-
+  document.getElementById('game-overlay').classList.add('active');
   isRunning = false;
   document.getElementById('run-btn').disabled = false;
-  setStatus('// error — fix sequence and retry');
+  setStatus('// error — see above for details', 'err');
 }
 
 function showSuccess() {
-  const overlay = document.getElementById('overlay');
+  const level = LEVELS[currentLevel];
   const box = document.getElementById('overlay-box');
-  const nextBtn = document.getElementById('next-btn');
-
-  box.className = 'success-box';
+  box.className = 'overlay-box success-box';
   document.getElementById('overlay-title').textContent = '✓ Dish Served!';
-  document.getElementById('overlay-msg').textContent = LEVELS[currentLevel].goal + ' completed successfully!';
+  document.getElementById('overlay-msg').textContent = level.goal + ' completed!';
   document.getElementById('overlay-error-code').style.display = 'none';
   const isLast = currentLevel >= LEVELS.length - 1;
-  nextBtn.style.display = isLast ? 'none' : 'inline-block';
-  if (isLast) {
-    document.getElementById('overlay-msg').textContent += '\n\nAll levels complete! 🎉';
-  }
-  overlay.classList.add('active');
+  document.getElementById('next-btn').style.display = isLast ? 'none' : 'inline-block';
+  document.getElementById('game-overlay').classList.add('active');
   spawnConfetti();
   isRunning = false;
-  setStatus('// success!');
-
-  document.getElementById(`dot-${currentLevel}`).classList.add('done');
-  document.getElementById(`dot-${currentLevel}`).classList.remove('active');
+  setStatus('// success! dish served', 'ok');
+  const dot = document.getElementById(`dot-${currentLevel}`);
+  dot.classList.remove('active'); dot.classList.add('done');
 }
 
 function nextLevel() {
-  document.getElementById('overlay').classList.remove('active');
+  document.getElementById('game-overlay').classList.remove('active');
   if (currentLevel + 1 < LEVELS.length) loadLevel(currentLevel + 1);
 }
 
 function spawnConfetti() {
-  const colors = ['#e2c77a', '#3fb950', '#79c0ff', '#ffa657', '#f78166'];
-  for (let i = 0; i < 40; i++) {
+  const colors = ['#e2c77a','#3fb950','#79c0ff','#ffa657','#f78166','#d2a8ff'];
+  for (let i=0;i<45;i++) {
     const el = document.createElement('div');
     el.className = 'confetti-particle';
-    el.style.left = Math.random() * 100 + 'vw';
+    el.style.left = Math.random()*100+'vw';
     el.style.top = '-20px';
-    el.style.background = colors[Math.floor(Math.random() * colors.length)];
-    el.style.animationDelay = Math.random() * 0.8 + 's';
-    el.style.transform = `rotate(${Math.random() * 360}deg)`;
+    el.style.background = colors[Math.floor(Math.random()*colors.length)];
+    el.style.animationDelay = Math.random()*.9+'s';
+    el.style.transform = `rotate(${Math.random()*360}deg)`;
     document.body.appendChild(el);
-    setTimeout(() => el.remove(), 2500);
+    setTimeout(() => el.remove(), 2600);
   }
 }
 
 // =============================================
-// BLOCK RENDERING
+// TUTORIAL
 // =============================================
-function createBlockEl(blockDef, listType) {
-  const el = document.createElement('div');
-  let cls = 'block';
-  if (blockDef.type === 'conditional') cls += ' conditional';
-  else if (blockDef.type === 'loop') cls += ' loop-block';
-  if (listType === 'sequence') cls += ' in-sequence';
-  el.className = cls;
-  el.dataset.id = blockDef.id;
-
-  el.innerHTML = `<span class="fn-name">${blockDef.label}</span><span class="fn-paren">(</span><span class="fn-arg">${blockDef.arg}</span><span class="fn-paren">)</span>`;
-
-  if (listType === 'sequence') {
-    const rm = document.createElement('span');
-    rm.className = 'remove-btn';
-    rm.textContent = '×';
-    rm.addEventListener('pointerdown', (e) => {
-      e.stopPropagation();
-      if (isRunning) return;
-      removeFromSequence(blockDef.id);
-    });
-    el.appendChild(rm);
-  }
-
-  return el;
+function dismissTutorial() {
+  document.getElementById('tutorial-overlay').classList.remove('active');
 }
 
-// Re-render the available blocks, greying out those already in sequence
+// =============================================
+// HINT TOGGLE
+// =============================================
+function toggleHint() {
+  hintOpen = !hintOpen;
+  const hint = document.getElementById('recipe-hint');
+  const toggle = document.getElementById('hint-toggle');
+  hint.classList.toggle('open', hintOpen);
+  toggle.classList.toggle('active', hintOpen);
+  toggle.textContent = hintOpen ? '💡 hide' : '💡 hint';
+}
+
+// =============================================
+// BLOCK TYPE HELPERS
+// =============================================
+function blockTypeClass(type) {
+  if (type === 'conditional') return 'type-cond';
+  if (type === 'loop') return 'type-loop';
+  return 'type-basic';
+}
+function blockTypeIcon(type) {
+  if (type === 'conditional') return '◇';
+  if (type === 'loop') return '↺';
+  return '○';
+}
+
+// =============================================
+// RENDERING
+// =============================================
 function renderAvailableBlocks() {
   const level = LEVELS[currentLevel];
-  const avail = document.getElementById('available-blocks');
-  avail.innerHTML = '<div id="available-label">// AVAILABLE</div>';
+  const container = document.getElementById('available-blocks');
+  container.innerHTML = '';
 
-  const shuffled = [...level.blocks].sort((a, b) => {
-    const aUsed = sequenceIds.includes(a.id) ? 1 : 0;
-    const bUsed = sequenceIds.includes(b.id) ? 1 : 0;
-    return aUsed - bUsed;
-  });
+  const remaining = level.blocks.filter(b => !sequenceIds.includes(b.id)).length;
+  document.getElementById('avail-count').textContent = remaining > 0 ? `${remaining} left` : 'all used';
 
-  shuffled.forEach(blockDef => {
-    const el = createBlockEl(blockDef, 'available');
-    if (sequenceIds.includes(blockDef.id)) {
-      el.classList.add('used');
-    } else {
-      // Tap to add
-      el.addEventListener('pointerup', (e) => {
-        if (isRunning) return;
-        if (!dragMoved) addToSequence(blockDef.id);
-      });
-      initAvailableDrag(el, blockDef.id);
+  level.blocks.forEach(blockDef => {
+    const el = document.createElement('div');
+    const used = sequenceIds.includes(blockDef.id);
+    el.className = `block ${blockTypeClass(blockDef.type)}${used ? ' used' : ''}`;
+    el.dataset.id = blockDef.id;
+    el.innerHTML =
+      `<span class="b-icon">${blockTypeIcon(blockDef.type)}</span>` +
+      `<span class="fn-name">${blockDef.label}</span>` +
+      `<span class="fn-paren">(</span><span class="fn-arg">${blockDef.arg}</span><span class="fn-paren">)</span>`;
+
+    if (!used) {
+      el.addEventListener('pointerup', () => { if (!dragMoved && !isRunning) addToSequence(blockDef.id); });
+      initDrag(el, 'available', blockDef.id, null);
     }
-    avail.appendChild(el);
+    container.appendChild(el);
   });
 }
 
-// Re-render the sequence area
 function renderSequence() {
-  const slots = document.getElementById('sequence-slots');
-  slots.innerHTML = '';
-
-  if (sequenceIds.length === 0) {
-    const hint = document.createElement('div');
-    hint.id = 'drop-hint';
-    hint.textContent = '← tap or drag blocks here';
-    slots.appendChild(hint);
-    return;
-  }
-
-  const level = LEVELS[currentLevel];
-  sequenceIds.forEach((id, idx) => {
-    const blockDef = level.blocks.find(b => b.id === id);
-    if (!blockDef) return;
-    const el = createBlockEl(blockDef, 'sequence');
-    el.dataset.seqIdx = idx;
-    initSequenceDrag(el, blockDef.id, idx);
-    slots.appendChild(el);
-  });
-
-  updateRunBtn();
-}
-
-function updateRunBtn() {
   const level = LEVELS[currentLevel];
   const total = level.blocks.length;
   const used = sequenceIds.length;
+  const container = document.getElementById('sequence-blocks');
+  container.innerHTML = '';
+
+  const counter = document.getElementById('seq-counter');
+  counter.textContent = `${used} / ${total}`;
+  counter.className = used === 0 ? '' : used === total ? 'complete' : 'partial';
+
   const runBtn = document.getElementById('run-btn');
+  runBtn.disabled = isRunning || used === 0;
+
   if (used === 0) {
-    setStatus('// ready — ' + LEVELS[currentLevel].description);
-  } else {
-    setStatus(`// sequence: ${used}/${total} blocks`);
+    const empty = document.createElement('div');
+    empty.id = 'empty-hint';
+    empty.innerHTML = `<div id="empty-arrow">←</div><div id="empty-text">Tap a block on the left<br>to add it here</div>`;
+    container.appendChild(empty);
+    setStatus('// tap a block to add it →', '');
+    return;
   }
-  runBtn.disabled = isRunning;
+
+  sequenceIds.forEach((id, idx) => {
+    const blockDef = level.blocks.find(b => b.id === id);
+    if (!blockDef) return;
+    const el = document.createElement('div');
+    el.className = `block ${blockTypeClass(blockDef.type)} in-sequence`;
+    el.dataset.id = id;
+    el.dataset.idx = idx;
+
+    const stepNum = document.createElement('span');
+    stepNum.className = 'step-num';
+    stepNum.textContent = idx + 1;
+
+    el.innerHTML =
+      `<span class="fn-name">${blockDef.label}</span>` +
+      `<span class="fn-paren">(</span><span class="fn-arg">${blockDef.arg}</span><span class="fn-paren">)</span>`;
+    el.insertBefore(stepNum, el.firstChild);
+
+    const rm = document.createElement('span');
+    rm.className = 'remove-btn';
+    rm.textContent = '×';
+    rm.addEventListener('pointerdown', e => {
+      e.stopPropagation();
+      if (!isRunning) removeFromSequence(id);
+    });
+    el.appendChild(rm);
+
+    initDrag(el, 'sequence', id, idx);
+    container.appendChild(el);
+  });
+
+  if (used > 0 && used < total) setStatus(`// ${total - used} more block${total - used > 1 ? 's' : ''} needed`, 'warn');
+  else if (used === total) setStatus('// sequence complete — press Run!', 'ok');
 }
 
 // =============================================
 // BLOCK MANAGEMENT
 // =============================================
 function addToSequence(blockId) {
-  if (sequenceIds.includes(blockId)) return; // no duplicates
+  if (sequenceIds.includes(blockId) || isRunning) return;
   sequenceIds.push(blockId);
   renderSequence();
   renderAvailableBlocks();
@@ -972,178 +1019,102 @@ function addToSequence(blockId) {
 
 function removeFromSequence(blockId) {
   const idx = sequenceIds.indexOf(blockId);
-  if (idx !== -1) sequenceIds.splice(idx, 1);
-  renderSequence();
-  renderAvailableBlocks();
+  if (idx !== -1) { sequenceIds.splice(idx, 1); renderSequence(); renderAvailableBlocks(); }
 }
 
 function moveInSequence(fromIdx, toIdx) {
   if (fromIdx === toIdx) return;
   const [item] = sequenceIds.splice(fromIdx, 1);
-  sequenceIds.splice(toIdx, 0, item);
+  const target = toIdx > fromIdx ? toIdx - 1 : toIdx;
+  sequenceIds.splice(target, 0, item);
   renderSequence();
 }
 
 // =============================================
-// DRAG AND DROP — Pointer Events
+// DRAG & DROP
 // =============================================
-let dragBlockId = null;
-let dragSource = null; // 'available' | 'sequence'
-let dragFromIdx = null;
-let dragCloneEl = null;
-let dragOffsetX = 0, dragOffsetY = 0;
-let dragMoved = false;
-const DRAG_THRESHOLD = 6;
-let pointerStartX = 0, pointerStartY = 0;
+let dragBlockId = null, dragSource = null, dragFromIdx = null;
+let dragOffX = 0, dragOffY = 0;
+let dragMoved = false, ptStartX = 0, ptStartY = 0;
+const DRAG_THRESH = 8;
 
-function initAvailableDrag(el, blockId) {
-  el.addEventListener('pointerdown', (e) => {
-    if (isRunning) return;
+function initDrag(el, source, blockId, idx) {
+  el.addEventListener('pointerdown', e => {
+    if (isRunning || e.target.classList.contains('remove-btn')) return;
     e.preventDefault();
-    dragMoved = false;
-    pointerStartX = e.clientX;
-    pointerStartY = e.clientY;
-    dragBlockId = blockId;
-    dragSource = 'available';
-    dragFromIdx = null;
-
+    dragMoved = false; ptStartX = e.clientX; ptStartY = e.clientY;
+    dragBlockId = blockId; dragSource = source; dragFromIdx = idx;
     const rect = el.getBoundingClientRect();
-    dragOffsetX = e.clientX - rect.left;
-    dragOffsetY = e.clientY - rect.top;
+    dragOffX = e.clientX - rect.left; dragOffY = e.clientY - rect.top;
 
-    startDragClone(el, e.clientX, e.clientY, rect.width);
+    const clone = document.getElementById('drag-clone');
+    clone.className = `block ${blockTypeClass(LEVELS[currentLevel].blocks.find(b=>b.id===blockId)?.type||'basic')}`;
+    clone.style.width = rect.width + 'px';
+    clone.style.left = (e.clientX - dragOffX) + 'px';
+    clone.style.top  = (e.clientY - dragOffY) + 'px';
+    clone.innerHTML = el.innerHTML.replace(/<span class="remove-btn">.*?<\/span>/, '');
+    clone.style.display = 'none'; // show only after threshold
+    el.classList.add('dragging');
   });
 }
 
-function initSequenceDrag(el, blockId, idx) {
-  el.addEventListener('pointerdown', (e) => {
-    if (isRunning) return;
-    // Don't initiate drag if clicking the × button
-    if (e.target.classList.contains('remove-btn')) return;
-    e.preventDefault();
-    dragMoved = false;
-    pointerStartX = e.clientX;
-    pointerStartY = e.clientY;
-    dragBlockId = blockId;
-    dragSource = 'sequence';
-    dragFromIdx = idx;
-
-    const rect = el.getBoundingClientRect();
-    dragOffsetX = e.clientX - rect.left;
-    dragOffsetY = e.clientY - rect.top;
-
-    startDragClone(el, e.clientX, e.clientY, rect.width);
-  });
-}
-
-function startDragClone(sourceEl, cx, cy, width) {
-  dragCloneEl = document.getElementById('drag-clone');
-  dragCloneEl.innerHTML = sourceEl.innerHTML;
-  dragCloneEl.className = sourceEl.className.replace(' dragging','').replace(' in-sequence','');
-  dragCloneEl.style.width = width + 'px';
-  dragCloneEl.style.left = (cx - dragOffsetX) + 'px';
-  dragCloneEl.style.top = (cy - dragOffsetY) + 'px';
-  dragCloneEl.style.display = 'block';
-  // Remove any × button from clone
-  const rmBtn = dragCloneEl.querySelector('.remove-btn');
-  if (rmBtn) rmBtn.remove();
-}
-
-document.addEventListener('pointermove', (e) => {
-  if (!dragCloneEl || !dragBlockId) return;
-
-  const dx = e.clientX - pointerStartX;
-  const dy = e.clientY - pointerStartY;
-  if (!dragMoved && Math.sqrt(dx*dx + dy*dy) > DRAG_THRESHOLD) dragMoved = true;
-
-  if (!dragMoved) return;
-
-  dragCloneEl.style.left = (e.clientX - dragOffsetX) + 'px';
-  dragCloneEl.style.top = (e.clientY - dragOffsetY) + 'px';
-
-  // Show drop indicator in sequence
-  updateDropIndicator(e.clientX, e.clientY);
-});
-
-document.addEventListener('pointerup', (e) => {
+document.addEventListener('pointermove', e => {
   if (!dragBlockId) return;
-
-  clearDropIndicators();
-
-  if (!dragMoved) {
-    // It was a tap — handled by pointerup listener on the element (available)
-    // For sequence blocks, tapping does nothing special (remove is via ×)
-    cleanupDrag();
-    return;
+  const dx = e.clientX - ptStartX, dy = e.clientY - ptStartY;
+  if (!dragMoved && Math.sqrt(dx*dx+dy*dy) > DRAG_THRESH) {
+    dragMoved = true;
+    document.getElementById('drag-clone').style.display = 'block';
   }
+  if (!dragMoved) return;
+  const clone = document.getElementById('drag-clone');
+  clone.style.left = (e.clientX - dragOffX) + 'px';
+  clone.style.top  = (e.clientY - dragOffY) + 'px';
 
-  const cloneEl = document.getElementById('drag-clone');
-  cloneEl.style.display = 'none';
-
-  const target = document.elementFromPoint(e.clientX, e.clientY);
-  const seqArea = document.getElementById('sequence-area');
-  const availArea = document.getElementById('available-blocks');
-
-  if (seqArea && seqArea.contains(target)) {
-    if (dragSource === 'available') {
-      // Add to sequence at computed position
-      const insertIdx = getInsertIndex(e.clientY);
-      if (!sequenceIds.includes(dragBlockId)) {
-        sequenceIds.splice(insertIdx, 0, dragBlockId);
-        renderSequence();
-        renderAvailableBlocks();
-      }
-    } else if (dragSource === 'sequence') {
-      // Reorder within sequence
-      const insertIdx = getInsertIndex(e.clientY);
-      const adjustedIdx = insertIdx > dragFromIdx ? insertIdx - 1 : insertIdx;
-      if (adjustedIdx !== dragFromIdx) moveInSequence(dragFromIdx, adjustedIdx);
-    }
-  } else if (availArea && availArea.contains(target)) {
-    if (dragSource === 'sequence') {
-      removeFromSequence(dragBlockId);
-    }
-  }
-
-  cleanupDrag();
+  // Highlight sequence col when dragging over
+  const seqCol = document.getElementById('sequence-col');
+  const seqRect = seqCol.getBoundingClientRect();
+  const over = e.clientX >= seqRect.left && e.clientX <= seqRect.right && e.clientY >= seqRect.top && e.clientY <= seqRect.bottom;
+  seqCol.classList.toggle('drag-over', over);
 });
 
-function cleanupDrag() {
-  dragBlockId = null;
-  dragSource = null;
-  dragFromIdx = null;
-  dragMoved = false;
-  const cloneEl = document.getElementById('drag-clone');
-  if (cloneEl) cloneEl.style.display = 'none';
-}
+document.addEventListener('pointerup', e => {
+  if (!dragBlockId) return;
+  document.getElementById('drag-clone').style.display = 'none';
+  document.getElementById('sequence-col').classList.remove('drag-over');
 
-// Calculate where to insert in sequence based on Y position
+  document.querySelectorAll('.block.dragging').forEach(el => el.classList.remove('dragging'));
+
+  if (dragMoved) {
+    const target = document.elementFromPoint(e.clientX, e.clientY);
+    const seqCol = document.getElementById('sequence-col');
+    const availCol = document.getElementById('available-col');
+
+    if (seqCol && seqCol.contains(target)) {
+      if (dragSource === 'available') {
+        const insertIdx = getInsertIndex(e.clientY);
+        if (!sequenceIds.includes(dragBlockId)) {
+          sequenceIds.splice(insertIdx, 0, dragBlockId);
+          renderSequence(); renderAvailableBlocks();
+        }
+      } else if (dragSource === 'sequence') {
+        const insertIdx = getInsertIndex(e.clientY);
+        moveInSequence(dragFromIdx, insertIdx);
+      }
+    } else if (availCol && availCol.contains(target)) {
+      if (dragSource === 'sequence') removeFromSequence(dragBlockId);
+    }
+  }
+
+  dragBlockId = null; dragSource = null; dragFromIdx = null; dragMoved = false;
+});
+
 function getInsertIndex(clientY) {
-  const slots = document.getElementById('sequence-slots');
-  const blocks = Array.from(slots.querySelectorAll('.block'));
-  if (blocks.length === 0) return 0;
-
+  const blocks = Array.from(document.querySelectorAll('#sequence-blocks .block'));
   for (let i = 0; i < blocks.length; i++) {
-    const rect = blocks[i].getBoundingClientRect();
-    if (clientY < rect.top + rect.height / 2) return i;
+    const r = blocks[i].getBoundingClientRect();
+    if (clientY < r.top + r.height / 2) return i;
   }
   return blocks.length;
-}
-
-// Show a drop line indicator between sequence items
-function updateDropIndicator(cx, cy) {
-  const seqArea = document.getElementById('sequence-area');
-  if (!seqArea) return;
-  const seqRect = seqArea.getBoundingClientRect();
-  if (cx < seqRect.left || cx > seqRect.right || cy < seqRect.top || cy > seqRect.bottom) {
-    clearDropIndicators();
-    return;
-  }
-  // Visual feedback: nothing complex — the clone following cursor is enough
-}
-
-function clearDropIndicators() {
-  document.querySelectorAll('.drop-line').forEach(el => el.remove());
 }
 
 // =============================================
@@ -1154,51 +1125,47 @@ function loadLevel(idx) {
   sequenceIds = [];
   const level = LEVELS[idx];
 
+  document.getElementById('level-icon').textContent = LEVEL_ICONS[idx] || '🍽';
   document.getElementById('level-name').textContent = level.name;
+  document.getElementById('recipe-goal').textContent = level.goal;
+  document.getElementById('recipe-desc').textContent = level.description;
 
   for (let i = 0; i < LEVELS.length; i++) {
     const dot = document.getElementById(`dot-${i}`);
-    dot.classList.remove('active', 'done');
+    dot.classList.remove('active','done');
     if (i < idx) dot.classList.add('done');
     else if (i === idx) dot.classList.add('active');
   }
 
-  renderAvailableBlocks();
-  renderSequence();
-
   if (chef) {
     chef.group.position.set(0, chefState.y, 0);
     chef.group.rotation.y = 0;
-    chefState.action = 'idle';
-    chefState.targetX = 0;
+    chefState.action = 'idle'; chefState.targetX = 0;
   }
-
   clearIngredients();
   isRunning = false;
-  document.getElementById('run-btn').disabled = false;
-  setStatus('// ready — ' + level.description);
-  document.getElementById('overlay').classList.remove('active');
+  document.getElementById('game-overlay').classList.remove('active');
+  renderAvailableBlocks();
+  renderSequence();
+  setStatus('// tap a block to start →', '');
 }
 
 function resetLevel() {
-  document.getElementById('overlay').classList.remove('active');
+  document.getElementById('game-overlay').classList.remove('active');
   loadLevel(currentLevel);
 }
 
-function setStatus(msg) {
-  document.getElementById('status-text').textContent = msg;
+function setStatus(msg, type) {
+  const el = document.getElementById('status-text');
+  el.textContent = msg;
+  el.className = type || '';
 }
 
 // =============================================
 // INIT
 // =============================================
-window.addEventListener('load', () => {
-  initScene();
-  loadLevel(0);
-});
-
-window.addEventListener('resize', () => { onResize(); });
-
+window.addEventListener('load', () => { initScene(); loadLevel(0); });
+window.addEventListener('resize', onResize);
 document.getElementById('game-canvas').addEventListener('touchstart', e => e.preventDefault(), { passive: false });
 </script>
 </body>
