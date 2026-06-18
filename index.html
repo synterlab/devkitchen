@@ -2,618 +2,1197 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>DevKitchen</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>DevKitchen 3D</title>
 <style>
-:root{
-  --bg:#06060D;--panel:#0F0F1E;--card:#16162A;--cardh:#1E1E36;
-  --bd:rgba(255,255,255,0.06);--bdb:rgba(255,255,255,0.12);
-  --fire:#FF5722;--fire2:#CC3800;--fg:rgba(255,87,34,0.35);
-  --mint:#00E896;--mint2:#009F65;--mg:rgba(0,232,150,0.3);
-  --gold:#FFD700;--gold2:#CC9F00;--gg:rgba(255,215,0,0.3);
-  --pur:#A855F7;--pur2:#7C22C8;--pg:rgba(168,85,247,0.3);
-  --red:#FF3333;--rg:rgba(255,51,51,0.3);
-  --t:#F0EEFF;--t2:#7A7898;--t3:#3A3858;
-  --r:18px;--rsm:12px;--rxs:8px;
-  --font:'Space Grotesk',sans-serif;--mono:'DM Mono',monospace;
-}
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
-html,body{height:100%;overflow:hidden}
-body{font-family:var(--font);background:var(--bg);color:var(--t);display:flex;justify-content:center;align-items:center}
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #1a1a2e; font-family: 'Courier New', monospace; overflow: hidden; height: 100vh; touch-action: none; }
 
-/* === BACKGROUND === */
-.canvas{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-.canvas-glow{position:absolute;inset:0;background:
-  radial-gradient(ellipse 70% 50% at 10% 5%,rgba(168,85,247,0.07) 0%,transparent 60%),
-  radial-gradient(ellipse 60% 60% at 90% 95%,rgba(255,87,34,0.06) 0%,transparent 60%),
-  radial-gradient(ellipse 40% 40% at 50% 50%,rgba(0,232,150,0.03) 0%,transparent 55%)}
-.canvas-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.009) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.009) 1px,transparent 1px);background-size:40px 40px}
-.canvas-vignette{position:absolute;inset:0;background:radial-gradient(ellipse 100% 100% at 50% 50%,transparent 40%,rgba(6,6,13,0.7) 100%)}
-.particles{position:absolute;inset:0;overflow:hidden}
-.p{position:absolute;border-radius:50%;animation:pFloat linear infinite;opacity:0}
-@keyframes pFloat{0%{transform:translateY(100vh) scale(0);opacity:0}8%{opacity:0.6}92%{opacity:0.4}100%{transform:translateY(-80px) scale(1);opacity:0}}
+  #canvas-container {
+    position: fixed; top: 0; left: 0; width: 100%; height: 60vh;
+    background: #f5e6d0;
+  }
+  #game-canvas { display: block; width: 100%; height: 100%; }
 
-/* === APP SHELL === */
-#app{width:100%;max-width:430px;height:100vh;max-height:932px;position:relative;z-index:1;display:flex;flex-direction:column;background:linear-gradient(170deg,#0D0B20 0%,var(--bg) 100%);overflow:hidden}
-@media(min-width:431px){#app{border-radius:40px;box-shadow:0 0 0 1px rgba(255,255,255,0.06),0 40px 100px rgba(0,0,0,0.9);height:91vh}}
+  /* Top Bar */
+  #top-bar {
+    position: fixed; top: 0; left: 0; right: 0; height: 44px;
+    background: rgba(16,16,32,0.92); backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 12px; z-index: 100; border-bottom: 1px solid #333;
+  }
+  #level-name { color: #e2c77a; font-size: 13px; font-weight: bold; letter-spacing: 1px; }
+  #reset-btn {
+    background: #2d2d4e; color: #e2c77a; border: 1px solid #e2c77a;
+    padding: 6px 14px; border-radius: 4px; font-family: 'Courier New', monospace;
+    font-size: 12px; cursor: pointer; touch-action: manipulation; min-width: 44px; min-height: 36px;
+  }
+  #reset-btn:active { background: #e2c77a; color: #1a1a2e; }
 
-/* === HUD STRIP === */
-.hud{position:relative;z-index:10;padding:12px 18px 10px;display:flex;align-items:center;gap:10px;background:linear-gradient(180deg,rgba(13,11,32,0.95) 0%,rgba(13,11,32,0.6) 100%);border-bottom:1px solid var(--bd);flex-shrink:0}
-.hud-avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--pur),var(--fire));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0;cursor:pointer;box-shadow:0 0 14px rgba(168,85,247,0.25)}
-.hud-info{flex:1;min-width:0}
-.hud-name{font-size:13px;font-weight:700;letter-spacing:-0.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1}
-.hud-rank{font-size:10px;color:var(--t3);font-weight:600;letter-spacing:0.5px;margin-top:1px}
-.hud-stats{display:flex;gap:6px;flex-shrink:0}
-.hud-coin{display:flex;align-items:center;gap:4px;font-family:var(--mono);font-size:12px;font-weight:500;color:var(--gold);background:rgba(255,215,0,0.09);border:1px solid rgba(255,215,0,0.18);border-radius:8px;padding:4px 8px}
-.hud-xp{display:flex;align-items:center;gap:4px;font-family:var(--mono);font-size:12px;font-weight:500;color:var(--pur);background:rgba(168,85,247,0.09);border:1px solid rgba(168,85,247,0.18);border-radius:8px;padding:4px 8px}
-.hud-xpbar{position:absolute;bottom:0;left:0;right:0;height:2px;background:rgba(255,255,255,0.04)}
-.hud-xpfill{height:100%;background:linear-gradient(90deg,var(--pur),var(--fire));transition:width 0.5s ease;box-shadow:0 0 6px var(--fg)}
+  /* Code Block Tray */
+  #code-area {
+    position: fixed; bottom: 0; left: 0; right: 0; height: 40vh;
+    background: #12121f; border-top: 2px solid #333; display: flex; flex-direction: column;
+    z-index: 50;
+  }
+  #tray-label {
+    padding: 6px 12px; font-size: 11px; color: #666;
+    border-bottom: 1px solid #222; background: #0e0e1a;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .tray-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot-red { background: #ff5f57; } .dot-yellow { background: #ffbd2e; } .dot-green { background: #28ca41; }
+  #tray-label span { color: #555; font-size: 11px; margin-left: 6px; }
 
-/* === SCREENS === */
-.screen{position:absolute;top:0;left:0;width:100%;height:100%;display:none;flex-direction:column;overflow-y:auto;scrollbar-width:none;opacity:0;transform:translateY(12px);transition:opacity 0.3s ease,transform 0.3s ease}
-.screen.active{display:flex;opacity:1;transform:translateY(0)}
-.screen::-webkit-scrollbar{display:none}
-.screen-body{flex:1;padding:16px 18px 90px;overflow-y:auto;scrollbar-width:none}
-.screen-body::-webkit-scrollbar{display:none}
+  #blocks-container {
+    display: flex; flex-direction: row; gap: 0; height: calc(100% - 80px); overflow: hidden;
+  }
 
-/* === TYPOGRAPHY === */
-.title{font-size:28px;font-weight:800;letter-spacing:-1px;line-height:1.1}
-.section-head{font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.section-head::after{content:'';flex:1;height:1px;background:var(--bd)}
+  /* Available blocks (left side) */
+  #available-blocks {
+    width: 50%; padding: 8px 6px; overflow-y: auto; border-right: 1px solid #222;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  #available-label { font-size: 10px; color: #555; margin-bottom: 4px; letter-spacing: 1px; }
 
-/* === GAME CARDS === */
-.gcard{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:16px;margin-bottom:10px;transition:all 0.18s ease;position:relative;overflow:hidden}
-.gcard::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.08),transparent)}
-.gcard.fire{border-color:rgba(255,87,34,0.28);box-shadow:0 0 20px rgba(255,87,34,0.06)}
-.gcard.mint{border-color:rgba(0,232,150,0.28);box-shadow:0 0 20px rgba(0,232,150,0.06)}
-.gcard.gold{border-color:rgba(255,215,0,0.28);box-shadow:0 0 20px rgba(255,215,0,0.06)}
-.gcard.pur{border-color:rgba(168,85,247,0.28);box-shadow:0 0 20px rgba(168,85,247,0.06)}
+  /* Sequence area (right side) */
+  #sequence-area {
+    width: 50%; padding: 8px 6px; overflow-y: auto;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  #sequence-label { font-size: 10px; color: #555; margin-bottom: 4px; letter-spacing: 1px; }
+  #sequence-slots {
+    min-height: 60px; display: flex; flex-direction: column; gap: 6px;
+  }
+  #drop-hint {
+    border: 1px dashed #333; border-radius: 4px; padding: 10px;
+    color: #333; font-size: 11px; text-align: center;
+    min-height: 44px; display: flex; align-items: center; justify-content: center;
+  }
 
-/* === BUTTONS === */
-.btn{width:100%;padding:15px 20px;border:none;border-radius:14px;font-family:var(--font);font-size:15px;font-weight:700;cursor:pointer;transition:all 0.15s ease;position:relative;overflow:hidden;letter-spacing:0.1px}
-.btn-game{background:linear-gradient(180deg,var(--fire) 0%,var(--fire2) 100%);color:#fff;box-shadow:0 4px 0 rgba(150,30,0,0.8),0 6px 20px var(--fg);border:1px solid rgba(255,120,80,0.3)}
-.btn-game:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(150,30,0,0.8),0 3px 10px var(--fg)}
-.btn-game-mint{background:linear-gradient(180deg,var(--mint) 0%,var(--mint2) 100%);color:#001810;box-shadow:0 4px 0 rgba(0,100,60,0.8),0 6px 20px var(--mg)}
-.btn-game-mint:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,100,60,0.8)}
-.btn-game-gold{background:linear-gradient(180deg,var(--gold) 0%,var(--gold2) 100%);color:#1A1000;box-shadow:0 4px 0 rgba(120,80,0,0.8),0 6px 20px var(--gg)}
-.btn-game-gold:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(120,80,0,0.8)}
-.btn-ghost{background:rgba(255,255,255,0.05);color:var(--t2);border:1px solid var(--bd);box-shadow:none}
-.btn-ghost:active{background:rgba(255,255,255,0.09)}
-.btn-sm{padding:9px 15px;font-size:12px;border-radius:10px;width:auto}
-.btn-danger{background:rgba(255,51,51,0.12);color:var(--red);border:1px solid rgba(255,51,51,0.2);box-shadow:none}
+  /* Instruction blocks */
+  .block {
+    background: #1e1e3a; border-left: 3px solid #7c6af7;
+    border-radius: 4px; padding: 10px 12px; cursor: grab;
+    font-size: 12px; color: #c9d1d9; user-select: none;
+    min-height: 44px; display: flex; align-items: center; gap: 6px;
+    touch-action: none; transition: opacity 0.15s, transform 0.1s;
+    position: relative;
+  }
+  .block:active { transform: scale(0.97); }
+  .block.dragging { opacity: 0.5; }
+  .block .fn-name { color: #79c0ff; }
+  .block .fn-arg { color: #ffa657; }
+  .block .fn-paren { color: #888; }
+  .block.conditional { border-left-color: #f78166; }
+  .block.conditional .fn-name { color: #f78166; }
+  .block.loop-block { border-left-color: #3fb950; }
+  .block.loop-block .fn-name { color: #3fb950; }
+  .block.in-sequence { cursor: grab; }
+  .block .remove-btn {
+    margin-left: auto; color: #555; font-size: 14px; padding: 2px 6px;
+    touch-action: manipulation; cursor: pointer;
+  }
+  .block .remove-btn:hover { color: #ff5f57; }
 
-/* === INPUTS === */
-.input-wrap{margin-bottom:12px}
-.input-wrap label{display:block;font-size:10px;font-weight:700;color:var(--t3);margin-bottom:5px;text-transform:uppercase;letter-spacing:1.5px}
-.inp{width:100%;padding:13px 16px;background:rgba(255,255,255,0.04);border:1px solid var(--bd);border-radius:12px;color:var(--t);font-family:var(--font);font-size:15px;outline:none;transition:all 0.2s ease;font-weight:500}
-.inp:focus{border-color:var(--fire);box-shadow:0 0 0 3px rgba(255,87,34,0.12)}
-.inp::placeholder{color:var(--t3)}
+  /* Bottom bar */
+  #bottom-bar {
+    height: 44px; padding: 6px 12px; display: flex; align-items: center;
+    justify-content: space-between; border-top: 1px solid #222; background: #0e0e1a;
+  }
+  #run-btn {
+    background: #238636; color: #fff; border: none;
+    padding: 8px 24px; border-radius: 4px; font-family: 'Courier New', monospace;
+    font-size: 13px; font-weight: bold; cursor: pointer; min-height: 36px; min-width: 80px;
+    touch-action: manipulation; letter-spacing: 1px;
+    transition: background 0.15s;
+  }
+  #run-btn:active { background: #2ea043; }
+  #run-btn:disabled { background: #1a4a20; color: #555; cursor: not-allowed; }
+  #status-text { font-size: 11px; color: #555; }
 
-/* === NAV === */
-.nav{position:absolute;bottom:0;left:0;width:100%;height:78px;background:rgba(6,6,13,0.92);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);border-top:1px solid var(--bd);display:flex;justify-content:space-around;align-items:center;z-index:100;padding:0 8px 8px}
-.nav-btn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 18px;cursor:pointer;border:none;background:none;font-family:var(--font);color:var(--t3);transition:all 0.2s ease;border-radius:12px;position:relative}
-.nav-btn.on{color:var(--fire)}
-.nav-btn.on::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:24px;height:2px;background:var(--fire);border-radius:0 0 3px 3px;box-shadow:0 0 8px var(--fg)}
-.nav-btn svg{width:20px;height:20px;transition:all 0.2s}
-.nav-btn.on svg{filter:drop-shadow(0 0 4px var(--fg))}
-.nav-btn span{font-size:9px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase}
+  /* Overlays */
+  #overlay {
+    display: none; position: fixed; inset: 0; z-index: 200;
+    align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+  }
+  #overlay.active { display: flex; }
+  #overlay-box {
+    background: #12121f; border: 1px solid #333; border-radius: 8px;
+    padding: 24px 28px; max-width: 340px; width: 90%; text-align: center;
+  }
+  #overlay-box.error-box { border-color: #ff5f57; }
+  #overlay-box.success-box { border-color: #3fb950; }
+  #overlay-title { font-size: 14px; font-weight: bold; margin-bottom: 8px; letter-spacing: 1px; }
+  .error-box #overlay-title { color: #ff5f57; }
+  .success-box #overlay-title { color: #3fb950; }
+  #overlay-msg { font-size: 12px; color: #8b949e; margin-bottom: 16px; line-height: 1.6; }
+  #overlay-error-code {
+    background: #0d1117; border-radius: 4px; padding: 10px; text-align: left;
+    font-size: 11px; color: #ff5f57; margin-bottom: 16px; border-left: 3px solid #ff5f57;
+    display: none;
+  }
+  .overlay-btn {
+    background: #238636; color: #fff; border: none; padding: 8px 20px;
+    border-radius: 4px; font-family: 'Courier New', monospace; font-size: 12px;
+    cursor: pointer; min-height: 36px; touch-action: manipulation;
+  }
+  .overlay-btn.next-btn { background: #1f6feb; }
+  .overlay-btn.retry-btn { background: #6e40c9; }
 
-/* === DASHBOARD === */
-.daily-card{background:linear-gradient(135deg,rgba(168,85,247,0.12),rgba(255,87,34,0.08));border:1px solid rgba(168,85,247,0.22);border-radius:var(--r);padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:10px;position:relative;overflow:hidden}
-.daily-card::after{content:'DAILY';position:absolute;top:8px;right:10px;font-size:8px;font-weight:800;letter-spacing:1.5px;color:var(--pur);opacity:0.6}
-.daily-icon{font-size:24px;flex-shrink:0}
-.daily-info{flex:1}
-.daily-title{font-size:14px;font-weight:700;margin-bottom:2px}
-.daily-sub{font-size:11px;color:var(--t2);line-height:1.4}
-.daily-reward{font-family:var(--mono);font-size:12px;color:var(--gold);font-weight:500;margin-top:3px}
-.streak-strip{display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:10px 14px;background:var(--card);border:1px solid var(--bd);border-radius:12px}
-.streak-n{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--fire);line-height:1}
-.streak-lbl{font-size:11px;color:var(--t2);flex:1}
-.streak-dots{display:flex;gap:3px}
-.sd{width:14px;height:5px;border-radius:3px;background:var(--bd)}
-.sd.on{background:linear-gradient(90deg,var(--fire),var(--gold))}
-.proj-row{display:flex;align-items:center;gap:11px;padding:12px 14px;background:var(--card);border:1px solid var(--bd);border-radius:14px;margin-bottom:7px;transition:all 0.15s}
-.proj-row:active{background:var(--cardh)}
-.proj-ico{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
-.proj-detail{flex:1;min-width:0}
-.proj-name{font-size:13px;font-weight:700;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.proj-date{font-size:10px;color:var(--t3);font-family:var(--mono)}
-.proj-stars{font-size:11px}
-.ms-row{display:flex;align-items:center;gap:10px;padding:11px 13px;background:var(--card);border-radius:12px;margin-bottom:6px;border:1px solid transparent;transition:all 0.2s}
-.ms-row.done{border-color:rgba(0,232,150,0.18);background:rgba(0,232,150,0.05)}
-.ms-ico{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;background:rgba(255,255,255,0.05);flex-shrink:0}
-.ms-row.done .ms-ico{background:rgba(0,232,150,0.12)}
-.ms-info{flex:1}
-.ms-name{font-size:12px;font-weight:700}
-.ms-desc{font-size:10px;color:var(--t3);margin-top:1px}
-.ms-ck{font-size:12px;color:var(--t3)}
-.ms-row.done .ms-ck{color:var(--mint)}
+  /* Execution step highlight */
+  .block.executing {
+    border-left-color: #e2c77a !important;
+    background: #2a2a1e;
+    animation: pulse 0.5s ease-in-out infinite alternate;
+  }
+  @keyframes pulse { from { box-shadow: 0 0 0 0 rgba(226,199,122,0.4); } to { box-shadow: 0 0 8px 2px rgba(226,199,122,0.2); } }
 
-/* === PROJECT SELECT === */
-.recipe-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-.recipe-card{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:15px 11px;text-align:center;cursor:pointer;transition:all 0.15s;position:relative}
-.recipe-card:active{transform:scale(0.95)}
-.recipe-card.on{border-color:var(--fire);background:rgba(255,87,34,0.08);box-shadow:0 0 16px rgba(255,87,34,0.12),0 4px 0 rgba(255,87,34,0.3)}
-.recipe-ico{font-size:28px;margin-bottom:7px;display:block}
-.recipe-name{font-size:12px;font-weight:700;margin-bottom:4px;line-height:1.3}
-.recipe-tag{display:inline-block;font-size:9px;font-weight:700;padding:2px 7px;border-radius:100px;background:rgba(255,255,255,0.06);color:var(--t2);text-transform:uppercase;letter-spacing:0.4px}
-.recipe-card.on .recipe-tag{background:rgba(255,87,34,0.18);color:var(--fire)}
-.recipe-rew{position:absolute;top:8px;right:9px;font-size:9px}
-.diff-pill{display:inline-flex;align-items:center;padding:2px 7px;border-radius:100px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;border:1px solid;margin-top:3px}
-.diff-e{color:var(--mint);border-color:rgba(0,232,150,0.3);background:rgba(0,232,150,0.08)}
-.diff-m{color:var(--gold);border-color:rgba(255,215,0,0.3);background:rgba(255,215,0,0.08)}
-.diff-h{color:var(--fire);border-color:rgba(255,87,34,0.3);background:rgba(255,87,34,0.08)}
+  /* Progress dots */
+  #progress {
+    display: flex; gap: 6px; align-items: center;
+  }
+  .prog-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: #333;
+    transition: background 0.3s;
+  }
+  .prog-dot.done { background: #3fb950; }
+  .prog-dot.active { background: #e2c77a; }
 
-/* === GAME SCREEN === */
-.cook-hdr{padding:12px 18px;background:rgba(13,11,32,0.7);border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-.cook-meta{font-size:10px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
-.cook-title{font-size:16px;font-weight:800;letter-spacing:-0.3px}
-.req-panel{background:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:13px 14px;margin-bottom:9px}
-.req-r{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-.req-r:last-child{margin-bottom:0}
-.req-l{font-size:10px;font-weight:700;color:var(--t2);width:50px;flex-shrink:0;text-transform:uppercase;letter-spacing:0.4px}
-.req-trk{flex:1;height:5px;background:rgba(255,255,255,0.05);border-radius:3px;overflow:hidden}
-.req-fill{height:100%;border-radius:3px;transition:width 0.5s}
-.rf-idea{background:linear-gradient(90deg,#7C22C8,var(--pur))}
-.rf-code{background:linear-gradient(90deg,var(--mint2),var(--mint))}
-.rf-design{background:linear-gradient(90deg,#8B7FFF,#B8AAFF)}
-.rf-hype{background:linear-gradient(90deg,var(--gold2),var(--gold))}
-.req-v{font-family:var(--mono);font-size:10px;color:var(--t2);width:24px;text-align:right}
-
-/* COMBO METER */
-.combo-strip{display:flex;align-items:center;gap:8px;padding:9px 13px;background:var(--card);border:1px solid var(--bd);border-radius:12px;margin-bottom:9px}
-.combo-gems{display:flex;gap:5px;flex:1}
-.gem{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;background:rgba(255,255,255,0.04);border:1px solid var(--bd);transition:all 0.2s}
-.gem.idea.on{background:rgba(168,85,247,0.2);border-color:rgba(168,85,247,0.4);box-shadow:0 0 8px rgba(168,85,247,0.3)}
-.gem.code.on{background:rgba(0,232,150,0.2);border-color:rgba(0,232,150,0.4);box-shadow:0 0 8px rgba(0,232,150,0.3)}
-.gem.design.on{background:rgba(184,170,255,0.2);border-color:rgba(184,170,255,0.4);box-shadow:0 0 8px rgba(184,170,255,0.3)}
-.gem.hype.on{background:rgba(255,215,0,0.2);border-color:rgba(255,215,0,0.4);box-shadow:0 0 8px rgba(255,215,0,0.3)}
-.combo-txt{font-family:var(--mono);font-size:12px;color:var(--t3);transition:all 0.2s;white-space:nowrap}
-.combo-txt.active{color:var(--gold);text-shadow:0 0 8px rgba(255,215,0,0.4)}
-
-/* FORGE */
-.forge-wrap{display:flex;justify-content:center;align-items:center;padding:4px 0 8px;position:relative}
-.forge{width:200px;height:200px;position:relative;display:flex;align-items:center;justify-content:center}
-.forge-ring{position:absolute;border-radius:50%;border:1px solid rgba(255,87,34,0.08);animation:frpulse 3s ease-in-out infinite}
-.forge-ring:nth-child(1){inset:0;animation-delay:0s}
-.forge-ring:nth-child(2){inset:14px;border-color:rgba(255,87,34,0.06);animation-delay:0.6s}
-.forge-ring:nth-child(3){inset:28px;border-color:rgba(255,87,34,0.04);animation-delay:1.2s}
-@keyframes frpulse{0%,100%{opacity:0.4;transform:scale(1)}50%{opacity:1;transform:scale(1.02)}}
-.forge-core{width:100px;height:100px;border-radius:50%;border:2px dashed rgba(255,87,34,0.2);background:radial-gradient(circle,rgba(255,87,34,0.04) 0%,transparent 70%);display:flex;align-items:center;justify-content:center;position:relative;z-index:1;transition:all 0.3s;cursor:default}
-.forge.hot .forge-core{border-style:solid;border-color:var(--fire);background:radial-gradient(circle,rgba(255,87,34,0.12) 0%,transparent 70%);box-shadow:0 0 30px rgba(255,87,34,0.2),0 0 60px rgba(255,87,34,0.08)}
-.forge.hot .forge-ring{animation-duration:1.2s}
-.forge-ct{text-align:center;padding:6px}
-.forge-t{font-size:11px;color:var(--t3);font-weight:600;margin-bottom:2px}
-.forge-h{font-size:10px;color:var(--t3)}
-.pan-ings{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;max-width:90px}
-.pan-i{font-size:16px;animation:dropIn 0.22s cubic-bezier(0.34,1.56,0.64,1)}
-@keyframes dropIn{0%{transform:scale(0) translateY(-14px);opacity:0}100%{transform:scale(1);opacity:1}}
-
-/* HEAT BAR */
-.heat-bar{padding:9px 13px;background:var(--card);border:1px solid var(--bd);border-radius:12px;margin-bottom:9px}
-.heat-top{display:flex;justify-content:space-between;margin-bottom:6px}
-.heat-lbl{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:1.2px}
-.heat-st{font-family:var(--mono);font-size:11px;font-weight:500;transition:color 0.3s}
-.heat-trk{height:8px;background:rgba(255,255,255,0.04);border-radius:4px;overflow:hidden}
-.heat-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--mint) 0%,var(--gold) 40%,var(--fire) 70%,var(--red) 100%);transition:width 0.3s;width:0%;box-shadow:0 0 6px rgba(255,87,34,0.2)}
-
-/* TIMING BAR */
-.timing-bar{height:52px;background:rgba(255,255,255,0.025);border:1px solid var(--bd);border-radius:12px;position:relative;overflow:hidden;margin-bottom:9px}
-.timing-zones{position:absolute;inset:0;display:flex}
-.tz-bad{flex:3;background:rgba(255,51,51,0.08)}
-.tz-good{flex:2;background:rgba(0,232,150,0.12);position:relative}
-.tz-good::before{content:'SWEET SPOT';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:8px;font-weight:800;color:var(--mint);letter-spacing:1px;opacity:0.8;white-space:nowrap}
-.tz-bad2{flex:3;background:rgba(255,51,51,0.08)}
-.timing-cur{position:absolute;top:5px;bottom:5px;width:3px;background:#fff;border-radius:2px;box-shadow:0 0 8px rgba(255,255,255,0.7);transition:left 0.04s linear}
-
-/* INGREDIENT GEMS */
-.ing-grid{display:flex;gap:7px;overflow-x:auto;padding:0 1px 4px;scrollbar-width:none;margin-bottom:0}
-.ing-grid::-webkit-scrollbar{display:none}
-.ing-gem{flex:1;min-width:72px;display:flex;flex-direction:column;align-items:center;gap:5px;padding:12px 8px;background:var(--card);border-radius:14px;cursor:pointer;transition:all 0.14s ease;position:relative;overflow:hidden;border:1px solid var(--bd)}
-.ing-gem::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:14px 14px 0 0;transition:opacity 0.2s}
-.ing-gem.idea::after{background:linear-gradient(90deg,var(--pur2),var(--pur))}
-.ing-gem.code::after{background:linear-gradient(90deg,var(--mint2),var(--mint))}
-.ing-gem.design::after{background:linear-gradient(90deg,#8B7FFF,#C4BCFF)}
-.ing-gem.hype::after{background:linear-gradient(90deg,var(--gold2),var(--gold))}
-.ing-gem.idea{border-color:rgba(168,85,247,0.15)}
-.ing-gem.code{border-color:rgba(0,232,150,0.15)}
-.ing-gem.design{border-color:rgba(196,188,255,0.15)}
-.ing-gem.hype{border-color:rgba(255,215,0,0.15)}
-.ing-gem:active{transform:scale(0.91) translateY(2px)}
-.ing-gem.flash{animation:gemFlash 0.18s ease}
-@keyframes gemFlash{0%{transform:scale(1)}50%{transform:scale(0.88) translateY(2px)}100%{transform:scale(1)}}
-.ing-icon{font-size:24px;line-height:1;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.5))}
-.ing-lbl{font-size:10px;font-weight:800;color:var(--t2);text-transform:uppercase;letter-spacing:0.6px}
-.ing-cnt{font-family:var(--mono);font-size:10px;color:var(--t3)}
-.bug-pop{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);padding:8px 16px;background:rgba(255,30,30,0.93);border:1px solid rgba(255,80,80,0.5);border-radius:10px;color:#fff;font-weight:800;font-size:12px;display:none;animation:bpop 0.4s ease;z-index:50;cursor:pointer;backdrop-filter:blur(12px);white-space:nowrap;letter-spacing:0.2px}
-@keyframes bpop{0%{transform:translate(-50%,-50%) scale(0.5);opacity:0}60%{transform:translate(-50%,-50%) scale(1.08)}100%{transform:translate(-50%,-50%) scale(1);opacity:1}}
-
-/* === RESULT SCREEN === */
-.result-hero{text-align:center;padding:20px 18px 10px}
-.result-emoji{font-size:64px;display:block;margin-bottom:10px;animation:heroIn 0.5s cubic-bezier(0.34,1.56,0.64,1)}
-@keyframes heroIn{0%{transform:scale(0) rotate(-15deg);opacity:0}100%{transform:scale(1) rotate(0deg);opacity:1}}
-.result-title{font-size:28px;font-weight:800;letter-spacing:-0.8px;margin-bottom:4px}
-.result-sub{font-size:13px;color:var(--t2);margin-bottom:4px}
-.rank-up-banner{display:none;background:linear-gradient(135deg,rgba(168,85,247,0.2),rgba(255,87,34,0.12));border:1px solid rgba(168,85,247,0.3);border-radius:10px;padding:7px 14px;font-size:12px;font-weight:800;color:var(--pur);text-align:center;margin:8px 18px}
-.star-row{display:flex;justify-content:center;gap:4px;margin:12px 0}
-.star{font-size:28px;filter:grayscale(1) opacity(0.35);transition:all 0.25s}
-.star.on{filter:grayscale(0) opacity(1);text-shadow:0 0 14px rgba(255,215,0,0.5)}
-.star.pop{animation:spop 0.4s cubic-bezier(0.34,1.56,0.64,1)}
-@keyframes spop{0%{transform:scale(0) rotate(-180deg)}100%{transform:scale(1) rotate(0)}}
-.score-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 18px 10px}
-.score-cell{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px 14px;text-align:center}
-.score-val{font-family:var(--mono);font-size:20px;font-weight:700;margin-bottom:2px}
-.score-lbl{font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:0.8px}
-.feedback-card{margin:0 18px 10px;padding:12px 14px;background:var(--card);border:1px solid var(--bd);border-radius:14px;font-size:13px;color:var(--t2);text-align:center;line-height:1.6}
-.result-actions{padding:0 18px 10px;display:flex;flex-direction:column;gap:8px}
-
-/* === PROFILE SCREEN === */
-.prof-hero{text-align:center;padding:20px 18px 16px;position:relative}
-.prof-av{width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,var(--pur),var(--fire));display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#fff;margin:0 auto 12px;box-shadow:0 0 24px rgba(168,85,247,0.25)}
-.prof-name{font-size:20px;font-weight:800;margin-bottom:4px}
-.prof-rank{display:inline-block;padding:3px 12px;background:linear-gradient(135deg,rgba(168,85,247,0.15),rgba(255,87,34,0.1));border:1px solid rgba(168,85,247,0.25);border-radius:100px;font-size:11px;font-weight:700;color:var(--pur)}
-.stats-2x2{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 18px 10px}
-.stat-tile{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:13px 14px}
-.stat-v{font-family:var(--mono);font-size:20px;font-weight:700;margin-bottom:1px}
-.stat-l{font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:0.8px}
-.prof-section{padding:0 18px}
-
-/* === TOASTS & EFFECTS === */
-.toast{position:fixed;top:14px;left:50%;transform:translateX(-50%) translateY(-120px);padding:9px 18px;background:rgba(13,11,32,0.97);backdrop-filter:blur(24px);border:1px solid var(--bdb);border-radius:10px;font-size:13px;font-weight:700;z-index:300;transition:transform 0.28s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none;white-space:nowrap;font-family:var(--font)}
-.toast.show{transform:translateX(-50%) translateY(0)}
-.toast.success{border-color:rgba(0,232,150,0.3);color:var(--mint)}
-.toast.error{border-color:rgba(255,51,51,0.3);color:var(--red)}
-.toast.gold{border-color:rgba(255,215,0,0.3);color:var(--gold)}
-.glitch-ov{position:fixed;inset:0;background:rgba(255,30,30,0.15);pointer-events:none;z-index:200;display:none;animation:gflash 0.26s ease}
-@keyframes gflash{0%,100%{opacity:0}50%{opacity:1}}
-.shake{animation:sk 0.36s ease}
-@keyframes sk{0%,100%{transform:none}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
-.pdot{position:absolute;width:5px;height:5px;border-radius:50%;animation:pb 0.65s ease-out forwards}
-@keyframes pb{0%{transform:translate(0,0);opacity:1}100%{transform:translate(var(--tx),var(--ty));opacity:0}}
-.cf{position:absolute;animation:cff 1.7s ease-out forwards}
-@keyframes cff{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(260px) rotate(720deg);opacity:0}}
-.xpf{position:absolute;font-family:var(--mono);font-size:14px;font-weight:700;color:var(--mint);pointer-events:none;animation:xpfl 1.2s ease-out forwards;z-index:50}
-@keyframes xpfl{0%{transform:translateY(0);opacity:1}100%{transform:translateY(-60px);opacity:0}}
-.combo-anim{position:absolute;top:0;left:50%;transform:translateX(-50%);font-size:13px;font-weight:800;color:var(--gold);pointer-events:none;animation:comboPop 1s ease-out forwards;z-index:50;white-space:nowrap;text-shadow:0 0 12px rgba(255,215,0,0.5)}
-@keyframes comboPop{0%{transform:translateX(-50%) translateY(0) scale(0.5);opacity:0}30%{transform:translateX(-50%) translateY(-12px) scale(1.1);opacity:1}100%{transform:translateX(-50%) translateY(-40px) scale(1);opacity:0}}
-.lvlup-flash{position:fixed;inset:0;pointer-events:none;z-index:250;display:none;background:radial-gradient(circle,rgba(168,85,247,0.25) 0%,transparent 70%);animation:lvlup 0.6s ease-out forwards}
-@keyframes lvlup{0%{opacity:0}30%{opacity:1}100%{opacity:0}}
-
-/* === NAME MODAL === */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);z-index:200;display:none;align-items:flex-end;justify-content:center}
-.modal-bg.show{display:flex}
-.modal{background:var(--panel);border:1px solid var(--bdb);border-radius:20px 20px 0 0;padding:24px 20px 36px;width:100%;max-width:430px}
-.modal-title{font-size:18px;font-weight:800;margin-bottom:14px}
+  /* Confetti */
+  .confetti-particle {
+    position: fixed; width: 8px; height: 8px; border-radius: 2px;
+    pointer-events: none; z-index: 300; animation: fall 1.5s ease-in forwards;
+  }
+  @keyframes fall {
+    0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
 </style>
 </head>
 <body>
-<div class="canvas">
-  <div class="canvas-glow"></div>
-  <div class="canvas-grid"></div>
-  <div class="canvas-vignette"></div>
-  <div class="particles" id="particles"></div>
-</div>
-<div class="glitch-ov" id="glitchOv"></div>
-<div class="lvlup-flash" id="lvlFlash"></div>
-<div class="toast" id="toast"></div>
 
-<!-- NAME MODAL -->
-<div class="modal-bg" id="nameModal">
-  <div class="modal">
-    <div class="modal-title">Set Your Handle</div>
-    <div class="input-wrap"><label>Chef Name</label><input type="text" class="inp" id="nameInput" placeholder="chef_dev" autocomplete="off" maxlength="20"></div>
-    <button class="btn btn-game" id="nameConfirmBtn">Save Handle</button>
+<!-- Top Bar -->
+<div id="top-bar">
+  <div id="level-name">// LEVEL 1: FRIED RICE</div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <div id="progress">
+      <div class="prog-dot active" id="dot-0"></div>
+      <div class="prog-dot" id="dot-1"></div>
+      <div class="prog-dot" id="dot-2"></div>
+    </div>
+    <button id="reset-btn" onclick="resetLevel()">↺ Reset</button>
   </div>
 </div>
 
-<div id="app">
-  <!-- HUD (always visible when logged in) -->
-  <div class="hud" id="hud" style="display:none">
-    <div class="hud-avatar" id="hudAvatar" title="Change name">D</div>
-    <div class="hud-info">
-      <div class="hud-name" id="hudName">Chef</div>
-      <div class="hud-rank" id="hudRank">APPRENTICE</div>
-    </div>
-    <div class="hud-stats">
-      <div class="hud-coin">🪙 <span id="hudCoins">0</span></div>
-      <div class="hud-xp">⚡ <span id="hudLevel">1</span></div>
-    </div>
-    <div class="hud-xpbar"><div class="hud-xpfill" id="hudXpFill" style="width:0%"></div></div>
-  </div>
-
-  <!-- DASHBOARD -->
-  <div class="screen" id="dashScreen">
-    <div class="screen-body">
-      <div class="daily-card" id="dailyCard">
-        <div class="daily-icon" id="dailyIcon">🎯</div>
-        <div class="daily-info">
-          <div class="daily-title" id="dailyTitle">Daily Challenge</div>
-          <div class="daily-sub" id="dailySub">Cook any Hard project today</div>
-          <div class="daily-reward" id="dailyReward">🪙 +200 bonus coins</div>
-        </div>
-      </div>
-      <div class="streak-strip">
-        <div>
-          <div class="streak-n" id="streakN">0</div>
-          <div style="font-size:10px;color:var(--t3);margin-top:1px">day streak</div>
-        </div>
-        <div class="streak-lbl" style="font-size:11px">Keep cooking daily to grow your streak</div>
-        <div class="streak-dots" id="streakDots"></div>
-      </div>
-      <button class="btn btn-game" id="startBtn" style="margin-bottom:16px">🍳 Start Cooking</button>
-      <div class="section-head">Recent Projects</div>
-      <div id="recentProjects">
-        <div class="gcard" style="text-align:center;padding:24px"><p style="color:var(--t3);font-size:13px;font-weight:600">No projects yet.<br>Start your first cook!</p></div>
-      </div>
-      <div class="section-head">Achievements</div>
-      <div id="milestones">
-        <div class="ms-row" data-id="first-project"><div class="ms-ico">🎯</div><div class="ms-info"><div class="ms-name">First Project</div><div class="ms-desc">Complete your first cook</div></div><span class="ms-ck">○</span></div>
-        <div class="ms-row" data-id="reach-level-5"><div class="ms-ico">⭐</div><div class="ms-info"><div class="ms-name">Rising Chef</div><div class="ms-desc">Reach Level 5</div></div><span class="ms-ck">○</span></div>
-        <div class="ms-row" data-id="earn-1000"><div class="ms-ico">💰</div><div class="ms-info"><div class="ms-name">Well-Funded</div><div class="ms-desc">Earn 1,000 coins</div></div><span class="ms-ck">○</span></div>
-        <div class="ms-row" data-id="perfect-rating"><div class="ms-ico">🏆</div><div class="ms-info"><div class="ms-name">Flawless Launch</div><div class="ms-desc">Get a 5-star rating</div></div><span class="ms-ck">○</span></div>
-        <div class="ms-row" data-id="streak-3"><div class="ms-ico">🔥</div><div class="ms-info"><div class="ms-name">On a Roll</div><div class="ms-desc">3-day streak</div></div><span class="ms-ck">○</span></div>
-        <div class="ms-row" data-id="hard-project"><div class="ms-ico">💀</div><div class="ms-info"><div class="ms-name">No Fear</div><div class="ms-desc">Ship a Hard project</div></div><span class="ms-ck">○</span></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- PROJECT SELECT -->
-  <div class="screen" id="projectSelectScreen">
-    <div class="screen-body">
-      <div style="margin-bottom:14px"><div style="font-size:22px;font-weight:800;letter-spacing:-0.5px;margin-bottom:3px">Pick a Recipe</div><div style="font-size:13px;color:var(--t2)">Choose your project — difficulty affects rewards</div></div>
-      <div class="recipe-grid" id="recipeGrid"></div>
-      <button class="btn btn-game" id="confirmBtn" style="opacity:0.45;pointer-events:none">Select a Recipe First</button>
-      <button class="btn btn-ghost" id="backBtn" style="margin-top:8px">← Back to Kitchen</button>
-    </div>
-  </div>
-
-  <!-- GAME SCREEN -->
-  <div class="screen" id="gameScreen">
-    <div class="cook-hdr">
-      <div>
-        <div class="cook-meta">Project Order</div>
-        <div class="cook-title" id="projectName">Build Viral Idle Game</div>
-        <span class="diff-pill diff-e" id="diffTag">Starter</span>
-      </div>
-      <button class="btn btn-ghost btn-sm" id="cancelBtn">✕ Exit</button>
-    </div>
-    <div class="screen-body" style="padding-top:12px">
-      <div class="req-panel">
-        <div style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:1.4px;margin-bottom:9px">Recipe Requirements</div>
-        <div class="req-r"><span class="req-l">💡 Idea</span><div class="req-trk"><div class="req-fill rf-idea" id="reqIdea" style="width:30%"></div></div><span class="req-v" id="reqIdeaVal">30%</span></div>
-        <div class="req-r"><span class="req-l">💻 Code</span><div class="req-trk"><div class="req-fill rf-code" id="reqCode" style="width:40%"></div></div><span class="req-v" id="reqCodeVal">40%</span></div>
-        <div class="req-r"><span class="req-l">🎨 Design</span><div class="req-trk"><div class="req-fill rf-design" id="reqDesign" style="width:20%"></div></div><span class="req-v" id="reqDesignVal">20%</span></div>
-        <div class="req-r"><span class="req-l">🔥 Hype</span><div class="req-trk"><div class="req-fill rf-hype" id="reqHype" style="width:10%"></div></div><span class="req-v" id="reqHypeVal">10%</span></div>
-      </div>
-      <div class="combo-strip">
-        <div class="combo-gems">
-          <div class="gem idea" id="gemIdea">💡</div>
-          <div class="gem code" id="gemCode">💻</div>
-          <div class="gem design" id="gemDesign">🎨</div>
-          <div class="gem hype" id="gemHype">🔥</div>
-        </div>
-        <span class="combo-txt" id="comboTxt">No combo</span>
-      </div>
-      <div class="forge-wrap">
-        <div class="forge" id="cookingPan">
-          <div class="forge-ring"></div>
-          <div class="forge-ring"></div>
-          <div class="forge-ring"></div>
-          <div class="forge-core">
-            <div class="forge-ct" id="panContent">
-              <div class="forge-t">Drop ingredients</div>
-              <div class="forge-h">into the forge</div>
-            </div>
-          </div>
-          <div class="bug-pop" id="bugAlert">🐛 BUG! TAP TO FIX</div>
-        </div>
-      </div>
-      <div class="heat-bar" id="overheatContainer" style="display:none">
-        <div class="heat-top"><span class="heat-lbl">🌡 Heat Level</span><span class="heat-status" id="heatStatus" style="font-family:var(--mono);font-size:11px;color:var(--mint)">COLD</span></div>
-        <div class="heat-trk"><div class="heat-fill" id="overheatFill"></div></div>
-      </div>
-      <div class="timing-bar" id="timingContainer" style="display:none">
-        <div class="timing-zones">
-          <div class="tz-bad"></div>
-          <div class="tz-good"></div>
-          <div class="tz-bad2"></div>
-        </div>
-        <div class="timing-cur" id="timingIndicator" style="left:0%"></div>
-      </div>
-      <div style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:1.4px;margin-bottom:8px">Ingredients</div>
-      <div class="ing-grid">
-        <div class="ing-gem idea" data-type="idea" data-value="10"><div class="ing-icon">💡</div><div class="ing-lbl">Idea</div><div class="ing-cnt" id="ingIdea">×0</div></div>
-        <div class="ing-gem code" data-type="code" data-value="10"><div class="ing-icon">💻</div><div class="ing-lbl">Code</div><div class="ing-cnt" id="ingCode">×0</div></div>
-        <div class="ing-gem design" data-type="design" data-value="10"><div class="ing-icon">🎨</div><div class="ing-lbl">Design</div><div class="ing-cnt" id="ingDesign">×0</div></div>
-        <div class="ing-gem hype" data-type="hype" data-value="10"><div class="ing-icon">🔥</div><div class="ing-lbl">Hype</div><div class="ing-cnt" id="ingHype">×0</div></div>
-      </div>
-      <button class="btn btn-game" id="cookBtn" style="margin-top:12px;opacity:0.45;pointer-events:none">Add ingredients first</button>
-    </div>
-  </div>
-
-  <!-- RESULT SCREEN -->
-  <div class="screen" id="resultScreen">
-    <div class="result-hero">
-      <span class="result-emoji" id="resultIcon">🚀</span>
-      <div class="result-title" id="resultTitle">Shipped!</div>
-      <div class="result-sub" id="resultSubtitle">Your project is live</div>
-    </div>
-    <div class="rank-up-banner" id="rankUpBanner">🎖 RANK UP! You're now a <span id="rankUpTitle">Sous Chef</span>!</div>
-    <div class="star-row" id="starRating">
-      <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
-    </div>
-    <div class="score-grid">
-      <div class="score-cell"><div class="score-val positive" id="resultCoins" style="color:var(--gold)">+0</div><div class="score-lbl">Coins</div></div>
-      <div class="score-cell"><div class="score-val positive" id="resultXp" style="color:var(--pur)">+0</div><div class="score-lbl">XP</div></div>
-      <div class="score-cell"><div class="score-val" id="resultUsers" style="color:var(--mint)">0</div><div class="score-lbl">Users</div></div>
-      <div class="score-cell"><div class="score-val" id="resultCombo" style="color:var(--gold)">—</div><div class="score-lbl">Combo</div></div>
-    </div>
-    <div class="feedback-card" id="resultFeedback">Great timing!</div>
-    <div class="result-actions">
-      <button class="btn btn-game" id="continueBtn">Cook Again →</button>
-      <button class="btn btn-ghost" id="goHomeBtn">Back to Kitchen</button>
-    </div>
-  </div>
-
-  <!-- PROFILE SCREEN -->
-  <div class="screen" id="profileScreen">
-    <div class="prof-hero">
-      <div class="prof-av" id="profAv">D</div>
-      <div class="prof-name" id="profName">Chef Dev</div>
-      <div class="prof-rank" id="profRank">Apprentice</div>
-      <button class="btn btn-ghost btn-sm" id="renameBtn" style="margin-top:10px;width:auto">✏️ Change Handle</button>
-    </div>
-    <div class="stats-2x2">
-      <div class="stat-tile"><div class="stat-v" id="profCoins" style="color:var(--gold)">0</div><div class="stat-l">Coins</div></div>
-      <div class="stat-tile"><div class="stat-v" id="profXp" style="color:var(--pur)">0</div><div class="stat-l">Total XP</div></div>
-      <div class="stat-tile"><div class="stat-v" id="profProjects" style="color:var(--mint)">0</div><div class="stat-l">Cooked</div></div>
-      <div class="stat-tile"><div class="stat-v" id="profAvg" style="color:var(--fire)">—</div><div class="stat-l">Avg Stars</div></div>
-    </div>
-    <div class="prof-section">
-      <div class="gcard">
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--bd)">
-          <span style="font-size:13px;color:var(--t2)">🔥 Best Streak</span>
-          <span id="profStreak" style="font-family:var(--mono);font-size:15px;font-weight:700;color:var(--fire)">0 days</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--bd)">
-          <span style="font-size:13px;color:var(--t2)">📅 Joined</span>
-          <span id="profJoined" style="font-family:var(--mono);font-size:12px;color:var(--t2)">—</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0">
-          <span style="font-size:13px;color:var(--t2)">🏆 Level</span>
-          <span id="profLevel" style="font-family:var(--mono);font-size:15px;font-weight:700;color:var(--pur)">1</span>
-        </div>
-      </div>
-      <button class="btn btn-danger" id="resetBtn" style="margin-top:4px">Reset Progress</button>
-    </div>
-  </div>
-
-  <nav class="nav" id="nav" style="display:none">
-    <button class="nav-btn on" data-screen="dashboard">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      <span>Kitchen</span>
-    </button>
-    <button class="nav-btn" data-screen="game">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-      <span>Cook</span>
-    </button>
-    <button class="nav-btn" data-screen="profile">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      <span>Profile</span>
-    </button>
-  </nav>
+<!-- 3D Canvas -->
+<div id="canvas-container">
+  <canvas id="game-canvas"></canvas>
 </div>
 
+<!-- Code Area -->
+<div id="code-area">
+  <div id="tray-label">
+    <div class="tray-dot dot-red"></div>
+    <div class="tray-dot dot-yellow"></div>
+    <div class="tray-dot dot-green"></div>
+    <span>devkitchen.js — drag blocks to sequence</span>
+  </div>
+  <div id="blocks-container">
+    <!-- Available blocks -->
+    <div id="available-blocks">
+      <div id="available-label">// AVAILABLE</div>
+    </div>
+    <!-- Sequence area -->
+    <div id="sequence-area">
+      <div id="sequence-label">// SEQUENCE</div>
+      <div id="sequence-slots">
+        <div id="drop-hint">← drag blocks here</div>
+      </div>
+    </div>
+  </div>
+  <div id="bottom-bar">
+    <div id="status-text">// ready</div>
+    <button id="run-btn" onclick="runSequence()">▶ Run</button>
+  </div>
+</div>
+
+<!-- Overlay -->
+<div id="overlay">
+  <div id="overlay-box">
+    <div id="overlay-title">SUCCESS</div>
+    <div id="overlay-msg">Dish completed!</div>
+    <div id="overlay-error-code"></div>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button class="overlay-btn retry-btn" onclick="resetLevel()">↺ Retry</button>
+      <button class="overlay-btn next-btn" id="next-btn" onclick="nextLevel()">Next Level →</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-var CHEF_NAMES=['ByteWizard','NullPtr','AsyncChef','StackDevil','ForkBomb','DeadlockDan','LazyEval','CodeMaster','BitShifter','RaceCondition','SyntaxSage','HeapHero'];
-var RANKS=[{min:1,max:2,title:'Apprentice'},{min:3,max:5,title:'Sous Chef'},{min:6,max:9,title:'Head Chef'},{min:10,max:14,title:'Exec Chef'},{min:15,max:999,title:'Michelin ★'}];
-var DAILY_CHALLENGES=[
-  {icon:'💀',title:'No Fear',sub:'Ship a Hard project today',reward:'🪙 +200 bonus',key:'hard'},
-  {icon:'⚡',title:'Speed Chef',sub:'Cook any project in under 10 taps',reward:'🪙 +150 bonus',key:'any'},
-  {icon:'🎯',title:'Perfect Timing',sub:'Land in the sweet spot exactly',reward:'🪙 +250 bonus',key:'perfect'},
-  {icon:'🔥',title:'Full Combo',sub:'Use all 4 ingredients',reward:'🪙 +100 bonus',key:'combo'}
+// =============================================
+// GAME STATE
+// =============================================
+let currentLevel = 0;
+let isRunning = false;
+let chef, pan, cuttingBoard, ingredientMeshes = {};
+let scene, camera, renderer, animFrameId;
+let chefState = { x: 0, targetX: 0, y: 0.3, z: 0, action: 'idle' };
+let particleSystem = null;
+
+// =============================================
+// LEVEL DEFINITIONS
+// =============================================
+const LEVELS = [
+  {
+    name: '// LEVEL 1: FRIED RICE',
+    goal: 'Cook Fried Rice',
+    description: 'Arrange the steps in the correct order to cook fried rice.',
+    // All available blocks for this level
+    blocks: [
+      { id: 'heat_pan',    label: 'heat',   arg: 'pan',    type: 'basic' },
+      { id: 'add_oil',     label: 'add',    arg: 'oil',    type: 'basic' },
+      { id: 'chop_onion',  label: 'chop',   arg: 'onion',  type: 'basic' },
+      { id: 'add_onion',   label: 'add',    arg: 'onion',  type: 'basic' },
+      { id: 'add_rice',    label: 'add',    arg: 'rice',   type: 'basic' },
+      { id: 'stir_rice',   label: 'stir',   arg: 'rice',   type: 'basic' },
+    ],
+    // Correct answer sequence (block IDs in correct order)
+    solution: ['chop_onion', 'heat_pan', 'add_oil', 'add_onion', 'add_rice', 'stir_rice'],
+    // Validation rules: key must come before value
+    rules: [
+      { before: 'heat_pan',   after: 'add_oil',    error: 'TypeError: Cannot add oil to cold pan\n  at add(oil) — pan.temperature < MIN_TEMP' },
+      { before: 'add_oil',    after: 'add_onion',  error: 'TypeError: Cannot fry without oil\n  at add(onion) — oil is undefined' },
+      { before: 'add_onion',  after: 'add_rice',   error: 'ReferenceError: onion is undefined\n  at add(rice) — onion not in pan' },
+      { before: 'add_rice',   after: 'stir_rice',  error: 'ReferenceError: rice is undefined\n  at stir(rice) — rice not in pan' },
+      { before: 'chop_onion', after: 'add_onion',  error: 'TypeError: Cannot add whole onion\n  at add(onion) — onion.state !== "chopped"' },
+    ],
+  },
+  {
+    name: '// LEVEL 2: SPICY NOODLES',
+    goal: 'Cook Spicy Noodles',
+    description: 'Use the conditional block to handle the spice level correctly.',
+    blocks: [
+      { id: 'boil_water',  label: 'boil',   arg: 'water',  type: 'basic' },
+      { id: 'add_noodles', label: 'add',    arg: 'noodles',type: 'basic' },
+      { id: 'drain_water', label: 'drain',  arg: 'water',  type: 'basic' },
+      { id: 'if_spicy',    label: 'if',     arg: 'spicy → add(chili)', type: 'conditional' },
+      { id: 'add_sauce',   label: 'add',    arg: 'sauce',  type: 'basic' },
+      { id: 'toss_noodles',label: 'toss',   arg: 'noodles',type: 'basic' },
+    ],
+    solution: ['boil_water', 'add_noodles', 'drain_water', 'if_spicy', 'add_sauce', 'toss_noodles'],
+    rules: [
+      { before: 'boil_water',  after: 'add_noodles',  error: 'TypeError: Cannot cook noodles\n  at add(noodles) — water.state !== "boiling"' },
+      { before: 'add_noodles', after: 'drain_water',   error: 'TypeError: Noodles not ready\n  at drain(water) — noodles.done === false' },
+      { before: 'drain_water', after: 'if_spicy',      error: 'LogicError: Conditional must follow drain\n  at if(spicy) — context.noodles === wet' },
+      { before: 'if_spicy',    after: 'add_sauce',     error: 'ReferenceError: chili not applied\n  at add(sauce) — spice.level is undefined' },
+      { before: 'add_sauce',   after: 'toss_noodles',  error: 'TypeError: Cannot toss without sauce\n  at toss(noodles) — sauce is undefined' },
+    ],
+  },
+  {
+    name: '// LEVEL 3: PERFECT RISOTTO',
+    goal: 'Cook Perfect Risotto',
+    description: 'Use the loop block to stir the risotto the right number of times.',
+    blocks: [
+      { id: 'heat_broth',  label: 'heat',   arg: 'broth',  type: 'basic' },
+      { id: 'saute_onion', label: 'saute',  arg: 'onion',  type: 'basic' },
+      { id: 'add_rice2',   label: 'add',    arg: 'rice',   type: 'basic' },
+      { id: 'add_wine',    label: 'add',    arg: 'wine',   type: 'basic' },
+      { id: 'repeat_stir', label: 'repeat', arg: 'stir × 3', type: 'loop' },
+      { id: 'add_cheese',  label: 'add',    arg: 'parmesan', type: 'basic' },
+    ],
+    solution: ['heat_broth', 'saute_onion', 'add_rice2', 'add_wine', 'repeat_stir', 'add_cheese'],
+    rules: [
+      { before: 'heat_broth',  after: 'saute_onion', error: 'TypeError: Cannot saute without warm broth\n  at saute(onion) — broth.temp < OPTIMAL' },
+      { before: 'saute_onion', after: 'add_rice2',   error: 'TypeError: Base not prepared\n  at add(rice) — onion.state !== "sauteed"' },
+      { before: 'add_rice2',   after: 'add_wine',    error: 'LogicError: Rice must be added first\n  at add(wine) — rice not in pan' },
+      { before: 'add_wine',    after: 'repeat_stir', error: 'TypeError: Wine must be added before stirring\n  at repeat(stir,3) — wine.absorbed === false' },
+      { before: 'repeat_stir', after: 'add_cheese',  error: 'TypeError: Risotto not creamy\n  at add(parmesan) — stir.count < 3' },
+    ],
+  }
 ];
-var PROJECT_TYPES=[
-  {name:'Viral Idle Game',icon:'🎮',tag:'Starter',difficulty:'Easy',reward:'⭐',requirements:{idea:30,code:40,design:20,hype:10}},
-  {name:'SaaS Dashboard',icon:'📊',tag:'Funded',difficulty:'Medium',reward:'⭐⭐',requirements:{idea:20,code:50,design:20,hype:10}},
-  {name:'AI Chatbot',icon:'🤖',tag:'Hyped',difficulty:'Hard',reward:'⭐⭐⭐',requirements:{idea:40,code:35,design:15,hype:10}},
-  {name:'Portfolio Site',icon:'🎨',tag:'Personal',difficulty:'Easy',reward:'⭐',requirements:{idea:25,code:20,design:45,hype:10}},
-  {name:'Crypto Tracker',icon:'📈',tag:'Web3',difficulty:'Medium',reward:'⭐⭐',requirements:{idea:15,code:45,design:25,hype:15}},
-  {name:'Social App',icon:'💬',tag:'Ambitious',difficulty:'Hard',reward:'⭐⭐⭐',requirements:{idea:35,code:30,design:20,hype:15}},
-  {name:'Dev CLI Tool',icon:'⌨️',tag:'Niche',difficulty:'Medium',reward:'⭐⭐',requirements:{idea:25,code:55,design:10,hype:10}},
-  {name:'Browser Extension',icon:'🔌',tag:'Quick',difficulty:'Easy',reward:'⭐',requirements:{idea:20,code:50,design:20,hype:10}}
-];
-var FEEDBACKS={
-  perfect:['Flawless. 500 GitHub stars overnight.','Perfect timing — Product Hunt #1 of the day.','You nailed it. Ship it again tomorrow.'],
-  good:['Solid launch. Devs are sharing it on X.','Nice work! A few rough edges but it ships.','Good execution. The community is responding.'],
-  okay:['It shipped. Iterate fast.','Decent MVP. Keep cooking.','Not bad. The repo has a few early stars.'],
-  poor:['Overcooked — timing was off.','Undercooked — ship earlier next time.','The README confused everyone.'],
-  failed:['Deploy failed. Exception at runtime.','Too many bugs. GitHub issues incoming.','npm run deploy failed. Back to the terminal.']
-};
-var HEAT_STAGES=[{pct:0,lbl:'COLD',color:'var(--mint)'},{pct:35,lbl:'WARM',color:'var(--gold)'},{pct:65,lbl:'HOT 🌶',color:'var(--fire)'},{pct:85,lbl:'CRITICAL 🚨',color:'var(--red)'}];
 
-var state={user:null,projects:[],milestones:{'first-project':false,'reach-level-5':false,'earn-1000':false,'perfect-rating':false,'streak-3':false,'hard-project':false},streak:0,lastCook:null,comboBonus:0,dailyDone:false,dailyKey:null,currentProject:null,selectedType:null,ingredientsSelected:{idea:0,code:0,design:0,hype:0},cookState:'idle'};
-var cookingInterval=null,timingInterval=null,bugTimeout=null,overheatInterval=null;
-var timingPos=0,timingDir=1,heatLevel=0,bugCount=0;
+// =============================================
+// 3D SCENE SETUP
+// =============================================
+function initScene() {
+  const canvas = document.getElementById('game-canvas');
+  const container = document.getElementById('canvas-container');
 
-function getRank(lv){for(var i=RANKS.length-1;i>=0;i--)if(lv>=RANKS[i].min)return RANKS[i].title;return'Apprentice'}
-function getLevel(xp){return Math.floor(xp/100)+1}
-function getXpInLevel(xp){return xp%100}
-function genId(){return Date.now().toString(36)+Math.random().toString(36).substr(2)}
-function save(){localStorage.setItem('dk2_u',JSON.stringify(state.user));localStorage.setItem('dk2_p',JSON.stringify(state.projects));localStorage.setItem('dk2_m',JSON.stringify(state.milestones));localStorage.setItem('dk2_sk',JSON.stringify({streak:state.streak,lastCook:state.lastCook,dailyDone:state.dailyDone,dailyKey:state.dailyKey}))}
-function load(){var u=localStorage.getItem('dk2_u');var p=localStorage.getItem('dk2_p');var m=localStorage.getItem('dk2_m');var sk=localStorage.getItem('dk2_sk');if(u){state.user=JSON.parse(u);state.projects=p?JSON.parse(p):[];state.milestones=m?JSON.parse(m):state.milestones;if(sk){var s=JSON.parse(sk);state.streak=s.streak||0;state.lastCook=s.lastCook||null;state.dailyDone=s.dailyDone||false;state.dailyKey=s.dailyKey||null}}checkStreak();return!!state.user}
-function checkStreak(){var today=new Date().toDateString();if(state.lastCook&&state.lastCook!==today){var yest=new Date(Date.now()-86400000).toDateString();if(state.lastCook!==yest)state.streak=0}}
-function bumpStreak(){var today=new Date().toDateString();if(state.lastCook===today)return;var yest=new Date(Date.now()-86400000).toDateString();state.streak=state.lastCook===yest?state.streak+1:1;state.lastCook=today;if(!state.user.bestStreak||state.streak>state.user.bestStreak)state.user.bestStreak=state.streak;save()}
-function initUser(name){state.user={id:genId(),username:name,xp:0,coins:150,createdAt:new Date().toISOString(),bestStreak:0};state.projects=[];save()}
+  // Scene
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xfff3e0);
+  scene.fog = new THREE.Fog(0xfff3e0, 12, 22);
 
-var screens$={dashboard:document.getElementById('dashScreen'),projectSelect:document.getElementById('projectSelectScreen'),game:document.getElementById('gameScreen'),result:document.getElementById('resultScreen'),profile:document.getElementById('profileScreen')};
-function go(name){Object.values(screens$).forEach(function(s){s.classList.remove('active')});screens$[name].classList.add('active');document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.toggle('on',b.dataset.screen===name)});if(name==='dashboard')refreshDash();if(name==='profile')refreshProfile()}
-var toast=document.getElementById('toast');
-function showToast(msg,type){type=type||'success';toast.textContent=msg;toast.className='toast '+type+' show';setTimeout(function(){toast.classList.remove('show')},2500)}
-function refreshHud(){if(!state.user)return;var lv=getLevel(state.user.xp);document.getElementById('hudAvatar').textContent=state.user.username[0].toUpperCase();document.getElementById('hudName').textContent=state.user.username;document.getElementById('hudRank').textContent=getRank(lv).toUpperCase();document.getElementById('hudCoins').textContent=state.user.coins.toLocaleString();document.getElementById('hudLevel').textContent='LV'+lv;var xi=getXpInLevel(state.user.xp);document.getElementById('hudXpFill').style.width=(xi)+'%'}
-function refreshDash(){if(!state.user)return;refreshHud();refreshStreak();var today=new Date().toDateString();var dc=DAILY_CHALLENGES[new Date().getDay()%DAILY_CHALLENGES.length];if(!state.dailyKey||state.dailyKey!==today+'_'+dc.key){state.dailyDone=false;state.dailyKey=today+'_'+dc.key}document.getElementById('dailyIcon').textContent=state.dailyDone?'✅':dc.icon;document.getElementById('dailyTitle').textContent=state.dailyDone?'Daily Complete!':dc.title;document.getElementById('dailySub').textContent=state.dailyDone?'Great work, come back tomorrow!':dc.sub;document.getElementById('dailyReward').textContent=state.dailyDone?'Claimed':'Reward: '+dc.reward;var rc=document.getElementById('recentProjects');var recent=state.projects.slice(-3).reverse();if(!recent.length){rc.innerHTML='<div class="gcard" style="text-align:center;padding:22px"><p style="color:var(--t3);font-size:13px;font-weight:600">No projects yet.<br>Start your first cook!</p></div>'}else{rc.innerHTML=recent.map(function(p){var c=p.rating>=4?'var(--mint)':p.rating>=3?'var(--gold)':'var(--red)';var stars='★'.repeat(p.rating)+'☆'.repeat(5-p.rating);return'<div class="proj-row"><div class="proj-ico" style="background:'+c+';opacity:0.15">'+p.icon+'</div><div class="proj-detail"><div class="proj-name">'+p.name+'</div><div class="proj-date">'+new Date(p.date).toLocaleDateString()+'</div></div><div class="proj-stars" style="color:var(--gold)">'+stars+'</div></div>'}).join('')}refreshMilestones()}
-function refreshStreak(){document.getElementById('streakN').textContent=state.streak||0;var dots=document.getElementById('streakDots');dots.innerHTML='';for(var i=0;i<7;i++){var d=document.createElement('div');d.className='sd'+(i<state.streak?' on':'');dots.appendChild(d)}}
-function refreshMilestones(){if(!state.user)return;var lv=getLevel(state.user.xp);document.querySelectorAll('#milestones .ms-row').forEach(function(row){var id=row.dataset.id;var done=false;if(id==='first-project')done=state.projects.length>=1;if(id==='reach-level-5')done=lv>=5;if(id==='earn-1000')done=state.user.coins>=1000;if(id==='perfect-rating')done=state.projects.some(function(p){return p.rating===5});if(id==='streak-3')done=state.streak>=3;if(id==='hard-project')done=state.projects.some(function(p){return p.difficulty==='Hard'});if(done&&!state.milestones[id]){state.milestones[id]=true;save();showToast('🏆 Achievement: '+row.querySelector('.ms-name').textContent,'gold')}row.classList.toggle('done',done);var ck=row.querySelector('.ms-ck');if(ck)ck.textContent=done?'✓':'○'})}
-function refreshProfile(){if(!state.user)return;var lv=getLevel(state.user.xp);document.getElementById('profAv').textContent=state.user.username[0].toUpperCase();document.getElementById('profName').textContent=state.user.username;document.getElementById('profRank').textContent=getRank(lv);document.getElementById('profLevel').textContent=lv;document.getElementById('profCoins').textContent=state.user.coins.toLocaleString();document.getElementById('profXp').textContent=state.user.xp.toLocaleString();document.getElementById('profProjects').textContent=state.projects.length;document.getElementById('profJoined').textContent=new Date(state.user.createdAt).toLocaleDateString();document.getElementById('profStreak').textContent=(state.user.bestStreak||0)+' days';var avg=state.projects.length?state.projects.reduce(function(s,p){return s+p.rating},0)/state.projects.length:null;document.getElementById('profAvg').textContent=avg?avg.toFixed(1):'—'}
+  // Camera — isometric-style perspective
+  camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 50);
+  camera.position.set(0, 5, 7);
+  camera.lookAt(0, 0, 0);
 
-/* INIT WITHOUT LOGIN */
-function startApp(){if(load()){showApp()}else{document.getElementById('nameModal').classList.add('show')}}
-function showApp(){document.getElementById('hud').style.display='flex';document.getElementById('nav').style.display='flex';go('dashboard')}
-document.getElementById('nameConfirmBtn').addEventListener('click',function(){var n=document.getElementById('nameInput').value.trim();if(!n){var rn=CHEF_NAMES[Math.floor(Math.random()*CHEF_NAMES.length)];n=rn}initUser(n);document.getElementById('nameModal').classList.remove('show');showToast('Welcome, '+n+'! 🍳');showApp()});
-document.getElementById('nameInput').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('nameConfirmBtn').click()});
-document.getElementById('hudAvatar').addEventListener('click',function(){document.getElementById('nameInput').value=state.user?state.user.username:'';document.getElementById('nameModal').classList.add('show')});
-document.getElementById('renameBtn').addEventListener('click',function(){document.getElementById('nameInput').value=state.user?state.user.username:'';document.getElementById('nameModal').classList.add('show')});
-document.getElementById('nameModal').addEventListener('click',function(e){if(e.target===this&&state.user)this.classList.remove('show')});
+  // Renderer
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setSize(container.clientWidth, container.clientHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-/* NAV */
-document.querySelectorAll('.nav-btn').forEach(function(btn){btn.addEventListener('click',function(){var s=btn.dataset.screen;if(s==='game')go('projectSelect');else go(s)})});
-document.getElementById('startBtn').addEventListener('click',function(){go('projectSelect')});
-document.getElementById('backBtn').addEventListener('click',function(){go('dashboard')});
+  // Lighting
+  const ambient = new THREE.AmbientLight(0xfff5e0, 0.7);
+  scene.add(ambient);
 
-/* PROJECT SELECT */
-function initRecipes(){var g=document.getElementById('recipeGrid');g.innerHTML=PROJECT_TYPES.map(function(p,i){var dc=p.difficulty==='Hard'?'diff-h':p.difficulty==='Medium'?'diff-m':'diff-e';return'<div class="recipe-card" data-i="'+i+'"><div class="recipe-rew">'+p.reward+'</div><span class="recipe-ico">'+p.icon+'</span><div class="recipe-name">'+p.name+'</div><div class="recipe-tag">'+p.tag+'</div><br><span class="diff-pill '+dc+'">'+p.difficulty+'</span></div>'}).join('');g.querySelectorAll('.recipe-card').forEach(function(card){card.addEventListener('click',function(){g.querySelectorAll('.recipe-card').forEach(function(c){c.classList.remove('on')});card.classList.add('on');state.selectedType=PROJECT_TYPES[parseInt(card.dataset.i)];var cb=document.getElementById('confirmBtn');cb.style.opacity='1';cb.style.pointerEvents='auto';cb.textContent='Cook This Project →'})})}
-document.getElementById('confirmBtn').addEventListener('click',function(){if(!state.selectedType)return;startGame(state.selectedType)});
+  const dirLight = new THREE.DirectionalLight(0xfff0d0, 1.0);
+  dirLight.position.set(5, 8, 5);
+  dirLight.castShadow = true;
+  dirLight.shadow.mapSize.width = 512;
+  dirLight.shadow.mapSize.height = 512;
+  dirLight.shadow.camera.near = 0.5;
+  dirLight.shadow.camera.far = 30;
+  dirLight.shadow.camera.left = -8;
+  dirLight.shadow.camera.right = 8;
+  dirLight.shadow.camera.top = 8;
+  dirLight.shadow.camera.bottom = -8;
+  scene.add(dirLight);
 
-/* SPAWN EFFECTS */
-function createParticles(){var c=document.getElementById('particles');var cols=['rgba(255,87,34,0.5)','rgba(168,85,247,0.5)','rgba(255,215,0,0.4)','rgba(0,232,150,0.4)'];for(var i=0;i<16;i++){var p=document.createElement('div');p.className='p';p.style.left=Math.random()*100+'%';var s=Math.random()*3+1.5;p.style.width=s+'px';p.style.height=s+'px';p.style.background=cols[Math.floor(Math.random()*cols.length)];p.style.animationDuration=(Math.random()*12+10)+'s';p.style.animationDelay=(Math.random()*12)+'s';c.appendChild(p)}}
-function spawnDots(x,y,col,n){var c=document.getElementById('app');for(var i=0;i<n;i++){var d=document.createElement('div');d.className='pdot';d.style.left=x+'px';d.style.top=y+'px';d.style.background=col;d.style.setProperty('--tx',(Math.random()-0.5)*100+'px');d.style.setProperty('--ty',(Math.random()-0.5)*100+'px');c.appendChild(d);setTimeout(function(){d.remove()},660)}}
-function spawnConfetti(){var c=document.getElementById('app');var cols=['#FF5722','#A855F7','#FFD700','#00E896','#FF3333'];for(var i=0;i<30;i++){var p=document.createElement('div');p.className='cf';p.style.left=Math.random()*100+'%';p.style.top='-8px';p.style.background=cols[i%cols.length];var s=Math.random()*7+3;p.style.width=s+'px';p.style.height=s+'px';p.style.borderRadius=Math.random()>0.5?'50%':'2px';p.style.animationDelay=(Math.random()*0.5)+'s';p.style.animationDuration=(Math.random()*0.9+1.4)+'s';c.appendChild(p);setTimeout(function(){p.remove()},2300)}}
-function spawnXp(x,y,v){var c=document.getElementById('app');var el=document.createElement('div');el.className='xpf';el.textContent='+'+v+' XP';el.style.left=x+'px';el.style.top=y+'px';c.appendChild(el);setTimeout(function(){el.remove()},1250)}
-function spawnComboAnim(){var fw=document.querySelector('.forge-wrap');if(!fw)return;var el=document.createElement('div');el.className='combo-anim';el.textContent=state.comboBonus===25?'✨ FULL COMBO +25%!':'🔥 COMBO +'+state.comboBonus+'%';fw.appendChild(el);setTimeout(function(){el.remove()},1050)}
+  const fillLight = new THREE.PointLight(0xffd080, 0.5, 12);
+  fillLight.position.set(-3, 4, 2);
+  scene.add(fillLight);
 
-/* GAME LOGIC */
-function getDiffClass(d){return d==='Hard'?'diff-h':d==='Medium'?'diff-m':'diff-e'}
-function getDiffMult(d){return d==='Hard'?1.6:d==='Medium'?1.25:1}
-function startGame(pt){state.currentProject={name:pt.name,icon:pt.icon,requirements:pt.requirements,difficulty:pt.difficulty};state.ingredientsSelected={idea:0,code:0,design:0,hype:0};state.cookState='selecting';state.comboBonus=0;bugCount=0;heatLevel=0;document.getElementById('projectName').textContent=pt.name;var dt=document.getElementById('diffTag');dt.textContent=pt.difficulty;dt.className='diff-pill '+getDiffClass(pt.difficulty);document.getElementById('reqIdea').style.width=pt.requirements.idea+'%';document.getElementById('reqCode').style.width=pt.requirements.code+'%';document.getElementById('reqDesign').style.width=pt.requirements.design+'%';document.getElementById('reqHype').style.width=pt.requirements.hype+'%';document.getElementById('reqIdeaVal').textContent=pt.requirements.idea+'%';document.getElementById('reqCodeVal').textContent=pt.requirements.code+'%';document.getElementById('reqDesignVal').textContent=pt.requirements.design+'%';document.getElementById('reqHypeVal').textContent=pt.requirements.hype+'%';document.getElementById('cookingPan').classList.remove('hot');document.getElementById('panContent').innerHTML='<div class="forge-t">Drop ingredients</div><div class="forge-h">into the forge</div>';document.getElementById('timingContainer').style.display='none';document.getElementById('overheatContainer').style.display='none';document.getElementById('bugAlert').style.display='none';['idea','code','design','hype'].forEach(function(t){document.getElementById('ing'+t.charAt(0).toUpperCase()+t.slice(1)).textContent='×0';document.getElementById('gem'+t.charAt(0).toUpperCase()+t.slice(1)).classList.remove('on')});document.getElementById('comboTxt').textContent='No combo';document.getElementById('comboTxt').classList.remove('active');document.getElementById('cookBtn').style.opacity='0.45';document.getElementById('cookBtn').style.pointerEvents='none';document.getElementById('cookBtn').textContent='Add ingredients first';go('game')}
-function updateIngUI(){var sel=state.ingredientsSelected;var types=0;['idea','code','design','hype'].forEach(function(t){var cap=t.charAt(0).toUpperCase()+t.slice(1);document.getElementById('ing'+cap).textContent='×'+(sel[t]/10);var on=sel[t]>0;document.getElementById('gem'+cap).classList.toggle('on',on);if(on)types++});var oldBonus=state.comboBonus;state.comboBonus=types===4?25:types===3?10:0;var ct=document.getElementById('comboTxt');ct.textContent=state.comboBonus>0?'+'+state.comboBonus+'% combo':'No combo';ct.classList.toggle('active',state.comboBonus>0);if(state.comboBonus>oldBonus&&state.comboBonus>0)spawnComboAnim();var total=sel.idea+sel.code+sel.design+sel.hype;var cb=document.getElementById('cookBtn');if(total>=10){cb.style.opacity='1';cb.style.pointerEvents='auto';cb.textContent=state.comboBonus>0?'🍳 Fire it up! (+'+state.comboBonus+'% combo)':'🍳 Fire it up'}else{cb.style.opacity='0.45';cb.style.pointerEvents='none';cb.textContent='Add ingredients ('+total+'/10)'}var pan=document.getElementById('panContent');if(total===0){pan.innerHTML='<div class="forge-t">Drop ingredients</div><div class="forge-h">into the forge</div>';return}var h='<div class="pan-ings">';var t2=state.ingredientsSelected;for(var i=0;i<t2.idea/10;i++)h+='<span class="pan-i">💡</span>';for(var i=0;i<t2.code/10;i++)h+='<span class="pan-i">💻</span>';for(var i=0;i<t2.design/10;i++)h+='<span class="pan-i">🎨</span>';for(var i=0;i<t2.hype/10;i++)h+='<span class="pan-i">🔥</span>';h+='</div>';pan.innerHTML=h}
-document.querySelectorAll('.ing-gem').forEach(function(gem){gem.addEventListener('click',function(){if(state.cookState!=='selecting')return;var t=gem.dataset.type;state.ingredientsSelected[t]+=10;gem.classList.add('flash');setTimeout(function(){gem.classList.remove('flash')},200);var rect=gem.getBoundingClientRect();var ar=document.getElementById('app').getBoundingClientRect();var col=t==='idea'?'var(--pur)':t==='code'?'var(--mint)':t==='design'?'#B8AAFF':'var(--gold)';spawnDots(rect.left-ar.left+rect.width/2,rect.top-ar.top+rect.height/2,col,5);updateIngUI()})});
-document.getElementById('cookBtn').addEventListener('click',function(){if(state.cookState!=='selecting')return;startCookingPhase()});
-document.getElementById('cancelBtn').addEventListener('click',function(){clearAll();go('dashboard')});
-function clearAll(){if(cookingInterval){clearInterval(cookingInterval);cookingInterval=null}if(timingInterval){clearInterval(timingInterval);timingInterval=null}if(bugTimeout){clearTimeout(bugTimeout);bugTimeout=null}if(overheatInterval){clearInterval(overheatInterval);overheatInterval=null}}
-function updateHeatUI(){var stage=HEAT_STAGES[0];for(var i=HEAT_STAGES.length-1;i>=0;i--)if(heatLevel>=HEAT_STAGES[i].pct){stage=HEAT_STAGES[i];break}var hs=document.getElementById('heatStatus');hs.textContent=stage.lbl;hs.style.color=stage.color}
-function startCookingPhase(){state.cookState='cooking';document.getElementById('cookingPan').classList.add('hot');document.getElementById('cookBtn').style.display='none';document.getElementById('overheatContainer').style.display='block';overheatInterval=setInterval(function(){heatLevel+=2;document.getElementById('overheatFill').style.width=heatLevel+'%';updateHeatUI();if(heatLevel>=100){clearAll();showFailure('Overheated! Deploy cancelled.')}},300);scheduleBug();setTimeout(function(){if(state.cookState==='cooking')startTimingPhase()},3000)}
-function scheduleBug(){if(state.cookState!=='cooking'&&state.cookState!=='timing')return;bugTimeout=setTimeout(function(){if(state.cookState==='cooking'||state.cookState==='timing')showBug()},Math.random()*2000+1500)}
-function showBug(){var al=document.getElementById('bugAlert');al.style.display='block';al.style.animation='none';al.offsetHeight;al.style.animation='bpop 0.4s ease';document.getElementById('app').classList.add('shake');setTimeout(function(){document.getElementById('app').classList.remove('shake')},360);bugCount++;setTimeout(function(){if(al.style.display==='block'){al.style.display='none';heatLevel+=15;document.getElementById('overheatFill').style.width=heatLevel+'%';updateHeatUI();showToast('Bug ignored! Heat +15%','error');if(heatLevel<100)scheduleBug()}},2000)}
-document.getElementById('bugAlert').addEventListener('click',function(){this.style.display='none';heatLevel=Math.max(0,heatLevel-12);document.getElementById('overheatFill').style.width=heatLevel+'%';updateHeatUI();showToast('Bug squashed! 🔧');spawnDots(215,300,'var(--mint)',7);if(state.cookState==='cooking'||state.cookState==='timing')scheduleBug()});
-function startTimingPhase(){state.cookState='timing';document.getElementById('timingContainer').style.display='block';document.getElementById('panContent').innerHTML='<div class="forge-t" style="font-size:12px;font-weight:800;color:var(--t)">TAP TO SHIP! 🚀</div>';timingPos=0;timingDir=1;var spd=1.8+(state.currentProject.difficulty==='Hard'?1.2:state.currentProject.difficulty==='Medium'?0.6:0);timingInterval=setInterval(function(){timingPos+=timingDir*spd;if(timingPos>=100){timingPos=100;timingDir=-1}if(timingPos<=0){timingPos=0;timingDir=1}document.getElementById('timingIndicator').style.left=timingPos+'%'},30);function stop(){if(state.cookState!=='timing')return;clearAll();document.getElementById('app').removeEventListener('click',stop);evalTiming()}document.getElementById('app').addEventListener('click',stop)}
-function evalTiming(){var p=timingPos;var r;if(p>=30&&p<=50)r='perfect';else if(p>=20&&p<=60)r='good';else if(p>=10&&p<=70)r='okay';else r='poor';if(bugCount>2)r='failed';if(heatLevel>80)r='failed';calcResult(r)}
-function showFailure(msg){document.getElementById('glitchOv').style.display='block';setTimeout(function(){document.getElementById('glitchOv').style.display='none'},280);document.getElementById('app').classList.add('shake');setTimeout(function(){document.getElementById('app').classList.remove('shake')},380);showToast(msg,'error');calcResult('failed')}
-function calcResult(tr){state.cookState='result';var req=state.currentProject.requirements;var sel=state.ingredientsSelected;var tot=sel.idea+sel.code+sel.design+sel.hype;var bal=tot>0?Math.max(0,100-(Math.abs(sel.idea/tot*100-req.idea)+Math.abs(sel.code/tot*100-req.code)+Math.abs(sel.design/tot*100-req.design)+Math.abs(sel.hype/tot*100-req.hype))/4):0;var dm=getDiffMult(state.currentProject.difficulty||'Easy');var rating,coins,xp,users;if(tr==='failed'){rating=1;coins=10;xp=5;users=Math.floor(Math.random()*50)}else if(tr==='perfect'){rating=5;coins=Math.floor((100+bal)*dm);xp=Math.floor((50+bal/2)*dm);users=Math.floor((1000+Math.random()*2000)*dm)}else if(tr==='good'){rating=4;coins=Math.floor((70+bal*0.7)*dm);xp=Math.floor((35+bal/3)*dm);users=Math.floor((500+Math.random()*1000)*dm)}else if(tr==='okay'){rating=3;coins=Math.floor((40+bal*0.5)*dm);xp=Math.floor((20+bal/4)*dm);users=Math.floor((200+Math.random()*300)*dm)}else{rating=2;coins=20;xp=10;users=50+Math.floor(Math.random()*100);}
-/* daily challenge bonus */
-var today=new Date().toDateString();var dc=DAILY_CHALLENGES[new Date().getDay()%DAILY_CHALLENGES.length];var dailyBonus=0;if(!state.dailyDone){var match=(dc.key==='hard'&&state.currentProject.difficulty==='Hard')||(dc.key==='any'&&tr!=='failed')||(dc.key==='perfect'&&tr==='perfect')||(dc.key==='combo'&&state.comboBonus>0);if(match){dailyBonus=200;state.dailyDone=true;showToast('📅 Daily Complete! +200 coins','gold')}}
-if(state.comboBonus>0){coins=Math.floor(coins*(1+state.comboBonus/100));xp=Math.floor(xp*(1+state.comboBonus/100))}
-coins+=dailyBonus;
-var fb=FEEDBACKS[tr][Math.floor(Math.random()*FEEDBACKS[tr].length)];if(bal>80&&tr!=='failed')fb+=' Perfect ingredient balance!';else if(bal<50&&tr!=='failed')fb+=' Fix your ingredient mix next time.';if(bugCount>0)fb+=' ('+bugCount+' bugs handled)';showResultScreen({rating:rating,coins:coins,xp:xp,users:users,feedback:fb,timing:tr,combo:state.comboBonus,dailyBonus:dailyBonus})}
-function showResultScreen(r){var proj={id:genId(),name:state.currentProject.name,icon:state.currentProject.icon,difficulty:state.currentProject.difficulty,rating:r.rating,coins:r.coins,xp:r.xp,users:r.users,date:new Date().toISOString()};state.projects.push(proj);bumpStreak();var oldLv=getLevel(state.user.xp);state.user.coins+=r.coins;state.user.xp+=r.xp;var newLv=getLevel(state.user.xp);var leveled=newLv>oldLv;save();
-var icon=r.rating>=4?'🚀':r.rating>=3?'✅':r.rating>=2?'😬':'💥';document.getElementById('resultIcon').textContent=icon;document.getElementById('resultIcon').style.animation='none';document.getElementById('resultIcon').offsetHeight;document.getElementById('resultIcon').style.animation='heroIn 0.5s cubic-bezier(0.34,1.56,0.64,1)';document.getElementById('resultTitle').textContent=r.rating>=4?'Shipped! 🎉':r.rating>=3?'Launched!':'Needs Work...';document.getElementById('resultSubtitle').textContent=r.rating>=4?'Your project is trending':r.rating>=3?'Live on the internet':'Iterate and try again';document.getElementById('resultCoins').textContent='+'+r.coins.toLocaleString();document.getElementById('resultXp').textContent='+'+r.xp.toLocaleString();document.getElementById('resultUsers').textContent=r.users.toLocaleString();document.getElementById('resultCombo').textContent=r.combo>0?'+'+r.combo+'%':'—';document.getElementById('resultFeedback').textContent=r.feedback;var rub=document.getElementById('rankUpBanner');if(leveled){rub.style.display='block';document.getElementById('rankUpTitle').textContent=getRank(newLv);var lf=document.getElementById('lvlFlash');lf.style.display='block';lf.style.animation='none';lf.offsetHeight;lf.style.animation='lvlup 0.6s ease-out forwards';setTimeout(function(){lf.style.display='none'},650)}else{rub.style.display='none'}document.querySelectorAll('#starRating .star').forEach(function(s,i){s.classList.remove('on','pop');if(i<r.rating){setTimeout(function(){s.classList.add('on','pop')},i*130)}});if(r.rating>=4){spawnConfetti();var ri=document.getElementById('resultIcon');var ar=document.getElementById('app').getBoundingClientRect();var rr=ri.getBoundingClientRect();spawnXp(rr.left-ar.left+28,rr.top-ar.top,r.xp)}go('result')}
-document.getElementById('continueBtn').addEventListener('click',function(){state.cookState='idle';state.ingredientsSelected={idea:0,code:0,design:0,hype:0};state.currentProject=null;document.getElementById('cookBtn').style.display='block';go('projectSelect')});
-document.getElementById('goHomeBtn').addEventListener('click',function(){state.cookState='idle';state.ingredientsSelected={idea:0,code:0,design:0,hype:0};state.currentProject=null;document.getElementById('cookBtn').style.display='block';go('dashboard')});
-document.getElementById('resetBtn').addEventListener('click',function(){if(confirm('Reset all progress? This cannot be undone.')){localStorage.removeItem('dk2_u');localStorage.removeItem('dk2_p');localStorage.removeItem('dk2_m');localStorage.removeItem('dk2_sk');location.reload()}});
-createParticles();
-initRecipes();
-startApp();
+  buildKitchen();
+  buildChef();
+  startRenderLoop();
+
+  window.addEventListener('resize', onResize);
+}
+
+// Build the 3D kitchen from primitives
+function buildKitchen() {
+  const mat = (color) => new THREE.MeshLambertMaterial({ color });
+
+  // Floor
+  const floor = new THREE.Mesh(
+    new THREE.PlaneGeometry(14, 12),
+    new THREE.MeshLambertMaterial({ color: 0xd4a96a })
+  );
+  floor.rotation.x = -Math.PI / 2;
+  floor.receiveShadow = true;
+  scene.add(floor);
+
+  // Floor tiles
+  for (let i = -3; i <= 3; i++) {
+    for (let j = -2; j <= 2; j++) {
+      if ((i + j) % 2 === 0) {
+        const tile = new THREE.Mesh(
+          new THREE.PlaneGeometry(1.98, 1.98),
+          new THREE.MeshLambertMaterial({ color: 0xc49050 })
+        );
+        tile.rotation.x = -Math.PI / 2;
+        tile.position.set(i * 2, 0.001, j * 2);
+        scene.add(tile);
+      }
+    }
+  }
+
+  // Back wall
+  const wall = new THREE.Mesh(new THREE.BoxGeometry(14, 4, 0.2), mat(0xe8d5b0));
+  wall.position.set(0, 2, -4);
+  wall.receiveShadow = true;
+  scene.add(wall);
+
+  // Counter (main)
+  const counter = new THREE.Mesh(new THREE.BoxGeometry(10, 0.2, 2), mat(0xc8a87a));
+  counter.position.set(0, 0.9, -2.5);
+  counter.castShadow = true; counter.receiveShadow = true;
+  scene.add(counter);
+
+  // Counter body
+  const counterBody = new THREE.Mesh(new THREE.BoxGeometry(10, 0.9, 2), mat(0x8b6340));
+  counterBody.position.set(0, 0.45, -2.5);
+  counterBody.castShadow = true;
+  scene.add(counterBody);
+
+  // Stove
+  const stove = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.05, 1.4), mat(0x555577));
+  stove.position.set(-2, 1.02, -2.5);
+  stove.castShadow = true;
+  scene.add(stove);
+
+  // Burners
+  for (let bx of [-2.5, -1.5]) {
+    const burner = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.28, 0.28, 0.05, 12),
+      new THREE.MeshLambertMaterial({ color: 0x333344 })
+    );
+    burner.position.set(bx, 1.05, -2.5);
+    scene.add(burner);
+  }
+
+  // Pan
+  const panGroup = new THREE.Group();
+  const panBase = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.45, 0.4, 0.12, 16),
+    new THREE.MeshLambertMaterial({ color: 0x222233 })
+  );
+  const panHandle = new THREE.Mesh(
+    new THREE.BoxGeometry(0.6, 0.07, 0.1),
+    new THREE.MeshLambertMaterial({ color: 0x1a1a22 })
+  );
+  panHandle.position.set(0.7, 0, 0);
+  panGroup.add(panBase);
+  panGroup.add(panHandle);
+  panGroup.position.set(-2.5, 1.12, -2.5);
+  pan = panGroup;
+  scene.add(panGroup);
+
+  // Cutting board
+  cuttingBoard = new THREE.Mesh(
+    new THREE.BoxGeometry(1.2, 0.06, 0.8),
+    new THREE.MeshLambertMaterial({ color: 0xa0724a })
+  );
+  cuttingBoard.position.set(1.5, 1.01, -2.5);
+  cuttingBoard.castShadow = true;
+  scene.add(cuttingBoard);
+
+  // Ingredient bins
+  const binColors = [0xe74c3c, 0xf39c12, 0x27ae60, 0x8e44ad];
+  const binLabels = ['chili', 'oil', 'veg', 'spice'];
+  for (let i = 0; i < 4; i++) {
+    const bin = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.2, 0.18, 0.35, 10),
+      new THREE.MeshLambertMaterial({ color: binColors[i] })
+    );
+    bin.position.set(-4 + i * 0.6, 1.1, -3.6);
+    bin.castShadow = true;
+    scene.add(bin);
+  }
+
+  // Shelf / cabinet
+  const shelf = new THREE.Mesh(new THREE.BoxGeometry(10, 0.12, 0.5), mat(0x7d5a3c));
+  shelf.position.set(0, 2.8, -3.8);
+  scene.add(shelf);
+
+  // Cabinet items — pots on shelf
+  for (let i = -2; i <= 2; i++) {
+    const pot = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.18, 0.15, 0.3, 10),
+      new THREE.MeshLambertMaterial({ color: i % 2 === 0 ? 0x888899 : 0x556677 })
+    );
+    pot.position.set(i * 1.5, 3.1, -3.8);
+    scene.add(pot);
+  }
+
+  // Small pot on stove
+  const pot2 = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.3, 0.26, 0.4, 12),
+    new THREE.MeshLambertMaterial({ color: 0x445566 })
+  );
+  pot2.position.set(-1.5, 1.22, -2.5);
+  scene.add(pot2);
+
+  // Table in front
+  const table = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 0.8, 0.08, 16), mat(0xa07850));
+  table.position.set(2, 0.7, 0.5);
+  table.castShadow = true;
+  scene.add(table);
+  const tableLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.7, 8), mat(0x7a5830));
+  tableLeg.position.set(2, 0.35, 0.5);
+  scene.add(tableLeg);
+
+  // Plate on table (for success dish)
+  const plate = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.5, 0.5, 0.04, 20),
+    new THREE.MeshLambertMaterial({ color: 0xf0f0f0 })
+  );
+  plate.position.set(2, 0.75, 0.5);
+  scene.add(plate);
+}
+
+// Build the chef character from stacked primitives
+function buildChef() {
+  const chefGroup = new THREE.Group();
+
+  // Chef hat
+  const hatBrim = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.22, 0.22, 0.04, 12),
+    new THREE.MeshLambertMaterial({ color: 0xffffff })
+  );
+  hatBrim.position.set(0, 0.42, 0);
+
+  const hatTop = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.16, 0.16, 0.28, 12),
+    new THREE.MeshLambertMaterial({ color: 0xffffff })
+  );
+  hatTop.position.set(0, 0.57, 0);
+
+  // Head
+  const head = new THREE.Mesh(
+    new THREE.SphereGeometry(0.18, 10, 10),
+    new THREE.MeshLambertMaterial({ color: 0xf5cba7 })
+  );
+  head.position.set(0, 0.23, 0);
+
+  // Eyes
+  for (let ex of [-0.07, 0.07]) {
+    const eye = new THREE.Mesh(
+      new THREE.SphereGeometry(0.03, 6, 6),
+      new THREE.MeshLambertMaterial({ color: 0x222222 })
+    );
+    eye.position.set(ex, 0.27, 0.16);
+    chefGroup.add(eye);
+  }
+
+  // Body (chef coat)
+  const body = new THREE.Mesh(
+    new THREE.BoxGeometry(0.3, 0.38, 0.22),
+    new THREE.MeshLambertMaterial({ color: 0xfafafa })
+  );
+  body.position.set(0, -0.04, 0);
+
+  // Apron
+  const apron = new THREE.Mesh(
+    new THREE.BoxGeometry(0.22, 0.28, 0.12),
+    new THREE.MeshLambertMaterial({ color: 0x3498db })
+  );
+  apron.position.set(0, -0.04, 0.06);
+
+  // Arms
+  const armMat = new THREE.MeshLambertMaterial({ color: 0xfafafa });
+  const leftArm = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.3, 0.1), armMat);
+  leftArm.position.set(-0.2, -0.02, 0);
+  const rightArm = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.3, 0.1), armMat);
+  rightArm.position.set(0.2, -0.02, 0);
+  chef = { group: chefGroup, leftArm, rightArm, head };
+
+  // Pants
+  const pants = new THREE.Mesh(
+    new THREE.BoxGeometry(0.28, 0.22, 0.2),
+    new THREE.MeshLambertMaterial({ color: 0x2c3e50 })
+  );
+  pants.position.set(0, -0.28, 0);
+
+  // Legs
+  for (let lx of [-0.08, 0.08]) {
+    const leg = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.22, 0.12), new THREE.MeshLambertMaterial({ color: 0x2c3e50 }));
+    leg.position.set(lx, -0.47, 0);
+    chefGroup.add(leg);
+  }
+
+  chefGroup.add(hatBrim, hatTop, head, body, apron, leftArm, rightArm, pants);
+  chefGroup.position.set(0, 0.3, 0);
+  chefGroup.castShadow = true;
+  scene.add(chefGroup);
+}
+
+// Render loop
+let clock = new THREE.Clock();
+function startRenderLoop() {
+  function animate() {
+    animFrameId = requestAnimationFrame(animate);
+    const t = clock.getElapsedTime();
+
+    // Idle chef bob
+    if (chef && chefState.action === 'idle') {
+      chef.group.position.y = chefState.y + Math.sin(t * 1.8) * 0.015;
+      chef.leftArm.rotation.x = Math.sin(t * 1.8) * 0.08;
+      chef.rightArm.rotation.x = -Math.sin(t * 1.8) * 0.08;
+    }
+
+    // Walk animation
+    if (chefState.action === 'walk') {
+      const dx = chefState.targetX - chef.group.position.x;
+      if (Math.abs(dx) > 0.05) {
+        chef.group.position.x += dx * 0.07;
+        chef.leftArm.rotation.x = Math.sin(t * 8) * 0.4;
+        chef.rightArm.rotation.x = -Math.sin(t * 8) * 0.4;
+        chef.group.rotation.y = dx > 0 ? 0.3 : -0.3;
+      } else {
+        chef.group.position.x = chefState.targetX;
+        chefState.action = 'arrived';
+        chef.group.rotation.y = 0;
+      }
+    }
+
+    // Chop animation
+    if (chefState.action === 'chop') {
+      chef.rightArm.rotation.x = Math.sin(t * 10) * 0.6 - 0.3;
+    }
+
+    // Stir animation
+    if (chefState.action === 'stir') {
+      chef.rightArm.rotation.z = Math.sin(t * 6) * 0.5;
+      chef.rightArm.rotation.x = -0.5;
+    }
+
+    // Pan glow for heat
+    if (chefState.action === 'heat') {
+      pan.children[0].material.color.setHSL(0.0, 1.0, 0.15 + Math.sin(t * 4) * 0.05);
+    }
+
+    renderer.render(scene, camera);
+  }
+  animate();
+}
+
+function onResize() {
+  const container = document.getElementById('canvas-container');
+  camera.aspect = container.clientWidth / container.clientHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(container.clientWidth, container.clientHeight);
+}
+
+// =============================================
+// INGREDIENT VISUALS
+// =============================================
+function spawnIngredient(type) {
+  // Remove old if exists
+  if (ingredientMeshes[type]) {
+    scene.remove(ingredientMeshes[type]);
+  }
+
+  let mesh;
+  switch (type) {
+    case 'onion_pieces': {
+      const g = new THREE.Group();
+      for (let i = 0; i < 5; i++) {
+        const piece = new THREE.Mesh(
+          new THREE.BoxGeometry(0.1, 0.05, 0.1),
+          new THREE.MeshLambertMaterial({ color: 0xf5cba7 })
+        );
+        piece.position.set((Math.random() - 0.5) * 0.6, 0, (Math.random() - 0.5) * 0.4);
+        g.add(piece);
+      }
+      g.position.set(1.5, 1.09, -2.5);
+      mesh = g;
+      break;
+    }
+    case 'oil': {
+      mesh = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.15, 0.15, 0.04, 12),
+        new THREE.MeshLambertMaterial({ color: 0xffe066, transparent: true, opacity: 0.8 })
+      );
+      mesh.position.set(-2.5, 1.19, -2.5);
+      break;
+    }
+    case 'rice': {
+      const g = new THREE.Group();
+      for (let i = 0; i < 12; i++) {
+        const grain = new THREE.Mesh(
+          new THREE.SphereGeometry(0.035, 4, 4),
+          new THREE.MeshLambertMaterial({ color: 0xfff8dc })
+        );
+        grain.position.set((Math.random() - 0.5) * 0.5, 0, (Math.random() - 0.5) * 0.4);
+        g.add(grain);
+      }
+      g.position.set(-2.5, 1.19, -2.5);
+      mesh = g;
+      break;
+    }
+    case 'noodles': {
+      const g = new THREE.Group();
+      for (let i = 0; i < 8; i++) {
+        const noodle = new THREE.Mesh(
+          new THREE.TorusGeometry(0.1 + i * 0.02, 0.02, 4, 8),
+          new THREE.MeshLambertMaterial({ color: 0xffd700 })
+        );
+        noodle.position.set((Math.random()-0.5)*0.3, 0, (Math.random()-0.5)*0.3);
+        noodle.rotation.x = Math.PI/2;
+        g.add(noodle);
+      }
+      g.position.set(-2.5, 1.22, -2.5);
+      mesh = g;
+      break;
+    }
+    case 'dish': {
+      const g = new THREE.Group();
+      const dishBase = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.35, 0.35, 0.08, 16),
+        new THREE.MeshLambertMaterial({ color: currentLevel === 0 ? 0xd4a017 : currentLevel === 1 ? 0xe74c3c : 0xf5f0e0 })
+      );
+      dishBase.position.set(0, 0.06, 0);
+      g.add(dishBase);
+      // Steam particles
+      for (let i = 0; i < 3; i++) {
+        const steam = new THREE.Mesh(
+          new THREE.SphereGeometry(0.05, 6, 6),
+          new THREE.MeshLambertMaterial({ color: 0xffffff, transparent: true, opacity: 0.5 })
+        );
+        steam.position.set((i-1)*0.12, 0.18 + i*0.05, 0);
+        g.add(steam);
+      }
+      g.position.set(2, 0.76, 0.5);
+      mesh = g;
+      break;
+    }
+    default:
+      return;
+  }
+  mesh.castShadow = true;
+  scene.add(mesh);
+  ingredientMeshes[type] = mesh;
+}
+
+function clearIngredients() {
+  for (const key in ingredientMeshes) {
+    if (ingredientMeshes[key]) scene.remove(ingredientMeshes[key]);
+  }
+  ingredientMeshes = {};
+  // Reset pan color
+  if (pan) pan.children[0].material.color.set(0x222233);
+}
+
+// =============================================
+// CHEF ACTIONS (Promise-based, executed sequentially)
+// =============================================
+function chefWalkTo(targetX) {
+  return new Promise(resolve => {
+    chefState.targetX = targetX;
+    chefState.action = 'walk';
+    const check = setInterval(() => {
+      if (chefState.action === 'arrived') {
+        chefState.action = 'idle';
+        clearInterval(check);
+        resolve();
+      }
+    }, 50);
+  });
+}
+
+function chefAnimate(action, duration) {
+  return new Promise(resolve => {
+    chefState.action = action;
+    setTimeout(() => {
+      chefState.action = 'idle';
+      chef.rightArm.rotation.x = 0;
+      chef.rightArm.rotation.z = 0;
+      resolve();
+    }, duration);
+  });
+}
+
+function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// =============================================
+// SEQUENCE VALIDATION
+// =============================================
+function validateSequence(level, sequence) {
+  const rules = level.rules;
+  for (const rule of rules) {
+    const beforeIdx = sequence.indexOf(rule.before);
+    const afterIdx = sequence.indexOf(rule.after);
+    // Both must be present and before must come first
+    if (beforeIdx !== -1 && afterIdx !== -1 && beforeIdx >= afterIdx) {
+      return { valid: false, error: rule.error, badBlock: rule.after };
+    }
+  }
+  return { valid: true };
+}
+
+// =============================================
+// GAMEPLAY: RUN SEQUENCE
+// =============================================
+async function runSequence() {
+  const level = LEVELS[currentLevel];
+  const slots = document.querySelectorAll('#sequence-slots .block');
+  if (slots.length === 0) {
+    setStatus('// error: sequence is empty');
+    return;
+  }
+
+  const sequence = Array.from(slots).map(b => b.dataset.id);
+  const validation = validateSequence(level, sequence);
+
+  if (!validation.valid) {
+    showError(validation.error, validation.badBlock);
+    return;
+  }
+
+  // Lock UI
+  isRunning = true;
+  document.getElementById('run-btn').disabled = true;
+  setStatus('// executing...');
+
+  // Clear previous ingredients
+  clearIngredients();
+
+  // Execute each block
+  for (let i = 0; i < slots.length; i++) {
+    const blockEl = slots[i];
+    blockEl.classList.add('executing');
+    const blockId = blockEl.dataset.id;
+    await executeBlock(blockId, level);
+    blockEl.classList.remove('executing');
+    await wait(200);
+  }
+
+  // Success!
+  await wait(300);
+  spawnIngredient('dish');
+  await wait(400);
+  showSuccess();
+}
+
+// Execute a single block with chef animation + visual effect
+async function executeBlock(blockId, level) {
+  switch (blockId) {
+    case 'chop_onion':
+      await chefWalkTo(1.5);
+      await chefAnimate('chop', 900);
+      spawnIngredient('onion_pieces');
+      break;
+    case 'heat_pan':
+    case 'heat_broth':
+      await chefWalkTo(-2.5);
+      await chefAnimate('heat', 900);
+      pan.children[0].material.color.set(0xff6622);
+      break;
+    case 'add_oil':
+      await chefWalkTo(-2.5);
+      await chefAnimate('stir', 700);
+      spawnIngredient('oil');
+      break;
+    case 'add_onion':
+    case 'saute_onion':
+      await chefWalkTo(-2.5);
+      await chefAnimate('stir', 700);
+      break;
+    case 'add_rice':
+    case 'add_rice2':
+      await chefWalkTo(-2.5);
+      await chefAnimate('stir', 700);
+      spawnIngredient('rice');
+      break;
+    case 'stir_rice':
+    case 'toss_noodles':
+      await chefWalkTo(-2.5);
+      await chefAnimate('stir', 1000);
+      break;
+    case 'repeat_stir':
+      await chefWalkTo(-2.5);
+      for (let r = 0; r < 3; r++) {
+        await chefAnimate('stir', 500);
+        await wait(100);
+      }
+      break;
+    case 'boil_water':
+      await chefWalkTo(-1.5);
+      await chefAnimate('heat', 800);
+      pan.children[0].material.color.set(0x4488ff);
+      break;
+    case 'add_noodles':
+      await chefWalkTo(-2.5);
+      await chefAnimate('stir', 700);
+      spawnIngredient('noodles');
+      break;
+    case 'drain_water':
+      await chefWalkTo(-2.5);
+      await chefAnimate('chop', 700);
+      break;
+    case 'if_spicy':
+      await chefWalkTo(0);
+      await chefAnimate('stir', 600);
+      break;
+    case 'add_sauce':
+      await chefWalkTo(-2.5);
+      await chefAnimate('stir', 600);
+      break;
+    case 'add_wine':
+      await chefWalkTo(-2.5);
+      await chefAnimate('stir', 600);
+      break;
+    case 'add_cheese':
+      await chefWalkTo(-2.5);
+      await chefAnimate('stir', 700);
+      break;
+    default:
+      await chefWalkTo(0);
+      await wait(500);
+  }
+}
+
+// =============================================
+// ERROR / SUCCESS OVERLAYS
+// =============================================
+function showError(errorMsg, badBlockId) {
+  chefState.action = 'idle';
+  // Glitch the chef
+  if (chef) {
+    chef.group.position.x += (Math.random() - 0.5) * 0.2;
+    setTimeout(() => { if (chef) chef.group.position.x = chefState.targetX || 0; }, 500);
+  }
+
+  const overlay = document.getElementById('overlay');
+  const box = document.getElementById('overlay-box');
+  const title = document.getElementById('overlay-title');
+  const msg = document.getElementById('overlay-msg');
+  const errCode = document.getElementById('overlay-error-code');
+  const nextBtn = document.getElementById('next-btn');
+
+  box.className = 'error-box';
+  title.textContent = '✗ Runtime Error';
+  msg.textContent = 'The chef froze! Fix your sequence and try again.';
+  errCode.style.display = 'block';
+  errCode.textContent = errorMsg;
+  nextBtn.style.display = 'none';
+  overlay.classList.add('active');
+
+  isRunning = false;
+  document.getElementById('run-btn').disabled = false;
+  setStatus('// error: see overlay');
+}
+
+function showSuccess() {
+  const overlay = document.getElementById('overlay');
+  const box = document.getElementById('overlay-box');
+  const title = document.getElementById('overlay-title');
+  const msg = document.getElementById('overlay-msg');
+  const errCode = document.getElementById('overlay-error-code');
+  const nextBtn = document.getElementById('next-btn');
+
+  box.className = 'success-box';
+  title.textContent = '✓ Dish Served!';
+  msg.textContent = LEVELS[currentLevel].goal + ' completed successfully!';
+  errCode.style.display = 'none';
+  nextBtn.style.display = currentLevel < LEVELS.length - 1 ? 'inline-block' : 'none';
+  if (currentLevel >= LEVELS.length - 1) {
+    msg.textContent += '\n\n🎉 You completed all levels!';
+  }
+  overlay.classList.add('active');
+
+  spawnConfetti();
+  isRunning = false;
+  setStatus('// success!');
+
+  // Mark level done
+  document.getElementById(`dot-${currentLevel}`).classList.add('done');
+  document.getElementById(`dot-${currentLevel}`).classList.remove('active');
+}
+
+function nextLevel() {
+  document.getElementById('overlay').classList.remove('active');
+  currentLevel++;
+  if (currentLevel < LEVELS.length) {
+    loadLevel(currentLevel);
+  }
+}
+
+function spawnConfetti() {
+  const colors = ['#e2c77a', '#3fb950', '#79c0ff', '#ffa657', '#f78166'];
+  for (let i = 0; i < 40; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-particle';
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.top = '-20px';
+    el.style.background = colors[Math.floor(Math.random() * colors.length)];
+    el.style.animationDelay = Math.random() * 0.8 + 's';
+    el.style.transform = `rotate(${Math.random() * 360}deg)`;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2500);
+  }
+}
+
+// =============================================
+// DRAG AND DROP — Pointer Events API
+// =============================================
+let dragging = null;
+let dragClone = null;
+let dragOffsetX = 0, dragOffsetY = 0;
+let dragSourceList = null; // 'available' or 'sequence'
+let dragSourceIndex = null;
+
+function initDrag(el, sourceList, sourceIndex) {
+  el.addEventListener('pointerdown', (e) => {
+    if (isRunning) return;
+    e.preventDefault();
+    dragging = el;
+    dragSourceList = sourceList;
+    dragSourceIndex = sourceIndex;
+
+    const rect = el.getBoundingClientRect();
+    dragOffsetX = e.clientX - rect.left;
+    dragOffsetY = e.clientY - rect.top;
+
+    // Create a floating clone
+    dragClone = el.cloneNode(true);
+    dragClone.style.position = 'fixed';
+    dragClone.style.width = rect.width + 'px';
+    dragClone.style.zIndex = '999';
+    dragClone.style.opacity = '0.85';
+    dragClone.style.pointerEvents = 'none';
+    dragClone.style.left = (e.clientX - dragOffsetX) + 'px';
+    dragClone.style.top = (e.clientY - dragOffsetY) + 'px';
+    dragClone.style.transform = 'scale(1.04)';
+    document.body.appendChild(dragClone);
+
+    el.classList.add('dragging');
+  });
+}
+
+document.addEventListener('pointermove', (e) => {
+  if (!dragClone) return;
+  dragClone.style.left = (e.clientX - dragOffsetX) + 'px';
+  dragClone.style.top = (e.clientY - dragOffsetY) + 'px';
+});
+
+document.addEventListener('pointerup', (e) => {
+  if (!dragging || !dragClone) return;
+
+  dragging.classList.remove('dragging');
+  dragClone.remove();
+  dragClone = null;
+
+  // Determine drop target
+  const el = document.elementFromPoint(e.clientX, e.clientY);
+  const sequenceArea = document.getElementById('sequence-area');
+  const availableArea = document.getElementById('available-blocks');
+
+  if (sequenceArea && sequenceArea.contains(el)) {
+    // Drop onto sequence
+    if (dragSourceList === 'available') {
+      addToSequence(dragging.dataset.id);
+    }
+    // If already in sequence, could reorder — skip for simplicity
+  } else if (availableArea && availableArea.contains(el)) {
+    // Drop back to available — remove from sequence
+    if (dragSourceList === 'sequence') {
+      removeFromSequence(dragging.dataset.id);
+    }
+  }
+
+  dragging = null;
+  dragSourceList = null;
+});
+
+// =============================================
+// BLOCK MANAGEMENT
+// =============================================
+function addToSequence(blockId) {
+  const level = LEVELS[currentLevel];
+  const blockDef = level.blocks.find(b => b.id === blockId);
+  if (!blockDef) return;
+
+  const slots = document.getElementById('sequence-slots');
+  const hint = document.getElementById('drop-hint');
+  if (hint) hint.remove();
+
+  const el = createBlockEl(blockDef, 'sequence');
+  slots.appendChild(el);
+  setStatus(`// added: ${blockDef.label}(${blockDef.arg})`);
+}
+
+function removeFromSequence(blockId) {
+  const slots = document.querySelectorAll('#sequence-slots .block');
+  slots.forEach(el => {
+    if (el.dataset.id === blockId) el.remove();
+  });
+  if (document.querySelectorAll('#sequence-slots .block').length === 0) {
+    const hint = document.createElement('div');
+    hint.id = 'drop-hint';
+    hint.textContent = '← drag blocks here';
+    document.getElementById('sequence-slots').appendChild(hint);
+  }
+}
+
+function createBlockEl(blockDef, listType) {
+  const el = document.createElement('div');
+  el.className = `block${blockDef.type === 'conditional' ? ' conditional' : blockDef.type === 'loop' ? ' loop-block' : ''}`;
+  el.dataset.id = blockDef.id;
+
+  el.innerHTML = `<span class="fn-name">${blockDef.label}</span><span class="fn-paren">(</span><span class="fn-arg">${blockDef.arg}</span><span class="fn-paren">)</span>`;
+
+  if (listType === 'sequence') {
+    el.classList.add('in-sequence');
+    const rm = document.createElement('span');
+    rm.className = 'remove-btn';
+    rm.textContent = '×';
+    rm.addEventListener('pointerdown', (e) => {
+      e.stopPropagation();
+      el.remove();
+      if (document.querySelectorAll('#sequence-slots .block').length === 0) {
+        const hint = document.createElement('div');
+        hint.id = 'drop-hint';
+        hint.textContent = '← drag blocks here';
+        document.getElementById('sequence-slots').appendChild(hint);
+      }
+    });
+    el.appendChild(rm);
+  }
+
+  initDrag(el, listType, null);
+  return el;
+}
+
+// =============================================
+// LEVEL LOADING
+// =============================================
+function loadLevel(idx) {
+  currentLevel = idx;
+  const level = LEVELS[idx];
+
+  // Update UI
+  document.getElementById('level-name').textContent = level.name;
+
+  // Update progress dots
+  for (let i = 0; i < LEVELS.length; i++) {
+    const dot = document.getElementById(`dot-${i}`);
+    dot.classList.remove('active', 'done');
+    if (i < idx) dot.classList.add('done');
+    else if (i === idx) dot.classList.add('active');
+  }
+
+  // Clear available blocks
+  const avail = document.getElementById('available-blocks');
+  avail.innerHTML = '<div id="available-label">// AVAILABLE</div>';
+
+  // Render available blocks (shuffled)
+  const shuffled = [...level.blocks].sort(() => Math.random() - 0.5);
+  shuffled.forEach(blockDef => {
+    avail.appendChild(createBlockEl(blockDef, 'available'));
+  });
+
+  // Clear sequence
+  const slots = document.getElementById('sequence-slots');
+  slots.innerHTML = '<div id="drop-hint">← drag blocks here</div>';
+
+  // Reset chef
+  if (chef) {
+    chef.group.position.set(0, chefState.y, 0);
+    chef.group.rotation.y = 0;
+    chefState.action = 'idle';
+    chefState.targetX = 0;
+  }
+
+  clearIngredients();
+  isRunning = false;
+  document.getElementById('run-btn').disabled = false;
+  setStatus('// ready — ' + level.description);
+  document.getElementById('overlay').classList.remove('active');
+}
+
+function resetLevel() {
+  document.getElementById('overlay').classList.remove('active');
+  loadLevel(currentLevel);
+}
+
+function setStatus(msg) {
+  document.getElementById('status-text').textContent = msg;
+}
+
+// =============================================
+// INIT
+// =============================================
+window.addEventListener('load', () => {
+  initScene();
+  loadLevel(0);
+});
+
+window.addEventListener('resize', () => {
+  onResize();
+});
+
+// Prevent default touch scroll on canvas
+document.getElementById('game-canvas').addEventListener('touchstart', e => e.preventDefault(), { passive: false });
 </script>
 </body>
 </html>
